@@ -78,13 +78,22 @@ LiquidLevel.bytesize = 8
 Error = 0
 T_sleep = 0.6 #sleep time
 
+# Flags for port status
+compstat = 1
+topstat = 1
+botstat = 1
+LLstat = 1
+
 def loop():
     global Compressor,Gauge1,Gauge2,flg,Error,V1,V2
  
     #Compressor: /dev/ttyUSB2
 #    print (cbCompressor.get())
-    Compressor = serial.Serial(compresspath)
-#    Compressor.port = cbCompressor.get()
+    try:
+        Compressor = serial.Serial(compresspath)
+    except serial.SerialException or serial.serialutil.SerialException:
+        compstat = 0 
+# Compressor.port = cbCompressor.get()
 #    Compressor.baudrate = 9600
 #    Compressor.parity = 'N'
 #    Compressor.stopbits = 1
@@ -93,7 +102,10 @@ def loop():
 
     #Pressure Gauge1: /dev/ttyUSB0
 #    print (cbPG1.get())
-    Gauge1 = serial.Serial(toppath)
+    try:
+       Gauge1 = serial.Serial(toppath)
+    except serial.SerialException or serial.serialutil.SerialException:
+        topstat = 0
 #    Gauge1.port = cbPG1.get()
 #    Gauge1.baudrate = 9600
 #    Gauge1.parity = 'N'
@@ -104,7 +116,10 @@ def loop():
     #Pressure Gauge2: /dev/ttyUSB1
 #    print (cbPG2.get())
     # This is the bottom pressure gauge
-    Gauge2 = serial.Serial(botpath)
+    try:
+        Gauge2 = serial.Serial(botpath)
+    except serial.SerialException or serial.serialutil.SerialException:
+        botstat = 0
 #    Gauge2.port = cbPG2.get() 
 #    Gauge2.baudrate = 9600
 #    Gauge2.parity = 'N'
@@ -113,7 +128,10 @@ def loop():
 #    Gauge2.timeout = T_sleep
 
     #Liquid Level Sensor: /dev/ttyACM0 # Now permanently at /dev/arduino. - Robin
-    LiquidLevel = serial.Serial(ardpath)
+    try:
+        LiquidLevel = serial.Serial(ardpath)
+    except serial.SerialException or serial.serialutil.SerialException:
+        LLstat = 0
 
     print('start the program')
     while True:
@@ -122,51 +140,51 @@ def loop():
             flg = True
             break
         else:
-            # Compressor temperature
-            Compressor.write(b'$TEAA4B9\r')
-            time.sleep(T_sleep)
-            CompressorOut = Compressor.read(Compressor.inWaiting()).decode('utf8')
-            while not (len(CompressorOut) == 26):
-                print ('Compressor temperature readout error')
+            if compstat == 1:
+                # Compressor temperature
                 Compressor.write(b'$TEAA4B9\r')
                 time.sleep(T_sleep)
                 CompressorOut = Compressor.read(Compressor.inWaiting()).decode('utf8')
-            #$TEA,021,015,015,000,6F37
-            print (CompressorOut)
-#            print (len(CompressorOut))
-            T1_tmp = float(CompressorOut[6:8])
-            txtT1.delete(0,tkinter.END)
-            txtT1.insert(tkinter.END,T1_tmp)
-            T2_tmp = float(CompressorOut[10:12])
-            txtT2.delete(0,tkinter.END)
-            txtT2.insert(tkinter.END,T2_tmp)
-            T3_tmp = float(CompressorOut[14:16])
-            txtT3.delete(0,tkinter.END)
-            txtT3.insert(tkinter.END,T3_tmp)
-#            print (T1_tmp,T2_tmp,T3_tmp)
+                while not (len(CompressorOut) == 26):
+                    print ('Compressor temperature readout error')
+                    Compressor.write(b'$TEAA4B9\r')
+                    time.sleep(T_sleep)
+                    CompressorOut = Compressor.read(Compressor.inWaiting()).decode('utf8')
+                #$TEA,021,015,015,000,6F37
+                print (CompressorOut)
+    #            print (len(CompressorOut))
+                T1_tmp = float(CompressorOut[6:8])
+                txtT1.delete(0,tkinter.END)
+                txtT1.insert(tkinter.END,T1_tmp)
+                T2_tmp = float(CompressorOut[10:12])
+                txtT2.delete(0,tkinter.END)
+                txtT2.insert(tkinter.END,T2_tmp)
+                T3_tmp = float(CompressorOut[14:16])
+                txtT3.delete(0,tkinter.END)
+                txtT3.insert(tkinter.END,T3_tmp)
+    #            print (T1_tmp,T2_tmp,T3_tmp)
 
-            # Compressor status
-            Compressor.write(b'$STA3504\r')
-            time.sleep(T_sleep)
-            CompressorOut = Compressor.read(Compressor.inWaiting()).decode('utf8')
-            while not (len(CompressorOut) == 15):
-                print ('Compressor status readout error')
+                # Compressor status
                 Compressor.write(b'$STA3504\r')
                 time.sleep(T_sleep)
                 CompressorOut = Compressor.read(Compressor.inWaiting()).decode('utf8')
-            #$STA,0000,FAD0
-            print (CompressorOut)
-#            print (len(CompressorOut))
-            Status_tmp = CompressorOut[5:9]
-            if(Status_tmp == '0000' and Error == 0): Status = 'OFF'
-            elif(Status_tmp == '0301'and Error == 0): Status = 'OK'
-            else: 
-                Status = 'ERROR'
-                Error = 1 
-            txtStatus.delete(0,tkinter.END)
-            txtStatus.insert(tkinter.END,Status)
-#            print (Status_tmp)
-
+                while not (len(CompressorOut) == 15):
+                    print ('Compressor status readout error')
+                    Compressor.write(b'$STA3504\r')
+                    time.sleep(T_sleep)
+                    CompressorOut = Compressor.read(Compressor.inWaiting()).decode('utf8')
+                #$STA,0000,FAD0
+                print (CompressorOut)
+    #            print (len(CompressorOut))
+                Status_tmp = CompressorOut[5:9]
+                if(Status_tmp == '0000' and Error == 0): Status = 'OFF'
+                elif(Status_tmp == '0301'and Error == 0): Status = 'OK'
+                else: 
+                    Status = 'ERROR'
+                    Error = 1 
+                txtStatus.delete(0,tkinter.END)
+                txtStatus.insert(tkinter.END,Status)
+    #            print (Status_tmp)
             # Presusre gauge 1
             Gauge1.write(b'$@253PR3?;FF')
 #            Gauge.write(b'$@253PR4?;FF')
@@ -420,7 +438,7 @@ if __name__ == '__main__':
         lblCompressor=tk.Label(window,text='Compressor')
         lblCompressor.grid(row=2,column=2)
         entCompressor = tk.Entry(width=7, justify="right")
-        ent.insert(0, compresspath)
+        entCompressor.insert(0, compresspath)
         #cbCompressor = ttk.Combobox(window, values=devices, style="office.TCombobox", width=12)
         #cbCompressor.set('/dev/ttyUSB2')
         entCompressor.grid(row=2,column=3)
