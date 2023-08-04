@@ -2,6 +2,8 @@ from pyfirmata import Arduino, util
 from time import sleep
 import math
 
+# Hello this is a test comment
+
 # Changed the symlink for the port to arduino! No need to go guessing again. -Robin
 board = Arduino('/dev/arduino')
 
