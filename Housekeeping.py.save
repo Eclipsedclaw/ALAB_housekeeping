@@ -1,0 +1,301 @@
+import time
+import math
+
+import serial
+from serial.tools import list_ports
+
+import tkinter as tk
+import tkinter.scrolledtext
+from tkinter import ttk
+
+from matplotlib import pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
+
+import RPi.GPIO as GPIO
+
+# search serial port
+ser = serial.Serial()
+devices = [info.device for info in list_ports.comports()]
+print('available port: ')
+print(devices)
+
+#fig = plt.figure()
+fig = plt.figure(figsize=(9,4))
+#plt.rcParams["font.size"] = 14
+#plt.grid()
+ax1 = fig.add_subplot(1, 2, 1)
+ax2 = fig.add_subplot(1, 2, 2)
+plt.subplots_adjust(wspace=0.3)
+T1,T2,T3,P1,P2,X = [],[],[],[],[],[]
+start_time = time.perf_counter()
+
+Compressor = serial.Serial()
+Gauge1 = serial.Serial()
+Gauge2 = serial.Serial()
+
+def loop():
+    global Compressor
+    global Gauge1
+    global Gauge2
+    global flg
+    #Compressor: /dev/ttyUSB1
+    Compressor = serial.Serial(cbCompressor.get())
+    Compressor.baudrate = 9600
+    Compressor.parity = 'N'
+    Compressor.stopbits = 1
+    Compressor.bytesize = 8
+
+    #Pressure Gauge1: /dev/ttyUSB2
+    Gauge1 = serial.Serial(cbPG1.get())
+    Gauge1.baudrate = 9600
+    Gauge1.parity = 'N'
+    Gauge1.stopbits = 1
+    Gauge1.bytesize = 8
+
+    #Pressure Gauge2: /dev/ttyUSB0
+    Gauge2 = serial.Serial(cbPG2.get())
+    Gauge2.baudrate = 9600
+    Gauge2.parity = 'N'
+    Gauge2.stopbits = 1
+    Gauge2.bytesize = 8
+
+    print('start the program')
+    while True:
+        if flg == False:
+            print('stop the program')
+            flg = True
+            break
+        else:
+            #Presusre gauge
+            Gauge1.write(b'$@253PR3?;FF')
+#            Gauge.write(b'$@253PR4?;FF')
+            time.sleep(0.2)
+            Gauge2.write(b'$@253PR3?;FF')
+            time.sleep(0.2)
+            GaugeP1 = Gauge1.read(Gauge1.inWaiting()).decode('utf8')
+            GaugeP2 = Gauge2.read(Gauge2.inWaiting()).decode('utf8')
+            P1_tmp = GaugeP1[7:14]
+#            P1_tmp = GaugeOut[7:15]
+            P2_tmp = GaugeP2[7:14]
+            txtP1.delete(0.,tk.END)
+            txtP2.delete(0.,tk.END)
+            txtP1.insert('1.0',P1_tmp,"right")
+            txtP2.insert('1.0',P2_tmp,"right")
+            #Compressor
+            Compressor.write(b'$TEAA4B9\r')
+            time.sleep(0.2)
+            CompressorOut = Compressor.read(Compressor.inWaiting()).decode('utf8')
+            T1_tmp = CompressorOut[6:8]
+            T2_tmp = CompressorOut[10:12]
+            T3_tmp = CompressorOut[14:16]
+            txtT1.delete(0.,tk.END)
+            txtT2.delete(0.,tk.END)
+            txtT3.delete(0.,tk.END)
+            txtT1.insert('1.0',T1_tmp,"right")
+            txtT2.insert('1.0',T2_tmp,"right")
+            txtT3.insert('1.0',T3_tmp,"right")
+            Compressor.write(b'$STA3504\r')
+            time.sleep(0.2)
+            CompressorOut = Compressor.read(Compressor.inWaiting()).decode('utf8')
+            Status_tmp = CompressorOut[5:9]
+            if(Status_tmp == '0000'): Status = 'OFF'
+            elif(Status_tmp == '0301'): Status = 'OK'
+            else: Statu = 'ERROR' 
+            txtStatus.delete(0.,tk.END)
+            txtStatus.insert('1.0',Status,"right")
+#            print (T1_tmp,T2_tmp,T3_tmp)
+#            print (P1_tmp)
+#           print('Time : %.2f, Temperature : %.2f'%(time.perf_counter() - start_time,tempC))
+#           if len(X) > 10:
+#               del X[0]
+#               X_max = X[0] + 14
+#               del Y[0]
+#           else:
+#               X_max = 14
+#           plt.cla()
+            ax1.cla()
+            ax2.cla()
+            print(type(T3_tmp))
+            P1.append(float(P1_tmp))
+            P2.append(float(P2_tmp))
+            T1.append(str(float(T1_tmp)))
+            T2.append(str(float(T2_tmp)))
+            T3.append(str(float(T3_tmp)))
+            X.append(time.perf_counter() - start_time)
+
+            ax1.set_title("Temperature [deg]")
+            ax1.set_xlabel("Time [s]")
+            ax1.set_ylabel("Temperature [deg]")
+#            ax1.set_yscale('log')
+            ax1.plot(X,T1,label="T1")
+            ax1.plot(X,T2,label="T2")
+            ax1.plot(X,T3,label="T3")
+            ax1.legend()
+
+            ax2.plot(X,P1,label="P1")
+            ax2.plot(X,P2,label="P2")
+            ax2.set_title("Pressure [Torr]")
+            ax2.set_xlabel("Time [s]"            ax2.set_ylabel("Pressure [Torr]")
+            ax2.set_yscale('log')
+            ax2.legend()
+
+#           plt.ylim(0, 50)
+#           plt.xlim(X[0], X_max)
+#           plt.xlabel('Time [s]')
+#           plt.ylabel('Temperature [deg]')
+            canvas.draw()
+            window.update()
+#           plt.pause(1)
+
+def stop():
+    global flg
+    global Compressor
+    global Gauge1
+    global Gauge2
+    flg = False
+    Compressor.close()
+    Gauge1.close()
+    Gauge2.close()
+    window.destroy()
+
+if __name__ == '__main__':
+    flg = True
+    try:
+        window = tk.Tk()
+        window.geometry('900x600')
+        window.title('GRAMS Housekeeping')
+#        window.withdraw()
+#        window.protocol('WM_DELETE_WINDOW', destroy)  # When you close the tkinter window.       
+
+        #row 1
+        lblCompressor=tk.Label(window,text='Compressor')
+        lblCompressor.grid(row=1,column=0,columnspan=2)
+        cbCompressor = ttk.Combobox(window, values=devices, style="office.TCombobox")
+        cbCompressor.set('/dev/ttyUSB1')
+        cbCompressor.grid(row=1,column=2,columnspan=2)
+
+        lblPG1=tk.Label(window,text='Pressure Gauge 1')
+        lblPG1.grid(row=1,column=0,columnspan=2)
+        cbPG1 = ttk.Combobox(window, values=devices, style="office.TCombobox")
+        cbPG1.set('/dev/ttyUSB2')
+        cbPG1.grid(row=1,column=2,columnspan=2)
+
+        lblPG2=tk.Label(window,text='Pressure Gauge 2')
+        lblPG2.grid(row=1,column=4,columnspan=2)
+        cbPG2 = ttk.Combobox(window, values=devices, style="office.TCombobox")
+        cbPG2.set('/dev/ttyUSB0')
+        cbPG2.grid(row=1,column=6,columnspan=2)
+
+        btnStart = tkinter.Button(window, text='Start', command=loop)
+        btnStart.grid(row=1,column=8,padx=5)
+
+        btnStop = tkinter.Button(window, text='Stop', command=stop)
+        btnStop.grid(row=1,column=9,padx=5)
+
+        #row 2
+        lblCompressor=tk.Label(window,text='Compressor')
+        lblCompressor.grid(row=2,column=0,columnspan=2)
+        cbCompressor = ttk.Combobox(window, values=devices, style="office.TCombobox")
+        cbCompressor.set('/dev/ttyUSB1')
+        cbCompressor.grid(row=2,column=2,columnspan=2)
+
+        lblLS=tk.Label(window,text='Liquid Level Sensor')
+        lblLS.grid(row=2,column=4,columnspan=2)
+        cbLS = ttk.Combobox(window, values=devices, style="office.TCombobox")
+        cbLS.set('/dev/ttyACM0')
+        cbLS.grid(row=2,column=6,columnspan=2)
+
+        lblStatus=tk.Label(window,text='Status')
+        lblStatus.grid(row=2,column=8)
+        txtStatus=tkinter.Text(height=1,width=8)
+        txtStatus.grid(row=2,column=9)
+        txtStatus.tag_configure("center", justify='center')
+
+        #row 3
+        lblP1=tk.Label(window,text='P1 [torr]')
+        lblP1.grid(row=3,column=0)
+        txtP1=tkinter.Text(height=1,width=8)
+        txtP1.grid(row=3,column=1)
+        txtP1.tag_configure("right", justify='right')
+
+        lblP2=tk.Label(window,text='P2 [torr]')
+        lblP2.grid(row=3,column=2)
+        txtP2=tkinter.Text(height=1,width=8)
+        txtP2.grid(row=3,column=3)
+        txtP2.tag_configure("right", justify='right')
+
+        lblT1=tk.Label(window,text='T1 [deg]')
+        lblT1.grid(row=3,column=4)
+        txtT1=tkinter.Text(height=1,width=8)
+        txtT1.grid(row=3,column=5)
+        txtT1.tag_configure("right", justify='right')
+
+        lblT2=tk.Label(window,text='T2 [deg]')
+        lblT2.grid(row=3,column=6)
+        txtT2=tkinter.Text(height=1,width=8)
+        txtT2.grid(row=3,column=7)
+        txtT2.tag_configure("right", justify='right')
+
+        lblT3=tk.Label(window,text='T3 [deg]')
+        lblT3.grid(row=3,column=8)
+        txtT3=tkinter.Text(height=1,width=8)
+        txtT3.grid(row=3,column=9)
+        txtT3.tag_configure("right", justify='right')
+
+        #row 4
+        lblL1=tk.Label(window,text='L1 [deg]')
+        lblL1.grid(row=4,column=0)
+        txtL1=tkinter.Text(height=1,width=8)
+        txtL1.grid(row=4,column=1)
+        txtL1.tag_configure("right", justify='right')
+
+        lblL2=tk.Label(window,text='L2 [deg]')
+        lblL2.grid(row=4,column=2)
+        txtL2=tkinter.Text(height=1,width=8)
+        txtL2.grid(row=4,column=3)
+        txtL2.tag_configure("right", justify='right')
+
+        lblL3=tk.Label(window,text='L3 [deg]')
+        lblL3.grid(row=4,column=4)
+        txtL3=tkinter.Text(height=1,width=8)
+        txtL3.grid(row=4,column=5)
+        txtL3.tag_configure("right", justify='right')
+
+        lblL4=tk.Label(window,text='L4 [deg]')
+        lblL4.grid(row=4,column=6)
+        txtL4=tkinter.Text(height=1,width=8)
+        txtL4.grid(row=4,column=7)
+        txtL4.tag_configure("right", justify='right')
+
+        lblL5=tk.Label(window,text='L5 [deg]')
+        lblL5.grid(row=4,column=8)
+        txtL5=tkinter.Text(height=1,width=8)
+        txtL5.grid(row=4,column=9)
+        txtL5.tag_configure("right", justify='right')
+        
+        #row 5: figures
+        canvas = FigureCanvasTkAgg(fig,window)
+        canvas.get_tk_widget().grid(row=5,column=0,columnspan=10,pady=5)
+#        canvas.get_tk_widget().pack()
+#        toolbar=NavigationToolbar2Tk(canvas,window)
+        
+        #row 6: navigation toolbar
+        toolbarFrame = tk.Frame(master=window)
+        toolbarFrame.grid(row=6,column=0,columnspan=10)
+        toolbar = NavigationToolbar2Tk(canvas,toolbarFrame)
+
+        window.mainloop()
+
+    except KeyboardInterrupt:
+        stop()
+
+#def destroy():
+#    Compressor.close()
+
+#if __name__ == '__main__':
+#    print ('Program is starting ... ')
+#    #setup()
+#    try:
+#        loop()
+#    except KeyboardInterrupt:
+#        destroy()

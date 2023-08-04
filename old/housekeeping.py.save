@@ -1,0 +1,61 @@
+import time
+import math
+import serial
+from matplotlib import pyplot as plt
+
+plt.figure(figsize=(6,4))
+plt.rcParams["font.size"] = 14
+plt.grid()
+X, Y = [], []
+start_time = time.perf_counter()
+
+#Compressor: /dev/ttyUSB1
+Compressor = serial.Serial('/dev/ttyUSB1')
+Compressor.baudrate = 9600
+Compressor.parity = 'N'Compressor.stopbits = 1
+Compressor.bytesize = 8
+
+#Pressure Gauge: /dev/ttyUSB2
+Gauge = serial.Serial('/dev/ttyUSB2')
+Gauge.baudrate = 9600
+Gauge.parity = 'N'
+Gauge.stopbits = 1
+Gauge.bytesize = 8
+def loop():
+    while True:
+        Compressor.write(b'$TEAA4B9\r')
+        time.sleep(0.1)
+        Gauge.write(b'$@253PR4?;FF')
+        time.sleep(0.1)
+        while Compressor.inWaiting() > 0:
+            out = Compressor.read(Compressor.inWaiting()).decode('utf8')
+            print (out)
+        tempC = 25
+        print('Time : %.2f, Temperature : %.2f'%(time.perf_counter() - start_time,tempC))
+        if len(X) > 10:
+            del X[0]
+            X_max = X[0] + 14
+            del Y[0]
+        else:
+            X_max = 14
+        plt.cla()
+        Y.append(float(tempC))
+        X.append(time.perf_counter() - start_time)
+        plt.plot(X, Y)
+        plt.ylim(20, 30)
+        plt.xlim(X[0], X_max)
+        plt.xlabel('Time [s]')
+        plt.ylabel('Temperature [deg]')
+        plt.pause(1)
+
+def destroy():
+    Compressor.close()
+
+if __name__ == '__main__':
+    print ('Program is starting ... ')
+    #setup()
+    try:
+        loop()
+    except KeyboardInterrupt:
+        destroy()
+
