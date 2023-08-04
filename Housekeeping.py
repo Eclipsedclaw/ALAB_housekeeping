@@ -79,7 +79,8 @@ def loop():
  
     #Compressor: /dev/ttyUSB2
 #    print (cbCompressor.get())
-    Compressor = serial.Serial(cbCompressor.get())
+    compresspath = "/dev/compress"
+    Compressor = serial.Serial(compresspath)
 #    Compressor.port = cbCompressor.get()
 #    Compressor.baudrate = 9600
 #    Compressor.parity = 'N'
@@ -89,7 +90,8 @@ def loop():
 
     #Pressure Gauge1: /dev/ttyUSB0
 #    print (cbPG1.get())
-    Gauge1 = serial.Serial(cbPG1.get())
+    toppath = "/dev/toppress"
+    Gauge1 = serial.Serial(toppath)
 #    Gauge1.port = cbPG1.get()
 #    Gauge1.baudrate = 9600
 #    Gauge1.parity = 'N'
@@ -99,7 +101,9 @@ def loop():
 
     #Pressure Gauge2: /dev/ttyUSB1
 #    print (cbPG2.get())
-    Gauge2 = serial.Serial(cbPG2.get())
+    # This is the bottom pressure gauge
+    botpath = "/dev/botpress"
+    Gauge2 = serial.Serial(botpath)
 #    Gauge2.port = cbPG2.get() 
 #    Gauge2.baudrate = 9600
 #    Gauge2.parity = 'N'
@@ -107,8 +111,9 @@ def loop():
 #    Gauge2.bytesize = 8
 #    Gauge2.timeout = T_sleep
 
-    #Liquid Level Sensor: /dev/ttyACM0
-    LiquidLevel = serial.Serial(cbLL.get())
+    #Liquid Level Sensor: /dev/ttyACM0 # Now permanently at /dev/arduino. - Robin
+    ardpath = "/dev/arduino"
+    LiquidLevel = serial.Serial(ardpath)
 
     print('start the program')
     while True:
@@ -156,7 +161,7 @@ def loop():
             if(Status_tmp == '0000' and Error == 0): Status = 'OFF'
             elif(Status_tmp == '0301'and Error == 0): Status = 'OK'
             else: 
-                Statu = 'ERROR'
+                Status = 'ERROR'
                 Error = 1 
             txtStatus.delete(0,tkinter.END)
             txtStatus.insert(tkinter.END,Status)
@@ -371,17 +376,21 @@ if __name__ == '__main__':
 #        window.protocol('WM_DELETE_WINDOW', destroy)  # When you close the tkinter window.       
 
         #row 1
-        lblPG1=tk.Label(window,text='Pressure Gauge 1')
+        lblPG1=tk.Label(window,text='Pressure Gauge 1 (top)')
         lblPG1.grid(row=1,column=0,columnspan=1)
-        cbPG1 = ttk.Combobox(window, values=devices, style="office.TCombobox", width=12)
-        cbPG1.set('/dev/ttyUSB0')
-        cbPG1.grid(row=1,column=1,columnspan=1)
+        entPG1 = tk.Entry(width=7, justify="right")
+        entPG1.insert(0, toppath)
+       #cbPG1 = ttk.Combobox(window, values=devices, style="office.TCombobox", width=12)
+       #cbPG1.set('/dev/ttyUSB0')
+        entPG1.grid(row=1,column=1,columnspan=1)
 
-        lblPG2=tk.Label(window,text='Pressure Gauge 2')
+        lblPG2=tk.Label(window,text='Pressure Gauge 2 (bot)')
         lblPG2.grid(row=1,column=2,columnspan=1)
-        cbPG2 = ttk.Combobox(window, values=devices, style="office.TCombobox",width=12)
-        cbPG2.set('/dev/ttyUSB1')
-        cbPG2.grid(row=1,column=3,columnspan=1)
+        entPG2 = tk.Entry(width=7, justify="right")
+        entPG2.insert(0, botpath)
+       #cbPG2 = ttk.Combobox(window, values=devices, style="office.TCombobox",width=12)
+       #cbPG2.set('/dev/ttyUSB1')
+        entPG2.grid(row=1,column=3,columnspan=1)
 
         lblP1=tk.Label(window,text='P1 [torr]')
         lblP1.grid(row=1,column=4)
@@ -402,15 +411,19 @@ if __name__ == '__main__':
         #row 2
         lblLL=tk.Label(window,text='Liquid Level Sensor')
         lblLL.grid(row=2,column=0)
-        cbLL = ttk.Combobox(window, values=devices, style="office.TCombobox", width=12)
-        cbLL.set('/dev/ttyACM0')
-        cbLL.grid(row=2,column=1)
+        entLL = tk.Entry(width=7, justify="right")
+        entLL.insert(0, ardpath)
+        #cbLL = ttk.Combobox(window, values=devices, style="office.TCombobox", width=12)
+        #cbLL.set('/dev/ttyACM0')
+        entLL.grid(row=2,column=1)
 
         lblCompressor=tk.Label(window,text='Compressor')
         lblCompressor.grid(row=2,column=2)
-        cbCompressor = ttk.Combobox(window, values=devices, style="office.TCombobox", width=12)
-        cbCompressor.set('/dev/ttyUSB2')
-        cbCompressor.grid(row=2,column=3)
+        entCompressor = tk.Entry(width=7, justify="right")
+        ent.insert(0, compresspath)
+        #cbCompressor = ttk.Combobox(window, values=devices, style="office.TCombobox", width=12)
+        #cbCompressor.set('/dev/ttyUSB2')
+        entCompressor.grid(row=2,column=3)
 
         btnCompressorOn = tkinter.Button(window, text='On', command=CompressorOn)
         btnCompressorOn.grid(row=2,column=8,padx=5)
