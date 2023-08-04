@@ -48,24 +48,28 @@ L0,L1,L2,L3,L4,L5 = [],[],[],[],[],[]
 start_time = time.perf_counter()
 
 Compressor = serial.Serial()
+compresspath = "/dev/compress"
 Compressor.baudrate = 9600
 Compressor.parity = 'N'
 Compressor.stopbits = 1
 Compressor.bytesize = 8
 
 Gauge1 = serial.Serial()
+toppath = "/dev/toppress"
 Gauge1.baudrate = 9600
 Gauge1.parity = 'N'
 Gauge1.stopbits = 1
 Gauge1.bytesize = 8
 
 Gauge2 = serial.Serial()
+botpath = "/dev/botpress"
 Gauge2.baudrate = 9600
 Gauge2.parity = 'N'
 Gauge2.stopbits = 1
 Gauge2.bytesize = 8
 
 LiquidLevel = serial.Serial()
+ardpath = "/dev/arduino"
 LiquidLevel.baudrate = 9600
 LiquidLevel.parity = 'N'
 LiquidLevel.stopbits = 1
@@ -79,7 +83,6 @@ def loop():
  
     #Compressor: /dev/ttyUSB2
 #    print (cbCompressor.get())
-    compresspath = "/dev/compress"
     Compressor = serial.Serial(compresspath)
 #    Compressor.port = cbCompressor.get()
 #    Compressor.baudrate = 9600
@@ -90,7 +93,6 @@ def loop():
 
     #Pressure Gauge1: /dev/ttyUSB0
 #    print (cbPG1.get())
-    toppath = "/dev/toppress"
     Gauge1 = serial.Serial(toppath)
 #    Gauge1.port = cbPG1.get()
 #    Gauge1.baudrate = 9600
@@ -102,7 +104,6 @@ def loop():
     #Pressure Gauge2: /dev/ttyUSB1
 #    print (cbPG2.get())
     # This is the bottom pressure gauge
-    botpath = "/dev/botpress"
     Gauge2 = serial.Serial(botpath)
 #    Gauge2.port = cbPG2.get() 
 #    Gauge2.baudrate = 9600
@@ -112,7 +113,6 @@ def loop():
 #    Gauge2.timeout = T_sleep
 
     #Liquid Level Sensor: /dev/ttyACM0 # Now permanently at /dev/arduino. - Robin
-    ardpath = "/dev/arduino"
     LiquidLevel = serial.Serial(ardpath)
 
     print('start the program')
