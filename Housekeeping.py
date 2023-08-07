@@ -86,13 +86,13 @@ LLstat = 1
 
 def loop():
     global Compressor,Gauge1,Gauge2,flg,Error,V1,V2
- 
+    global compstat, topstat, botstat, LLstat
     #Compressor: /dev/ttyUSB2
 #    print (cbCompressor.get())
     try:
         Compressor = serial.Serial(compresspath)
     except serial.SerialException or serial.serialutil.SerialException:
-        compstat = 0 
+        compstat = 0
 # Compressor.port = cbCompressor.get()
 #    Compressor.baudrate = 9600
 #    Compressor.parity = 'N'

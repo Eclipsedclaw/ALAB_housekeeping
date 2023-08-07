@@ -3,7 +3,7 @@ import serial
 
 # configure the serial connections (the parameters differs on the device you are connecting to)
 ser = serial.Serial(
-    port='/dev/ttyUSB2',
+    port='/dev/compress',
     baudrate=9600,
     parity='N',
     stopbits=1,
