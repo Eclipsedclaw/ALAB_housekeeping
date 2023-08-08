@@ -12,7 +12,7 @@ print(devices)
 
 # configure the serial connections (the parameters differs on the device you are connecting to)
 ser = serial.Serial(
-    port='/dev/ttyUSB0',
+    port='/dev/botpress',
     baudrate=9600,
     parity='N',
     stopbits=1,

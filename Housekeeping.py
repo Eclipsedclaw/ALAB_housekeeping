@@ -93,6 +93,7 @@ def loop():
         Compressor = serial.Serial(compresspath)
     except serial.SerialException or serial.serialutil.SerialException:
         compstat = 0
+
 # Compressor.port = cbCompressor.get()
 #    Compressor.baudrate = 9600
 #    Compressor.parity = 'N'
@@ -133,6 +134,7 @@ def loop():
     except serial.SerialException or serial.serialutil.SerialException:
         LLstat = 0
 
+    print(topstat, botstat, compstat, LLstat)
     print('start the program')
     while True:
         if flg == False:
@@ -184,127 +186,138 @@ def loop():
                     Error = 1 
                 txtStatus.delete(0,tkinter.END)
                 txtStatus.insert(tkinter.END,Status)
+            elif compstat == 0:
+                print("Compressor port not found/open")
     #            print (Status_tmp)
-            # Presusre gauge 1
-            Gauge1.write(b'$@253PR3?;FF')
-#            Gauge.write(b'$@253PR4?;FF')
-            time.sleep(T_sleep)
-            GaugeP1 = Gauge1.read(Gauge1.inWaiting()).decode('utf8')
-            while not (len(GaugeP1) == 17):
-                print ('Pressure gauge (P1) readout error')
-                Gauge1.write(b'$@253PR3?;FF')
+            if topstat == 1:
+                # Presusre gauge 1
+                Gauge1.write(('$@253PR3?;FF').encode('utf8'))
+#               Gauge.write(b'$@253PR4?;FF')
                 time.sleep(T_sleep)
                 GaugeP1 = Gauge1.read(Gauge1.inWaiting()).decode('utf8')
-            #@253ACK6.41E+2;FF
-            print (GaugeP1)
-#            print (len(GaugeP1))
-            P1_tmp = float(GaugeP1[7:14])
-#            P1_tmp = GaugeOut[7:15]
-            txtP1.delete(0,tkinter.END)
-            txtP1.insert(tkinter.END,P1_tmp)
-#            print (P1_tmp)
+                while not (len(GaugeP1) == 17):
+                    print ('Pressure gauge (P1) readout error')
+                    Gauge1.write(('$@253PR3?;FF').encode('utf8'))
+                    time.sleep(T_sleep)
+                    GaugeP1 = Gauge1.read(Gauge1.inWaiting()).decode('utf8')
+                #@253ACK6.41E+2;FF
+                print (GaugeP1)
+    #            print (len(GaugeP1))
+                P1_tmp = float(GaugeP1[7:14])
+    #            P1_tmp = GaugeOut[7:15]
+                txtP1.delete(0,tkinter.END)
+                txtP1.insert(tkinter.END,P1_tmp)
+    #            print (P1_tmp)
+                Pmax = float(txtPmax.get())
+    #            print (Pmax)
+                if(P1_tmp > Pmax):
+                    if(V1 == 'closed'): 
+                        GPIO.output(V1Channel,GPIO.HIGH)
+                        V1 = 'open'
+                    else:
+                         if(V1 == 'open'): 
+                            GPIO.output(V1Channel,GPIO.LOW)
+                            V1 = 'closed'
+                    txtV1.delete(0,tkinter.END)
+                    txtV1.insert(tkinter.END,V1) 
+                # LN2 valve
+                Pmin = float(txtPmin.get())
+    #            print (Pmin)
+                if(P1_tmp < Pmin):
+                    if(V2 == 'closed'): 
+                        GPIO.output(V2Channel,GPIO.HIGH)
+                        V2 = 'open'
+                else:
+                     if(V2 == 'open'): 
+                        GPIO.output(V2Channel,GPIO.LOW)
+                        V2 = 'closed'
+                txtV2.delete(0,tkinter.END)
+                txtV2.insert(tkinter.END,V2)
 
-            # Presusre gauge 2
-            Gauge2.write(b'$@253PR3?;FF')
-            time.sleep(T_sleep)
-            GaugeP2 = Gauge2.read(Gauge2.inWaiting()).decode('utf8')
-            while not (len(GaugeP2) == 17):
-                print ('Pressure gauge (P2) readout error')
+            elif topstat == 0:
+                print("Top pressure gauge port not found/open")
+            if botstat == 1:
+                # Presusre gauge 2
                 Gauge2.write(b'$@253PR3?;FF')
                 time.sleep(T_sleep)
                 GaugeP2 = Gauge2.read(Gauge2.inWaiting()).decode('utf8')
-            #@253ACK1.37E-1;FF
-            print (GaugeP2)
-#            print (len(GaugeP2))
-            P2_tmp = float(GaugeP2[7:14])
-            txtP2.delete(0,tkinter.END)
-            txtP2.insert(tkinter.END,P2_tmp)
-#            print (P2_tmp)
+                while not (len(GaugeP2) == 17):
+                    print ('Pressure gauge (P2) readout error')
+                    Gauge2.write(b'$@253PR3?;FF')
+                    time.sleep(T_sleep)
+                    GaugeP2 = Gauge2.read(Gauge2.inWaiting()).decode('utf8')
+                #@253ACK1.37E-1;FF
+                print (GaugeP2)
+    #            print (len(GaugeP2))
+                P2_tmp = float(GaugeP2[7:14])
+                txtP2.delete(0,tkinter.END)
+                txtP2.insert(tkinter.END,P2_tmp)
+    #            print (P2_tmp)
+            elif botstat == 0:
+                print("Bottom pressure gauge port not found/open")
 
-            # Releae valve
-            Pmax = float(txtPmax.get())
-#            print (Pmax)
-            if(P1_tmp > Pmax):
-                if(V1 == 'closed'): 
-                    GPIO.output(V1Channel,GPIO.HIGH)
-                    V1 = 'open'
-            else:
-                 if(V1 == 'open'): 
-                    GPIO.output(V1Channel,GPIO.LOW)
-                    V1 = 'closed'
-            txtV1.delete(0,tkinter.END)
-            txtV1.insert(tkinter.END,V1) 
-            # LN2 valve
-            Pmin = float(txtPmin.get())
-#            print (Pmin)
-            if(P1_tmp < Pmin):
-                if(V2 == 'closed'): 
-                    GPIO.output(V2Channel,GPIO.HIGH)
-                    V2 = 'open'
-            else:
-                 if(V2 == 'open'): 
-                    GPIO.output(V2Channel,GPIO.LOW)
-                    V2 = 'closed'
-            txtV2.delete(0,tkinter.END)
-            txtV2.insert(tkinter.END,V2) 
-
-            # Liquid Level Sensor 
-#            LiquidLevel.write(b'R')
-#            time.sleep(T_sleep)
-#            LiquidLevelOut = LiquidLevel.read(LiquidLevel.inWaiting()).decode('utf8')
-            LiquidLevelOut = LiquidLevel.readline().decode('utf8')
-            while not (len(LiquidLevelOut) == 43):
-                print ('Liquid Level Sensor readout error')
+            if LLstat == 0:
+                print("Arduino port not found/open")
+            elif LLstat == 1:
+                # Liquid Level Sensor 
+    #            LiquidLevel.write(b'R')
+    #            time.sleep(T_sleep)
+    #            LiquidLevelOut = LiquidLevel.read(LiquidLevel.inWaiting()).decode('utf8')
                 LiquidLevelOut = LiquidLevel.readline().decode('utf8')
-            print(LiquidLevelOut[0:42])
-            #A0_540_A1_540_A2_540_A3_540_A4_540_A5_540\n
-            #L0
-            L_ADC = float(LiquidLevelOut[3:6])
-            L_V = float(L_ADC)*(5.0/1023.0)
-            L_R = L_V*1000./(5.0-L_V)
-            L0_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
-            L0_tmp = int(L0_tmp)
-            #L1
-            L_ADC = float(LiquidLevelOut[10:13])
-            L_V = float(L_ADC)*(5.0/1023.0)
-            L_R = L_V*1000./(5.0-L_V)
-            L1_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
-            L1_tmp = int(L1_tmp)
-            #L2
-            L_ADC = float(LiquidLevelOut[17:20])
-            L_V = float(L_ADC)*(5.0/1023.0)
-            L_R = L_V*1000./(5.0-L_V)
-            L2_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
-            L2_tmp = int(L2_tmp)
-            #L3
-            L_ADC = float(LiquidLevelOut[24:27])
-            L_V = float(L_ADC)*(5.0/1023.0)
-            L_R = L_V*1000./(5.0-L_V)
-            L3_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
-            L3_tmp = int(L3_tmp)
-            #L4
-            L_ADC = float(LiquidLevelOut[31:34])
-            L_V = float(L_ADC)*(5.0/1023.0)
-            L_R = L_V*1000./(5.0-L_V)
-            L4_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
-            L4_tmp = int(L4_tmp)
-            #L5
-            L_tmp = float(LiquidLevelOut[38:41])
-            L_V = float(L_ADC)*(5.0/1023.0)
-            L_R = L_V*1000./(5.0-L_V)
-            L5_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
-            L5_tmp = int(L5_tmp)
+                while not (len(LiquidLevelOut) == 43):
+                    print ('Liquid Level Sensor readout error')
+                    LiquidLevelOut = LiquidLevel.readline().decode('utf8')
+                print(LiquidLevelOut[0:42])
+                #A0_540_A1_540_A2_540_A3_540_A4_540_A5_540\n
+                #L0
+                L_ADC = float(LiquidLevelOut[3:6])
+                L_V = float(L_ADC)*(5.0/1023.0)
+                L_R = L_V*1000./(5.0-L_V)
+                L0_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
+                L0_tmp = int(L0_tmp)
+                #L1
+                L_ADC = float(LiquidLevelOut[10:13])
+                L_V = float(L_ADC)*(5.0/1023.0)
+                L_R = L_V*1000./(5.0-L_V)
+                L1_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
+                L1_tmp = int(L1_tmp)
+                #L2
+                L_ADC = float(LiquidLevelOut[17:20])
+                L_V = float(L_ADC)*(5.0/1023.0)
+                L_R = L_V*1000./(5.0-L_V)
+                L2_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
+                L2_tmp = int(L2_tmp)
+                #L3
+                L_ADC = float(LiquidLevelOut[24:27])
+                L_V = float(L_ADC)*(5.0/1023.0)
+                L_R = L_V*1000./(5.0-L_V)
+                L3_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
+                L3_tmp = int(L3_tmp)
+                #L4
+                L_ADC = float(LiquidLevelOut[31:34])
+                L_V = float(L_ADC)*(5.0/1023.0)
+                L_R = L_V*1000./(5.0-L_V)
+                L4_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
+                L4_tmp = int(L4_tmp)
+                #L5
+                L_tmp = float(LiquidLevelOut[38:41])
+                L_V = float(L_ADC)*(5.0/1023.0)
+                L_R = L_V*1000./(5.0-L_V)
+                L5_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
+                L5_tmp = int(L5_tmp)
 
-            txtL1.delete(0,tkinter.END)
-            txtL1.insert(tkinter.END,L1_tmp)
-            txtL2.delete(0,tkinter.END)
-            txtL2.insert(tkinter.END,L2_tmp)
-            txtL3.delete(0,tkinter.END)
-            txtL3.insert(tkinter.END,L3_tmp)
-            txtL4.delete(0,tkinter.END)
-            txtL4.insert(tkinter.END,L4_tmp)
-            txtL5.delete(0,tkinter.END)
-            txtL5.insert(tkinter.END,L5_tmp)
+                txtL0.delete(0, tkinter.END)
+                txtL0.insert(tkinter.END, L0_tmp)
+                txtL1.delete(0,tkinter.END)
+                txtL1.insert(tkinter.END,L1_tmp)
+                txtL2.delete(0,tkinter.END)
+                txtL2.insert(tkinter.END,L2_tmp)
+                txtL3.delete(0,tkinter.END)
+                txtL3.insert(tkinter.END,L3_tmp)
+                txtL4.delete(0,tkinter.END)
+                txtL4.insert(tkinter.END,L4_tmp)
+                txtL5.delete(0,tkinter.END)
+                txtL5.insert(tkinter.END,L5_tmp)
 
 #           print('Time : %.2f, Temperature : %.2f'%(time.perf_counter() - start_time,tempC))
 #           if len(X) > 10:
@@ -315,43 +328,44 @@ def loop():
 #               X_max = 14
 #           plt.cla()
 
-            ax1.cla()
-            ax2.cla()
+                ax1.cla()
+                ax2.cla()
 
-            T1.append(T1_tmp)
-            T2.append(T2_tmp)
-            T3.append(T3_tmp)
-            P1.append(P1_tmp)
-            P2.append(P2_tmp)
-            L0.append(L0_tmp)
-            L1.append(L1_tmp)
-            L2.append(L2_tmp)
-            L3.append(L3_tmp)
-            L4.append(L4_tmp)
-            L5.append(L5_tmp)
-            X.append(time.perf_counter() - start_time)
+                T1.append(T1_tmp)
+                T2.append(T2_tmp)
+                T3.append(T3_tmp)
+                P1.append(P1_tmp)
+                P2.append(P2_tmp)
+                L0.append(L0_tmp)
+                L1.append(L1_tmp)
+                L2.append(L2_tmp)
+                L3.append(L3_tmp)
+                L4.append(L4_tmp)
+                L5.append(L5_tmp)
+                X.append(time.perf_counter() - start_time)
 
-            ax1.plot(X,T1,label="T1")
-            ax1.plot(X,T2,label="T2")
-            ax1.plot(X,T3,label="T3")
-            ax1.plot(X,L1,label="L1")
-            ax1.plot(X,L2,label="L2")
-            ax1.plot(X,L3,label="L3")
-            ax1.plot(X,L4,label="L4")
-            ax1.plot(X,L5,label="L5")
-            ax1.legend()
+                ax1.plot(X,T1,label="T1")
+                ax1.plot(X,T2,label="T2")
+                ax1.plot(X,T3,label="T3")
+               #ax1.plot(X, L0, label="L0")
+                ax1.plot(X,L1,label="L1")
+                ax1.plot(X,L2,label="L2")
+                ax1.plot(X,L3,label="L3")
+                ax1.plot(X,L4,label="L4")
+                ax1.plot(X,L5,label="L5")
+                ax1.legend()
 
-            ax2.plot(X,P1,label="P1")
-            ax2.plot(X,P2,label="P2")
-            ax2.set_yscale('log')
-            ax2.legend()
+                ax2.plot(X,P1,label="P1")
+                ax2.plot(X,P2,label="P2")
+                ax2.set_yscale('log')
+                ax2.legend()
 
 #           plt.ylim(0, 50)
 #           plt.xlim(X[0], X_max)
 #           plt.xlabel('Time [s]')
 #           plt.ylabel('Temperature [deg]')
-            canvas.draw()
-            window.update()
+                canvas.draw()
+                window.update()
 #           plt.pause(1)
 
 def stop():
@@ -466,30 +480,35 @@ if __name__ == '__main__':
         txtT3.grid(row=3,column=9)
 
         #row 4
+
+        lblL0 = tk.Label(window, text="L0 [deg]")
+        lblL0.grid(row=4, column=0)
+        txtL0 = tkinter.Entry(width=7, justify="right")
+        txtL0.grid(row=4, column=1)
         lblL1=tk.Label(window,text='L1 [deg]')
-        lblL1.grid(row=4,column=0)
+        lblL1.grid(row=4,column=2)
         txtL1=tkinter.Entry(width=7,justify='right')
-        txtL1.grid(row=4,column=1)
+        txtL1.grid(row=4,column=3)
 
         lblL2=tk.Label(window,text='L2 [deg]')
-        lblL2.grid(row=4,column=2)
+        lblL2.grid(row=4,column=4)
         txtL2=tkinter.Entry(width=7,justify='right')
-        txtL2.grid(row=4,column=3)
+        txtL2.grid(row=4,column=5)
 
         lblL3=tk.Label(window,text='L3 [deg]')
-        lblL3.grid(row=4,column=4)
+        lblL3.grid(row=4,column=6)
         txtL3=tkinter.Entry(width=7,justify='right')
-        txtL3.grid(row=4,column=5)
+        txtL3.grid(row=4,column=7)
 
         lblL4=tk.Label(window,text='L4 [deg]')
-        lblL4.grid(row=4,column=6)
+        lblL4.grid(row=4,column=8)
         txtL4=tkinter.Entry(width=7,justify='right')
-        txtL4.grid(row=4,column=7)
+        txtL4.grid(row=4,column=9)
 
         lblL5=tk.Label(window,text='L5 [deg]')
-        lblL5.grid(row=4,column=8)
+        lblL5.grid(row=4,column=10)
         txtL5=tkinter.Entry(width=7,justify='right')
-        txtL5.grid(row=4,column=9)
+        txtL5.grid(row=4,column=11)
         
         #row 5
         lblPmax=tk.Label(window,text=u'Pmax [torr]')
