@@ -12,4 +12,6 @@ python ~/code/Housekeeping.py
   
 <img width="1025" alt="Screen Shot 2023-08-09 at 2 25 18 PM" src="https://github.com/Eclipsedclaw/ALAB_housekeeping/assets/59633001/efc87a70-adcd-4ccc-bf9b-917cb20f62b6">
 
-3. Once the "START" button is pressed, the program will start receiving responses from the various connected devices. You will be able to see the decoded responses in the Terminal window. These values should automatically start updating on the GUI as well. 
+3. Once the "START" button is pressed, the program will start receiving responses from the various connected devices. You will be able to see the decoded responses in the Terminal window. These values should automatically start updating on the GUI as well.
+
+4. Please do not press the "ON" and "OFF" buttons for now. These are intended to start and stop the compressor. Unless you want to start/stop the compressor, it's advised to not use these buttons.
