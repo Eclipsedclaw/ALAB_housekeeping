@@ -1,5 +1,6 @@
 import time
 import math
+from datetime import datetime
 
 import serial
 from serial.tools import list_ports
@@ -11,6 +12,7 @@ from tkinter import messagebox
 
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
+import pandas as pd
 
 import RPi.GPIO as GPIO
 
@@ -42,10 +44,12 @@ ax2.set_title("Pressure [Torr]")
 ax2.set_xlabel("Time [s]")
 ax2.set_ylabel("Pressure [Torr]")
 
+
 plt.subplots_adjust(wspace=0.3)
 T1,T2,T3,P1,P2,X = [],[],[],[],[],[]
 L0,L1,L2,L3,L4,L5 = [],[],[],[],[],[]
 start_time = time.perf_counter()
+now = datetime.now()
 
 Compressor = serial.Serial()
 compresspath = "/dev/compress"
@@ -157,13 +161,28 @@ def loop():
     #            print (len(CompressorOut))
                 T1_tmp = float(CompressorOut[6:8])
                 txtT1.delete(0,tkinter.END)
-                txtT1.insert(tkinter.END,T1_tmp)
+                if T1_tmp >= 90.0:
+                    txtT1.config(bg="#e05a5a", fg="black")
+                    txtT1.insert(tkinter.END,T1_tmp)
+                elif T1_tmp <= 89.9:
+                    txtT1.config(bg="#5ae084", fg = "black")
+                    txtT1.insert(tkinter.END, T1_tmp)
                 T2_tmp = float(CompressorOut[10:12])
                 txtT2.delete(0,tkinter.END)
-                txtT2.insert(tkinter.END,T2_tmp)
+                if T2_tmp >= 90.0:
+                    txtT2.config(bg="#e05a5a", fg="black")
+                    txtT2.insert(tkinter.END,T2_tmp)
+                elif T2_tmp <= 89.9:
+                    txtT2.config(bg="#5ae084", fg="black")
+                    txtT2.insert(tkinter.END, T2_tmp)
                 T3_tmp = float(CompressorOut[14:16])
                 txtT3.delete(0,tkinter.END)
-                txtT3.insert(tkinter.END,T3_tmp)
+                if T3_tmp >= 90.0:
+                    txtT3.config(bg="#e05a5a", fg="black")
+                    txtT3.insert(tkinter.END,T3_tmp)
+                elif T3_tmp <= 89.9:
+                    txtT3.config(bg="#5ae084", fg="black")
+                    txtT3.insert(tkinter.END,T3_tmp)
     #            print (T1_tmp,T2_tmp,T3_tmp)
 
                 # Compressor status
@@ -206,6 +225,7 @@ def loop():
                 P1_tmp = float(GaugeP1[7:14])
     #            P1_tmp = GaugeOut[7:15]
                 txtP1.delete(0,tkinter.END)
+              #  if P1_tmp >= 90.0:
                 txtP1.insert(tkinter.END,P1_tmp)
     #            print (P1_tmp)
                 Pmax = float(txtPmax.get())
@@ -344,16 +364,22 @@ def loop():
                 L5.append(L5_tmp)
                 X.append(time.perf_counter() - start_time)
 
-                ax1.plot(X,T1,label="T1")
-                ax1.plot(X,T2,label="T2")
-                ax1.plot(X,T3,label="T3")
-               #ax1.plot(X, L0, label="L0")
+               # Creating the pandas dataframe that will save the data and using to_csv to save it.
+                dict_to_save = {"Time":X, "Temp1":T1, "Temp2":T2, "Temp3":T3, "TopPress":P1, "BotPress":P2, "L0Temp":L0, "L1Temp":L1, "L2Temp":L2, "L3Temp":L3, "L4Temp":L4, "L5Temp":L5}
+                df_to_save = pd.DataFrame(dict_to_save)
+                #date_time = now.strftime("%d_%m_%Y %H_%M_%S")
+                save_file = df_to_save.to_csv(sep=",",path_or_buf="run1_10_Aug_23_noon.csv")
+                print("Saved file")
+               # ax1.plot(X,T1,label="T1")
+               # ax1.plot(X,T2,label="T2")
+               # ax1.plot(X,T3,label="T3")
+                ax1.plot(X, L0, label="L0")
                 ax1.plot(X,L1,label="L1")
                 ax1.plot(X,L2,label="L2")
                 ax1.plot(X,L3,label="L3")
                 ax1.plot(X,L4,label="L4")
                 ax1.plot(X,L5,label="L5")
-                ax1.legend()
+                ax1.legend(loc="lower left")
 
                 ax2.plot(X,P1,label="P1")
                 ax2.plot(X,P2,label="P2")
@@ -367,6 +393,7 @@ def loop():
                 canvas.draw()
                 window.update()
 #           plt.pause(1)
+                # add saving comment here
 
 def stop():
     global flg,Compressor,Gauge1,Gauge2
