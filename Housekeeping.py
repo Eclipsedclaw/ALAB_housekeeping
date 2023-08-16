@@ -207,7 +207,11 @@ def loop():
                 txtStatus.insert(tkinter.END,Status)
             elif compstat == 0:
                 print("Compressor port not found/open")
-    #            print (Status_tmp)
+                T1_tmp = None
+                T2_tmp = None
+                T3_tmp = None
+                Status_tmp = None
+#            print (Status_tmp)
             if topstat == 1:
                 # Presusre gauge 1
                 Gauge1.write(('$@253PR3?;FF').encode('utf8'))
@@ -256,6 +260,7 @@ def loop():
 
             elif topstat == 0:
                 print("Top pressure gauge port not found/open")
+                P1_tmp = None
             if botstat == 1:
                 # Presusre gauge 2
                 Gauge2.write(b'$@253PR3?;FF')
@@ -275,9 +280,15 @@ def loop():
     #            print (P2_tmp)
             elif botstat == 0:
                 print("Bottom pressure gauge port not found/open")
-
+                P2_tmp = None
             if LLstat == 0:
                 print("Arduino port not found/open")
+                L0_tmp = None
+                L1_tmp = None
+                L2_tmp = None
+                L3_tmp = None
+                L4_tmp = None
+                L5_tmp = None
             elif LLstat == 1:
                 # Liquid Level Sensor 
     #            LiquidLevel.write(b'R')
@@ -368,7 +379,7 @@ def loop():
                 dict_to_save = {"Time":X, "Temp1":T1, "Temp2":T2, "Temp3":T3, "TopPress":P1, "BotPress":P2, "L0Temp":L0, "L1Temp":L1, "L2Temp":L2, "L3Temp":L3, "L4Temp":L4, "L5Temp":L5}
                 df_to_save = pd.DataFrame(dict_to_save)
                 #date_time = now.strftime("%d_%m_%Y %H_%M_%S")
-                save_file = df_to_save.to_csv(sep=",",path_or_buf="run1_10_Aug_23_noon.csv")
+                save_file = df_to_save.to_csv(sep=",",path_or_buf="testonaug162023.csv")
                 print("Saved file")
                # ax1.plot(X,T1,label="T1")
                # ax1.plot(X,T2,label="T2")
