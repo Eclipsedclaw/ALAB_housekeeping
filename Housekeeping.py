@@ -331,7 +331,7 @@ def loop():
                 L4_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
                 L4_tmp = int(L4_tmp)
                 #L5
-                L_tmp = float(LiquidLevelOut[38:41])
+                L_ADC = float(LiquidLevelOut[38:41])
                 L_V = float(L_ADC)*(5.0/1023.0)
                 L_R = L_V*1000./(5.0-L_V)
                 L5_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
