@@ -36,9 +36,9 @@ fig = plt.figure(figsize=(9,4))
 #plt.rcParams["font.size"] = 14
 #plt.grid()
 ax1 = fig.add_subplot(1, 2, 1)
-ax1.set_title("Temperature [deg]")
+ax1.set_title("Temperature [K]")
 ax1.set_xlabel("Time [s]")
-ax1.set_ylabel("Temperature [deg]")
+ax1.set_ylabel("Temperature [K]")
 ax2 = fig.add_subplot(1, 2, 2)
 ax2.set_title("Pressure [Torr]")
 ax2.set_xlabel("Time [s]")
@@ -125,7 +125,7 @@ def loop():
         Gauge2 = serial.Serial(botpath)
     except serial.SerialException or serial.serialutil.SerialException:
         botstat = 0
-#    Gauge2.port = cbPG2.get() 
+#    Gauge2.port = cbPG2.get()
 #    Gauge2.baudrate = 9600
 #    Gauge2.parity = 'N'
 #    Gauge2.stopbits = 1
@@ -151,60 +151,71 @@ def loop():
                 Compressor.write(b'$TEAA4B9\r')
                 time.sleep(T_sleep)
                 CompressorOut = Compressor.read(Compressor.inWaiting()).decode('utf8')
-                while not (len(CompressorOut) == 26):
+                flag1 = 0
+                while (len(CompressorOut) != 26 and flag1 <= 3):
                     print ('Compressor temperature readout error')
                     Compressor.write(b'$TEAA4B9\r')
                     time.sleep(T_sleep)
                     CompressorOut = Compressor.read(Compressor.inWaiting()).decode('utf8')
+                    flag1 += 1
                 #$TEA,021,015,015,000,6F37
                 print (CompressorOut)
+                if len(CompressorOut) == 26:
     #            print (len(CompressorOut))
-                T1_tmp = float(CompressorOut[6:8])
-                txtT1.delete(0,tkinter.END)
-                if T1_tmp >= 90.0:
-                    txtT1.config(bg="#e05a5a", fg="black")
-                    txtT1.insert(tkinter.END,T1_tmp)
-                elif T1_tmp <= 89.9:
-                    txtT1.config(bg="#5ae084", fg = "black")
-                    txtT1.insert(tkinter.END, T1_tmp)
-                T2_tmp = float(CompressorOut[10:12])
-                txtT2.delete(0,tkinter.END)
-                if T2_tmp >= 90.0:
-                    txtT2.config(bg="#e05a5a", fg="black")
-                    txtT2.insert(tkinter.END,T2_tmp)
-                elif T2_tmp <= 89.9:
-                    txtT2.config(bg="#5ae084", fg="black")
-                    txtT2.insert(tkinter.END, T2_tmp)
-                T3_tmp = float(CompressorOut[14:16])
-                txtT3.delete(0,tkinter.END)
-                if T3_tmp >= 90.0:
-                    txtT3.config(bg="#e05a5a", fg="black")
-                    txtT3.insert(tkinter.END,T3_tmp)
-                elif T3_tmp <= 89.9:
-                    txtT3.config(bg="#5ae084", fg="black")
-                    txtT3.insert(tkinter.END,T3_tmp)
+                    T1_tmp = float(CompressorOut[6:8])
+                    txtT1.delete(0,tkinter.END)
+                    if T1_tmp >= 90.0:
+                        txtT1.config(bg="#e05a5a", fg="black")
+                        txtT1.insert(tkinter.END,T1_tmp)
+                    elif T1_tmp <= 89.9:
+                        txtT1.config(bg="#5ae084", fg = "black")
+                        txtT1.insert(tkinter.END, T1_tmp)
+                    T2_tmp = float(CompressorOut[10:12])
+                    txtT2.delete(0,tkinter.END)
+                    if T2_tmp >= 90.0:
+                        txtT2.config(bg="#e05a5a", fg="black")
+                        txtT2.insert(tkinter.END,T2_tmp)
+                    elif T2_tmp <= 89.9:
+                        txtT2.config(bg="#5ae084", fg="black")
+                        txtT2.insert(tkinter.END, T2_tmp)
+                    T3_tmp = float(CompressorOut[14:16])
+                    txtT3.delete(0,tkinter.END)
+                    if T3_tmp >= 90.0:
+                        txtT3.config(bg="#e05a5a", fg="black")
+                        txtT3.insert(tkinter.END,T3_tmp)
+                    elif T3_tmp <= 89.9:
+                        txtT3.config(bg="#5ae084", fg="black")
+                        txtT3.insert(tkinter.END,T3_tmp)
     #            print (T1_tmp,T2_tmp,T3_tmp)
-
+                elif len(CompressorOut) != 26:
+                    T1_tmp = None
+                    T2_tmp = None
+                    T3_tmp = None
                 # Compressor status
                 Compressor.write(b'$STA3504\r')
                 time.sleep(T_sleep)
                 CompressorOut = Compressor.read(Compressor.inWaiting()).decode('utf8')
-                while not (len(CompressorOut) == 15):
+                flag2 = 0
+                while (len(CompressorOut) != 15 and flag2 <= 3):
                     print ('Compressor status readout error')
                     Compressor.write(b'$STA3504\r')
                     time.sleep(T_sleep)
                     CompressorOut = Compressor.read(Compressor.inWaiting()).decode('utf8')
+                    flag2 += 1
                 #$STA,0000,FAD0
                 print (CompressorOut)
     #            print (len(CompressorOut))
-                Status_tmp = CompressorOut[5:9]
-                if(Status_tmp == '0000' and Error == 0): Status = 'OFF'
-                elif(Status_tmp == '0301'and Error == 0): Status = 'OK'
-                else: 
-                    Status = 'ERROR'
-                    Error = 1 
-                txtStatus.delete(0,tkinter.END)
-                txtStatus.insert(tkinter.END,Status)
+                if len(CompressorOut) == 15:
+                    Status_tmp = CompressorOut[5:9]
+                    if(Status_tmp == '0000' and Error == 0): Status = 'OFF'
+                    elif(Status_tmp == '0301'and Error == 0): Status = 'OK'
+                    else:
+                        Status = 'ERROR'
+                        Error = 1
+                    txtStatus.delete(0,tkinter.END)
+                    txtStatus.insert(tkinter.END,Status)
+                elif len(CompressorOut) != 15:
+                    Status_tmp = None
             elif compstat == 0:
                 print("Compressor port not found/open")
                 T1_tmp = None
@@ -218,45 +229,51 @@ def loop():
 #               Gauge.write(b'$@253PR4?;FF')
                 time.sleep(T_sleep)
                 GaugeP1 = Gauge1.read(Gauge1.inWaiting()).decode('utf8')
-                while not (len(GaugeP1) == 17):
+                flag3 = 0
+                while (len(GaugeP1) != 17 and flag3 <= 3):
                     print ('Pressure gauge (P1) readout error')
                     Gauge1.write(('$@253PR3?;FF').encode('utf8'))
                     time.sleep(T_sleep)
                     GaugeP1 = Gauge1.read(Gauge1.inWaiting()).decode('utf8')
+                    print(GaugeP1 + " ;len = " +str(len(GaugeP1)))
+                    flag3 += 1
                 #@253ACK6.41E+2;FF
                 print (GaugeP1)
+                if len(GaugeP1) == 17:
     #            print (len(GaugeP1))
-                P1_tmp = float(GaugeP1[7:14])
+                    P1_tmp = float(GaugeP1[7:14])
     #            P1_tmp = GaugeOut[7:15]
-                txtP1.delete(0,tkinter.END)
+                    txtP1.delete(0,tkinter.END)
               #  if P1_tmp >= 90.0:
-                txtP1.insert(tkinter.END,P1_tmp)
+                    txtP1.insert(tkinter.END,P1_tmp)
     #            print (P1_tmp)
-                Pmax = float(txtPmax.get())
+                    Pmax = float(txtPmax.get())
     #            print (Pmax)
-                if(P1_tmp > Pmax):
-                    if(V1 == 'closed'): 
-                        GPIO.output(V1Channel,GPIO.HIGH)
-                        V1 = 'open'
-                    else:
-                         if(V1 == 'open'): 
-                            GPIO.output(V1Channel,GPIO.LOW)
-                            V1 = 'closed'
-                    txtV1.delete(0,tkinter.END)
-                    txtV1.insert(tkinter.END,V1) 
+                    if(P1_tmp > Pmax):
+                        if(V1 == 'closed'):
+                            GPIO.output(V1Channel,GPIO.HIGH)
+                            V1 = 'open'
+                        else:
+                            if(V1 == 'open'):
+                                GPIO.output(V1Channel,GPIO.LOW)
+                                V1 = 'closed'
+                        txtV1.delete(0,tkinter.END)
+                        txtV1.insert(tkinter.END,V1)
                 # LN2 valve
-                Pmin = float(txtPmin.get())
+                    Pmin = float(txtPmin.get())
     #            print (Pmin)
-                if(P1_tmp < Pmin):
-                    if(V2 == 'closed'): 
-                        GPIO.output(V2Channel,GPIO.HIGH)
-                        V2 = 'open'
-                else:
-                     if(V2 == 'open'): 
-                        GPIO.output(V2Channel,GPIO.LOW)
-                        V2 = 'closed'
-                txtV2.delete(0,tkinter.END)
-                txtV2.insert(tkinter.END,V2)
+                    if(P1_tmp < Pmin):
+                        if(V2 == 'closed'):
+                            GPIO.output(V2Channel,GPIO.HIGH)
+                            V2 = 'open'
+                    else:
+                        if(V2 == 'open'):
+                            GPIO.output(V2Channel,GPIO.LOW)
+                            V2 = 'closed'
+                    txtV2.delete(0,tkinter.END)
+                    txtV2.insert(tkinter.END,V2)
+                elif len(GaugeP1) != 17:
+                    P1_tmp = None
 
             elif topstat == 0:
                 print("Top pressure gauge port not found/open")
@@ -266,17 +283,25 @@ def loop():
                 Gauge2.write(b'$@253PR3?;FF')
                 time.sleep(T_sleep)
                 GaugeP2 = Gauge2.read(Gauge2.inWaiting()).decode('utf8')
-                while not (len(GaugeP2) == 17):
+                flag4 = 0
+                while (len(GaugeP2) != 17 and flag4 <= 3):
                     print ('Pressure gauge (P2) readout error')
                     Gauge2.write(b'$@253PR3?;FF')
                     time.sleep(T_sleep)
-                    GaugeP2 = Gauge2.read(Gauge2.inWaiting()).decode('utf8')
+                    try:
+                        GaugeP2 = Gauge2.read(Gauge2.inWaiting()).decode('utf8')
+                    except UnicodeDecodeError or UnicodeError:
+                        pass
+                    flag4 += 1
                 #@253ACK1.37E-1;FF
                 print (GaugeP2)
     #            print (len(GaugeP2))
-                P2_tmp = float(GaugeP2[7:14])
-                txtP2.delete(0,tkinter.END)
-                txtP2.insert(tkinter.END,P2_tmp)
+                if len(GaugeP2) == 17:
+                    P2_tmp = float(GaugeP2[7:14])
+                    txtP2.delete(0,tkinter.END)
+                    txtP2.insert(tkinter.END,P2_tmp)
+                elif len(GaugeP2) != 17:
+                    P2_tmp = None
     #            print (P2_tmp)
             elif botstat == 0:
                 print("Bottom pressure gauge port not found/open")
@@ -290,68 +315,85 @@ def loop():
                 L4_tmp = None
                 L5_tmp = None
             elif LLstat == 1:
-                # Liquid Level Sensor 
+                # Liquid Level Sensor
     #            LiquidLevel.write(b'R')
     #            time.sleep(T_sleep)
     #            LiquidLevelOut = LiquidLevel.read(LiquidLevel.inWaiting()).decode('utf8')
                 LiquidLevelOut = LiquidLevel.readline().decode('utf8')
-                while not (len(LiquidLevelOut) == 43):
+                flag5 = 0
+                while (len(LiquidLevelOut) != 43 and flag5 <= 3):
                     print ('Liquid Level Sensor readout error')
                     LiquidLevelOut = LiquidLevel.readline().decode('utf8')
+                    flag5 += 1
                 print(LiquidLevelOut[0:42])
-                #A0_540_A1_540_A2_540_A3_540_A4_540_A5_540\n
-                #L0
-                L_ADC = float(LiquidLevelOut[3:6])
-                L_V = float(L_ADC)*(5.0/1023.0)
-                L_R = L_V*1000./(5.0-L_V)
-                L0_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
-                L0_tmp = int(L0_tmp)
-                #L1
-                L_ADC = float(LiquidLevelOut[10:13])
-                L_V = float(L_ADC)*(5.0/1023.0)
-                L_R = L_V*1000./(5.0-L_V)
-                L1_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
-                L1_tmp = int(L1_tmp)
-                #L2
-                L_ADC = float(LiquidLevelOut[17:20])
-                L_V = float(L_ADC)*(5.0/1023.0)
-                L_R = L_V*1000./(5.0-L_V)
-                L2_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
-                L2_tmp = int(L2_tmp)
-                #L3
-                L_ADC = float(LiquidLevelOut[24:27])
-                L_V = float(L_ADC)*(5.0/1023.0)
-                L_R = L_V*1000./(5.0-L_V)
-                L3_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
-                L3_tmp = int(L3_tmp)
-                #L4
-                L_ADC = float(LiquidLevelOut[31:34])
-                L_V = float(L_ADC)*(5.0/1023.0)
-                L_R = L_V*1000./(5.0-L_V)
-                L4_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
-                L4_tmp = int(L4_tmp)
-                #L5
-                L_ADC = float(LiquidLevelOut[38:41])
-                L_V = float(L_ADC)*(5.0/1023.0)
-                L_R = L_V*1000./(5.0-L_V)
-                L5_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
-                L5_tmp = int(L5_tmp)
+                if len(LiquidLevelOut) == 43:
+                    #A0_540_A1_540_A2_540_A3_540_A4_540_A5_540\n
+                    #L0
+                    L_ADC = float(LiquidLevelOut[3:6])
+                    L_V = float(L_ADC)*(5.0/1023.0)
+                    L_R = L_V*1000./(5.0-L_V)
+                    L0_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
+                    L0_tmp = int(L0_tmp)
+                    L0_tmpK = L0_tmp + 273.15
+                    #L1
+                    L_ADC = float(LiquidLevelOut[10:13])
+                    L_V = float(L_ADC)*(5.0/1023.0)
+                    L_R = L_V*1000./(5.0-L_V)
+                    L1_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
+                    L1_tmp = int(L1_tmp)
+                    L1_tmpK = L1_tmp + 273.15
+                    #L2
+                    L_ADC = float(LiquidLevelOut[17:20])
+                    L_V = float(L_ADC)*(5.0/1023.0)
+                    L_R = L_V*1000./(5.0-L_V)
+                    L2_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
+                    L2_tmp = int(L2_tmp)
+                    L2_tmpK = L2_tmp + 273.15
+                    #L3
+                    L_ADC = float(LiquidLevelOut[24:27])
+                    L_V = float(L_ADC)*(5.0/1023.0)
+                    L_R = L_V*1000./(5.0-L_V)
+                    L3_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
+                    L3_tmp = int(L3_tmp)
+                    L3_tmpK = L3_tmp + 273.15
+                    #L4
+                    L_ADC = float(LiquidLevelOut[31:34])
+                    L_V = float(L_ADC)*(5.0/1023.0)
+                    L_R = L_V*1000./(5.0-L_V)
+                    L4_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
+                    L4_tmp = int(L4_tmp)
+                    L4_tmpK = L4_tmp + 273.15
+                    #L5
+                    L_ADC = float(LiquidLevelOut[38:41])
+                    L_V = float(L_ADC)*(5.0/1023.0)
+                    L_R = L_V*1000./(5.0-L_V)
+                    L5_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
+                    L5_tmp = int(L5_tmp)
+                    L5_tmpK = L5_tmp + 273.15
+
+                elif len(LiquidLevelOut) != 43:
+                    L0_tmpK = None
+                    L1_tmpK = None
+                    L2_tmpK = None
+                    L3_tmpK = None
+                    L4_tmpK = None
+                    L5_tmpK = None
 
                 txtL0.delete(0, tkinter.END)
-                txtL0.insert(tkinter.END, L0_tmp)
+                txtL0.insert(tkinter.END, L0_tmpK)
                 txtL1.delete(0,tkinter.END)
-                txtL1.insert(tkinter.END,L1_tmp)
+                txtL1.insert(tkinter.END,L1_tmpK)
                 txtL2.delete(0,tkinter.END)
-                txtL2.insert(tkinter.END,L2_tmp)
+                txtL2.insert(tkinter.END,L2_tmpK)
                 txtL3.delete(0,tkinter.END)
-                txtL3.insert(tkinter.END,L3_tmp)
+                txtL3.insert(tkinter.END,L3_tmpK)
                 txtL4.delete(0,tkinter.END)
-                txtL4.insert(tkinter.END,L4_tmp)
+                txtL4.insert(tkinter.END,L4_tmpK)
                 txtL5.delete(0,tkinter.END)
-                txtL5.insert(tkinter.END,L5_tmp)
+                txtL5.insert(tkinter.END,L5_tmpK)
 
-#           print('Time : %.2f, Temperature : %.2f'%(time.perf_counter() - start_time,tempC))
-#           if len(X) > 10:
+#               print('Time : %.2f, Temperature : %.2f'%(time.perf_counter() - start_time,tempC))
+#               if len(X) > 10:
 #               del X[0]
 #               X_max = X[0] + 14
 #               del Y[0]
@@ -367,19 +409,19 @@ def loop():
                 T3.append(T3_tmp)
                 P1.append(P1_tmp)
                 P2.append(P2_tmp)
-                L0.append(L0_tmp)
-                L1.append(L1_tmp)
-                L2.append(L2_tmp)
-                L3.append(L3_tmp)
-                L4.append(L4_tmp)
-                L5.append(L5_tmp)
+                L0.append(L0_tmpK)
+                L1.append(L1_tmpK)
+                L2.append(L2_tmpK)
+                L3.append(L3_tmpK)
+                L4.append(L4_tmpK)
+                L5.append(L5_tmpK)
                 X.append(time.perf_counter() - start_time)
 
                # Creating the pandas dataframe that will save the data and using to_csv to save it.
                 dict_to_save = {"Time":X, "Temp1":T1, "Temp2":T2, "Temp3":T3, "TopPress":P1, "BotPress":P2, "L0Temp":L0, "L1Temp":L1, "L2Temp":L2, "L3Temp":L3, "L4Temp":L4, "L5Temp":L5}
                 df_to_save = pd.DataFrame(dict_to_save)
                 #date_time = now.strftime("%d_%m_%Y %H_%M_%S")
-                save_file = df_to_save.to_csv(sep=",",path_or_buf="testonaug162023.csv")
+                save_file = df_to_save.to_csv(sep=",",path_or_buf="testforbugs.csv")
                 print("Saved file")
                # ax1.plot(X,T1,label="T1")
                # ax1.plot(X,T2,label="T2")
@@ -519,35 +561,35 @@ if __name__ == '__main__':
 
         #row 4
 
-        lblL0 = tk.Label(window, text="L0 [deg]")
+        lblL0 = tk.Label(window, text="L0 [K]")
         lblL0.grid(row=4, column=0)
         txtL0 = tkinter.Entry(width=7, justify="right")
         txtL0.grid(row=4, column=1)
-        lblL1=tk.Label(window,text='L1 [deg]')
+        lblL1=tk.Label(window,text='L1 [K]')
         lblL1.grid(row=4,column=2)
         txtL1=tkinter.Entry(width=7,justify='right')
         txtL1.grid(row=4,column=3)
 
-        lblL2=tk.Label(window,text='L2 [deg]')
+        lblL2=tk.Label(window,text='L2 [K]')
         lblL2.grid(row=4,column=4)
         txtL2=tkinter.Entry(width=7,justify='right')
         txtL2.grid(row=4,column=5)
 
-        lblL3=tk.Label(window,text='L3 [deg]')
+        lblL3=tk.Label(window,text='L3 [K]')
         lblL3.grid(row=4,column=6)
         txtL3=tkinter.Entry(width=7,justify='right')
         txtL3.grid(row=4,column=7)
 
-        lblL4=tk.Label(window,text='L4 [deg]')
+        lblL4=tk.Label(window,text='L4 [K]')
         lblL4.grid(row=4,column=8)
         txtL4=tkinter.Entry(width=7,justify='right')
         txtL4.grid(row=4,column=9)
 
-        lblL5=tk.Label(window,text='L5 [deg]')
+        lblL5=tk.Label(window,text='L5 [K]')
         lblL5.grid(row=4,column=10)
         txtL5=tkinter.Entry(width=7,justify='right')
         txtL5.grid(row=4,column=11)
-        
+
         #row 5
         lblPmax=tk.Label(window,text=u'Pmax [torr]')
         lblPmax.grid(row=5,column=0)
@@ -559,7 +601,7 @@ if __name__ == '__main__':
         lblPmin.grid(row=5,column=2)
         txtPmin=tkinter.Entry(width=7,justify='right')
         txtPmin.grid(row=5,column=3)
-        txtPmin.insert(tkinter.END,'1') 
+        txtPmin.insert(tkinter.END,'1')
 
         lblV1=tk.Label(window,text='Vout (Pin-2)')
         lblV1.grid(row=5,column=4)
@@ -582,7 +624,7 @@ if __name__ == '__main__':
         canvas.get_tk_widget().grid(row=6,column=0,columnspan=10,pady=5)
 #        canvas.get_tk_widget().pack()
 #        toolbar=NavigationToolbar2Tk(canvas,window)
-        
+
         #row 7: navigation toolbar
         toolbarFrame = tk.Frame(master=window)
         toolbarFrame.grid(row=7,column=0,columnspan=10)
