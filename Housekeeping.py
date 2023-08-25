@@ -44,12 +44,18 @@ ax2.set_title("Pressure [Torr]")
 ax2.set_xlabel("Time [s]")
 ax2.set_ylabel("Pressure [Torr]")
 
+#File name
+start = datetime.now()
+date_time = start.strftime("%Y_%m_%d %H_%M_%S")
+format_str = date_time + ".csv"
 
+# Plot + array creation
 plt.subplots_adjust(wspace=0.3)
-T1,T2,T3,P1,P2,X = [],[],[],[],[],[]
+T1,T2,T3,P1,P2,X,LT = [],[],[],[],[],[],[]
 L0,L1,L2,L3,L4,L5 = [],[],[],[],[],[]
 start_time = time.perf_counter()
 now = datetime.now()
+
 
 Compressor = serial.Serial()
 compresspath = "/dev/compress"
@@ -64,6 +70,8 @@ Gauge1.baudrate = 9600
 Gauge1.parity = 'N'
 Gauge1.stopbits = 1
 Gauge1.bytesize = 8
+#Gauge1.write(('$@253AD?;FF').encode('utf8'))
+#Gauge1.write(('$@253AD!001;FF').encode('utf8'))
 
 Gauge2 = serial.Serial()
 botpath = "/dev/botpress"
@@ -71,6 +79,7 @@ Gauge2.baudrate = 9600
 Gauge2.parity = 'N'
 Gauge2.stopbits = 1
 Gauge2.bytesize = 8
+#Gauge2.write(('$@253AD!002;FF').encode('utf8'))
 
 LiquidLevel = serial.Serial()
 ardpath = "/dev/arduino"
@@ -223,22 +232,34 @@ def loop():
                 T3_tmp = None
                 Status_tmp = None
 #            print (Status_tmp)
+
+
             if topstat == 1:
-                # Presusre gauge 1
-                Gauge1.write(('$@253PR3?;FF').encode('utf8'))
-#               Gauge.write(b'$@253PR4?;FF')
-                time.sleep(T_sleep)
+                # Pressure gauge 1
+                #Gauge1.write(('$@003AD!001;FF').encode('utf8'))
+                Gauge1.write(('$@001AD?;FF').encode('utf8'))
+                time.sleep(5*T_sleep)
                 GaugeP1 = Gauge1.read(Gauge1.inWaiting()).decode('utf8')
+                print('Main Chamber Address:' + GaugeP1 )
+                
+                #Gauge1.write(('$@253AD!001;FF').encode('utf8'))
+                time.sleep(T_sleep)
+                Gauge1.write(('$@001PR3?;FF').encode('utf8'))
+                #Gauge1.write(('@253PR3?;FF').encode('utf8'))
+#               Gauge.write(b'$@253PR4?;FF')
+                time.sleep(2*T_sleep)
+                GaugeP1 = Gauge1.read(Gauge1.inWaiting()).decode('utf8')
+                print('Main Chamber:' + GaugeP1 + " ;len = " +str(len(GaugeP1)))
+                
                 flag3 = 0
                 while (len(GaugeP1) != 17 and flag3 <= 3):
                     print ('Pressure gauge (P1) readout error')
-                    Gauge1.write(('$@253PR3?;FF').encode('utf8'))
+                    Gauge1.write(('$@001PR3?;FF').encode('utf8'))
                     time.sleep(T_sleep)
                     GaugeP1 = Gauge1.read(Gauge1.inWaiting()).decode('utf8')
                     print(GaugeP1 + " ;len = " +str(len(GaugeP1)))
                     flag3 += 1
                 #@253ACK6.41E+2;FF
-                print (GaugeP1)
                 if len(GaugeP1) == 17:
     #            print (len(GaugeP1))
                     P1_tmp = float(GaugeP1[7:14])
@@ -274,15 +295,22 @@ def loop():
                     txtV2.insert(tkinter.END,V2)
                 elif len(GaugeP1) != 17:
                     P1_tmp = None
-
             elif topstat == 0:
                 print("Top pressure gauge port not found/open")
                 P1_tmp = None
+                
+                
             if botstat == 1:
                 # Presusre gauge 2
-                Gauge2.write(b'$@253PR3?;FF')
+                #Gauge2.write(('$@253AD!002;FF').encode('utf8'))
+                time.sleep(2*T_sleep)
+                Gauge2.write(('$@253PR3?;FF').encode('utf8'))
+            
                 time.sleep(T_sleep)
+                
                 GaugeP2 = Gauge2.read(Gauge2.inWaiting()).decode('utf8')
+                print('Jacket:' + GaugeP2 + " ;len = " +str(len(GaugeP2)))
+
                 flag4 = 0
                 while (len(GaugeP2) != 17 and flag4 <= 3):
                     print ('Pressure gauge (P2) readout error')
@@ -306,6 +334,7 @@ def loop():
             elif botstat == 0:
                 print("Bottom pressure gauge port not found/open")
                 P2_tmp = None
+                ###################### Thermometry ###############################
             if LLstat == 0:
                 print("Arduino port not found/open")
                 L0_tmp = None
@@ -416,12 +445,12 @@ def loop():
                 L4.append(L4_tmpK)
                 L5.append(L5_tmpK)
                 X.append(time.perf_counter() - start_time)
+                LT.append(time.time())
 
                # Creating the pandas dataframe that will save the data and using to_csv to save it.
-                dict_to_save = {"Time":X, "Temp1":T1, "Temp2":T2, "Temp3":T3, "TopPress":P1, "BotPress":P2, "L0Temp":L0, "L1Temp":L1, "L2Temp":L2, "L3Temp":L3, "L4Temp":L4, "L5Temp":L5}
+                dict_to_save = {"Time":X,"EpochTime":LT,"Temp1":T1, "Temp2":T2, "Temp3":T3, "TopPress":P1, "BotPress":P2, "L0Temp":L0, "L1Temp":L1, "L2Temp":L2, "L3Temp":L3, "L4Temp":L4, "L5Temp":L5}
                 df_to_save = pd.DataFrame(dict_to_save)
-                #date_time = now.strftime("%d_%m_%Y %H_%M_%S")
-                save_file = df_to_save.to_csv(sep=",",path_or_buf="testforbugs.csv")
+                save_file = df_to_save.to_csv(sep=",",path_or_buf=format_str)
                 print("Saved file")
                # ax1.plot(X,T1,label="T1")
                # ax1.plot(X,T2,label="T2")
