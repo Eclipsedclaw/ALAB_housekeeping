@@ -364,6 +364,7 @@ def loop():
                     L0_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
                     L0_tmp = int(L0_tmp)
                     L0_tmpK = L0_tmp + 273.15
+                    L0_correction = L0_tmpK - 8.05 # This is added because the displayed temp was 304.15 K when the room thermometer measured 296.10 K.
                     #L1
                     L_ADC = float(LiquidLevelOut[10:13])
                     L_V = float(L_ADC)*(5.0/1023.0)
@@ -371,6 +372,7 @@ def loop():
                     L1_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
                     L1_tmp = int(L1_tmp)
                     L1_tmpK = L1_tmp + 273.15
+                    L1_correction = L1_tmpK + 0 # No correction for now
                     #L2
                     L_ADC = float(LiquidLevelOut[17:20])
                     L_V = float(L_ADC)*(5.0/1023.0)
@@ -378,6 +380,7 @@ def loop():
                     L2_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
                     L2_tmp = int(L2_tmp)
                     L2_tmpK = L2_tmp + 273.15
+                    L2_correction = L2_tmpK + 0 # No correction for now
                     #L3
                     L_ADC = float(LiquidLevelOut[24:27])
                     L_V = float(L_ADC)*(5.0/1023.0)
@@ -385,6 +388,7 @@ def loop():
                     L3_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
                     L3_tmp = int(L3_tmp)
                     L3_tmpK = L3_tmp + 273.15
+                    L3_correction = L3_tmpK + 0 # No correction for now
                     #L4
                     L_ADC = float(LiquidLevelOut[31:34])
                     L_V = float(L_ADC)*(5.0/1023.0)
@@ -392,6 +396,7 @@ def loop():
                     L4_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
                     L4_tmp = int(L4_tmp)
                     L4_tmpK = L4_tmp + 273.15
+                    L4_correction = L4_tmpK - 28.05 # This is added because the displayed temp was 324.15 K when the room thermometer measured 296.10 K.
                     #L5
                     L_ADC = float(LiquidLevelOut[38:41])
                     L_V = float(L_ADC)*(5.0/1023.0)
@@ -399,6 +404,7 @@ def loop():
                     L5_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
                     L5_tmp = int(L5_tmp)
                     L5_tmpK = L5_tmp + 273.15
+                    L5_correction = L5_tmpK - 24.05 # This is added because the displayed temp was 320.15 K when the room temperature measured 296.10 K.
 
                 elif len(LiquidLevelOut) != 43:
                     L0_tmpK = None
@@ -409,17 +415,17 @@ def loop():
                     L5_tmpK = None
 
                 txtL0.delete(0, tkinter.END)
-                txtL0.insert(tkinter.END, L0_tmpK)
+                txtL0.insert(tkinter.END, L0_correction)
                 txtL1.delete(0,tkinter.END)
-                txtL1.insert(tkinter.END,L1_tmpK)
+                txtL1.insert(tkinter.END,L1_correction)
                 txtL2.delete(0,tkinter.END)
-                txtL2.insert(tkinter.END,L2_tmpK)
+                txtL2.insert(tkinter.END,L2_correction)
                 txtL3.delete(0,tkinter.END)
-                txtL3.insert(tkinter.END,L3_tmpK)
+                txtL3.insert(tkinter.END,L3_correction)
                 txtL4.delete(0,tkinter.END)
-                txtL4.insert(tkinter.END,L4_tmpK)
+                txtL4.insert(tkinter.END,L4_correction)
                 txtL5.delete(0,tkinter.END)
-                txtL5.insert(tkinter.END,L5_tmpK)
+                txtL5.insert(tkinter.END,L5_correction)
 
 #               print('Time : %.2f, Temperature : %.2f'%(time.perf_counter() - start_time,tempC))
 #               if len(X) > 10:
@@ -438,12 +444,12 @@ def loop():
                 T3.append(T3_tmp)
                 P1.append(P1_tmp)
                 P2.append(P2_tmp)
-                L0.append(L0_tmpK)
-                L1.append(L1_tmpK)
-                L2.append(L2_tmpK)
-                L3.append(L3_tmpK)
-                L4.append(L4_tmpK)
-                L5.append(L5_tmpK)
+                L0.append(L0_correction)
+                L1.append(L1_correction)
+                L2.append(L2_correction)
+                L3.append(L3_correction)
+                L4.append(L4_correction)
+                L5.append(L5_correction)
                 X.append(time.perf_counter() - start_time)
                 LT.append(time.time())
 
