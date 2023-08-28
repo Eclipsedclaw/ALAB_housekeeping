@@ -91,11 +91,26 @@ LiquidLevel.bytesize = 8
 Error = 0
 T_sleep = 0.6 #sleep time
 
+# Time start for showing live times for all sensors
+master_start = datetime.now()
+
 # Flags for port status
 compstat = 1
 topstat = 1
 botstat = 1
 LLstat = 1
+
+
+def format_time(timedelta_obj):
+    tot_sec = timedelta_obj.total_seconds()
+    days = tot_sec // 86400
+    sec_wo_days = tot_sec - (days*86400)
+    hours = sec_wo_days // 3600
+    sec_wo_hours = sec_wo_days - (hours*3600)
+    mins = sec_wo_hours // 60
+    sec_wo_mins = sec_wo_hours - (mins*60)
+    sec = sec_wo_mins
+    return("%d:%d:%d:%.2f" % (days, hours, mins, sec))
 
 def loop():
     global Compressor,Gauge1,Gauge2,flg,Error,V1,V2
@@ -170,6 +185,10 @@ def loop():
                 #$TEA,021,015,015,000,6F37
                 print (CompressorOut)
                 if len(CompressorOut) == 26:
+                    comp_time = datetime.now()
+                    comp_delta = comp_time - master_start
+                    entCompressor.delete(0, tkinter.END)
+                    entCompressor.insert(tkinter.END, format_time(comp_delta))
     #            print (len(CompressorOut))
                     T1_tmp = float(CompressorOut[6:8])
                     txtT1.delete(0,tkinter.END)
@@ -241,7 +260,7 @@ def loop():
                 time.sleep(5*T_sleep)
                 GaugeP1 = Gauge1.read(Gauge1.inWaiting()).decode('utf8')
                 print('Main Chamber Address:' + GaugeP1 )
-                
+
                 #Gauge1.write(('$@253AD!001;FF').encode('utf8'))
                 time.sleep(T_sleep)
                 Gauge1.write(('$@001PR3?;FF').encode('utf8'))
@@ -250,7 +269,7 @@ def loop():
                 time.sleep(2*T_sleep)
                 GaugeP1 = Gauge1.read(Gauge1.inWaiting()).decode('utf8')
                 print('Main Chamber:' + GaugeP1 + " ;len = " +str(len(GaugeP1)))
-                
+
                 flag3 = 0
                 while (len(GaugeP1) != 17 and flag3 <= 3):
                     print ('Pressure gauge (P1) readout error')
@@ -261,6 +280,10 @@ def loop():
                     flag3 += 1
                 #@253ACK6.41E+2;FF
                 if len(GaugeP1) == 17:
+                    top_time = datetime.now()
+                    top_delta = top_time - master_start
+                    entPG1.delete(0, tkinter.END)
+                    entPG1.insert(tkinter.END, format_time(top_delta))
     #            print (len(GaugeP1))
                     P1_tmp = float(GaugeP1[7:14])
     #            P1_tmp = GaugeOut[7:15]
@@ -298,16 +321,15 @@ def loop():
             elif topstat == 0:
                 print("Top pressure gauge port not found/open")
                 P1_tmp = None
-                
-                
+
             if botstat == 1:
                 # Presusre gauge 2
                 #Gauge2.write(('$@253AD!002;FF').encode('utf8'))
                 time.sleep(2*T_sleep)
                 Gauge2.write(('$@253PR3?;FF').encode('utf8'))
-            
+
                 time.sleep(T_sleep)
-                
+
                 GaugeP2 = Gauge2.read(Gauge2.inWaiting()).decode('utf8')
                 print('Jacket:' + GaugeP2 + " ;len = " +str(len(GaugeP2)))
 
@@ -325,6 +347,10 @@ def loop():
                 print (GaugeP2)
     #            print (len(GaugeP2))
                 if len(GaugeP2) == 17:
+                    bot_time = datetime.now()
+                    bot_delta = bot_time - master_start
+                    entPG2.delete(0, tkinter.END)
+                    entPG2.insert(tkinter.END, format_time(bot_delta))
                     P2_tmp = float(GaugeP2[7:14])
                     txtP2.delete(0,tkinter.END)
                     txtP2.insert(tkinter.END,P2_tmp)
@@ -358,6 +384,12 @@ def loop():
                 if len(LiquidLevelOut) == 43:
                     #A0_540_A1_540_A2_540_A3_540_A4_540_A5_540\n
                     #L0
+                    ard_time = datetime.now()
+                    ard_delta = ard_time - master_start
+                    entLL.delete(0, tkinter.END)
+                    entLL.insert(tkinter.END, format_time(ard_delta))
+
+                    # Reading the ADC values
                     L_ADC = float(LiquidLevelOut[3:6])
                     L_V = float(L_ADC)*(5.0/1023.0)
                     L_R = L_V*1000./(5.0-L_V)
@@ -520,13 +552,12 @@ if __name__ == '__main__':
         window.geometry('900x600')
         window.title('GRAMS Housekeeping')
 #        window.withdraw()
-#        window.protocol('WM_DELETE_WINDOW', destroy)  # When you close the tkinter window.       
-
+#        window.protocol('WM_DELETE_WINDOW', destroy)  # When you close the tkinter window.
         #row 1
         lblPG1=tk.Label(window,text='Pressure Gauge 1 (top)')
         lblPG1.grid(row=1,column=0,columnspan=1)
         entPG1 = tk.Entry(width=7, justify="right")
-        entPG1.insert(0, toppath)
+        #entPG1.insert(0, toppath)
        #cbPG1 = ttk.Combobox(window, values=devices, style="office.TCombobox", width=12)
        #cbPG1.set('/dev/ttyUSB0')
         entPG1.grid(row=1,column=1,columnspan=1)
@@ -534,7 +565,7 @@ if __name__ == '__main__':
         lblPG2=tk.Label(window,text='Pressure Gauge 2 (bot)')
         lblPG2.grid(row=1,column=2,columnspan=1)
         entPG2 = tk.Entry(width=7, justify="right")
-        entPG2.insert(0, botpath)
+        #entPG2.insert(0, botpath)
        #cbPG2 = ttk.Combobox(window, values=devices, style="office.TCombobox",width=12)
        #cbPG2.set('/dev/ttyUSB1')
         entPG2.grid(row=1,column=3,columnspan=1)
@@ -559,7 +590,7 @@ if __name__ == '__main__':
         lblLL=tk.Label(window,text='Liquid Level Sensor')
         lblLL.grid(row=2,column=0)
         entLL = tk.Entry(width=7, justify="right")
-        entLL.insert(0, ardpath)
+        #entLL.insert(0, ardpath)
         #cbLL = ttk.Combobox(window, values=devices, style="office.TCombobox", width=12)
         #cbLL.set('/dev/ttyACM0')
         entLL.grid(row=2,column=1)
@@ -567,7 +598,7 @@ if __name__ == '__main__':
         lblCompressor=tk.Label(window,text='Compressor')
         lblCompressor.grid(row=2,column=2)
         entCompressor = tk.Entry(width=7, justify="right")
-        entCompressor.insert(0, compresspath)
+        #entCompressor.insert(0, compresspath)
         #cbCompressor = ttk.Combobox(window, values=devices, style="office.TCombobox", width=12)
         #cbCompressor.set('/dev/ttyUSB2')
         entCompressor.grid(row=2,column=3)
