@@ -376,13 +376,13 @@ def loop():
     #            LiquidLevelOut = LiquidLevel.read(LiquidLevel.inWaiting()).decode('utf8')
                 LiquidLevelOut = LiquidLevel.readline().decode('utf8')
                 flag5 = 0
-                while (len(LiquidLevelOut) != 43 and flag5 <= 3):
+                while (len(LiquidLevelOut) != 49 and flag5 <= 3):
                     print ('Liquid Level Sensor readout error')
                     LiquidLevelOut = LiquidLevel.readline().decode('utf8')
                     flag5 += 1
-                print(LiquidLevelOut[0:42])
-                if len(LiquidLevelOut) == 43:
-                    #A0_540_A1_540_A2_540_A3_540_A4_540_A5_540\n
+                print(LiquidLevelOut[0:48])
+                if len(LiquidLevelOut) == 49:
+                    #A0_0540_A1_0540_A2_0540_A3_0540_A4_0540_A5_0540\n
                     #L0
                     ard_time = datetime.now()
                     ard_delta = ard_time - master_start
@@ -390,7 +390,7 @@ def loop():
                     entLL.insert(tkinter.END, format_time(ard_delta))
 
                     # Reading the ADC values
-                    L_ADC = float(LiquidLevelOut[3:6])
+                    L_ADC = float(LiquidLevelOut[3:7])
                     L_V = float(L_ADC)*(5.0/1023.0)
                     L_R = L_V*1000./(5.0-L_V)
                     L0_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
@@ -398,7 +398,7 @@ def loop():
                     L0_tmpK = L0_tmp + 273.15
                     L0_correction = L0_tmpK - 8.05 # This is added because the displayed temp was 304.15 K when the room thermometer measured 296.10 K.
                     #L1
-                    L_ADC = float(LiquidLevelOut[10:13])
+                    L_ADC = float(LiquidLevelOut[11:15])
                     L_V = float(L_ADC)*(5.0/1023.0)
                     L_R = L_V*1000./(5.0-L_V)
                     L1_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
@@ -406,7 +406,7 @@ def loop():
                     L1_tmpK = L1_tmp + 273.15
                     L1_correction = L1_tmpK + 0 # No correction for now
                     #L2
-                    L_ADC = float(LiquidLevelOut[17:20])
+                    L_ADC = float(LiquidLevelOut[19:23])
                     L_V = float(L_ADC)*(5.0/1023.0)
                     L_R = L_V*1000./(5.0-L_V)
                     L2_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
@@ -414,7 +414,7 @@ def loop():
                     L2_tmpK = L2_tmp + 273.15
                     L2_correction = L2_tmpK + 0 # No correction for now
                     #L3
-                    L_ADC = float(LiquidLevelOut[24:27])
+                    L_ADC = float(LiquidLevelOut[27:31])
                     L_V = float(L_ADC)*(5.0/1023.0)
                     L_R = L_V*1000./(5.0-L_V)
                     L3_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
@@ -422,7 +422,7 @@ def loop():
                     L3_tmpK = L3_tmp + 273.15
                     L3_correction = L3_tmpK + 0 # No correction for now
                     #L4
-                    L_ADC = float(LiquidLevelOut[31:34])
+                    L_ADC = float(LiquidLevelOut[35:39])
                     L_V = float(L_ADC)*(5.0/1023.0)
                     L_R = L_V*1000./(5.0-L_V)
                     L4_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
@@ -430,7 +430,7 @@ def loop():
                     L4_tmpK = L4_tmp + 273.15
                     L4_correction = L4_tmpK - 28.05 # This is added because the displayed temp was 324.15 K when the room thermometer measured 296.10 K.
                     #L5
-                    L_ADC = float(LiquidLevelOut[38:41])
+                    L_ADC = float(LiquidLevelOut[43:47])
                     L_V = float(L_ADC)*(5.0/1023.0)
                     L_R = L_V*1000./(5.0-L_V)
                     L5_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
