@@ -549,7 +549,7 @@ if __name__ == '__main__':
     flg = True
     try:
         window = tk.Tk()
-        window.geometry('900x600')
+        window.geometry('1010x600')
         window.title('GRAMS Housekeeping')
 #        window.withdraw()
 #        window.protocol('WM_DELETE_WINDOW', destroy)  # When you close the tkinter window.
