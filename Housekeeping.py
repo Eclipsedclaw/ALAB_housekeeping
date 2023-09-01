@@ -5,6 +5,9 @@ from datetime import datetime
 import serial
 from serial.tools import list_ports
 
+import smtplib as smt # For email stuff
+from email.message import EmailMessage # For email stuff
+
 import tkinter as tk
 import tkinter.scrolledtext
 from tkinter import ttk
@@ -94,12 +97,50 @@ T_sleep = 0.6 #sleep time
 # Time start for showing live times for all sensors
 master_start = datetime.now()
 
+# Time control for email notification
+timesince = 0
+toglow = 0 # if toglow = 1, an email will be sent once toppress < 1500.0. Then toglow will be set to 0 again.
+
 # Flags for port status
 compstat = 1
 topstat = 1
 botstat = 1
 LLstat = 1
 
+# Initializing email variables
+server = "smtp.gmail.com"
+port = 587
+gmail_username = "gramsuser@gmail.com"
+gmail_pass = "rydqzoykdkdelgke"
+
+# Defining a class for an email object.
+class Mailer:
+    def sendmail(self, toppress, flag):
+        to = ["suraj.a@northeastern.edu", "j.leyva@northeastern.edu", \
+              "zeng.jia@northeastern.edu", "t.aramaki@northeastern.edu", "n.poudyal@northeastern.edu"]
+
+        session = smt.SMTP(server, port)
+        session.ehlo()
+        session.starttls()
+        session.ehlo()
+
+        message_high = "ALERT: The pressure in the main chamber is %02f torr." % toppress
+        message_low = "NOTICE: The pressure is now %02f torr, which is below the threshold of 1500 torr." % toppress
+        msg = EmailMessage()
+
+        session.login(gmail_username, gmail_pass)
+        msg["From"] = "gramsuser@gmail.com"
+        msg["To"] = ",".join(to)
+
+        if flag = "H":
+            msg["Subject"] = "Pressure high alert"
+            msg.set_content(message_high)
+            session.sendmail(gmail_username, to, msg.as_string())
+        elif flag = "L":
+            msg["Subject"] = "Normal pressure level restored"
+            msg.set_content(message_low)
+            session.sendmail(gmail_username, to, msg.as_string())
+        session.quit()
 
 def format_time(timedelta_obj):
     tot_sec = timedelta_obj.total_seconds()
@@ -110,11 +151,12 @@ def format_time(timedelta_obj):
     mins = sec_wo_hours // 60
     sec_wo_mins = sec_wo_hours - (mins*60)
     sec = sec_wo_mins
-    return("%d:%d:%d:%.2f" % (days, hours, mins, sec))
+    return("%02d:%02d:%02d:%02d" % (days, hours, mins, sec))
 
 def loop():
     global Compressor,Gauge1,Gauge2,flg,Error,V1,V2
     global compstat, topstat, botstat, LLstat
+    global timesince, toglow
     #Compressor: /dev/ttyUSB2
 #    print (cbCompressor.get())
     try:
@@ -255,11 +297,12 @@ def loop():
 
             if topstat == 1:
                 # Pressure gauge 1
+#               This part is for querying the address of the sensor. Uncomment if you want to display that! 
                 #Gauge1.write(('$@003AD!001;FF').encode('utf8'))
-                Gauge1.write(('$@001AD?;FF').encode('utf8'))
-                time.sleep(5*T_sleep)
-                GaugeP1 = Gauge1.read(Gauge1.inWaiting()).decode('utf8')
-                print('Main Chamber Address:' + GaugeP1 )
+#                Gauge1.write(('$@001AD?;FF').encode('utf8'))
+#                time.sleep(5*T_sleep)
+#                GaugeP1 = Gauge1.read(Gauge1.inWaiting()).decode('utf8')
+#                print('Main Chamber Address:' + GaugeP1 )
 
                 #Gauge1.write(('$@253AD!001;FF').encode('utf8'))
                 time.sleep(T_sleep)
@@ -268,16 +311,20 @@ def loop():
 #               Gauge.write(b'$@253PR4?;FF')
                 time.sleep(2*T_sleep)
                 GaugeP1 = Gauge1.read(Gauge1.inWaiting()).decode('utf8')
-                print('Main Chamber:' + GaugeP1 + " ;len = " +str(len(GaugeP1)))
+#                print('Main Chamber:' + GaugeP1 + " ;len = " +str(len(GaugeP1)))
 
                 flag3 = 0
                 while (len(GaugeP1) != 17 and flag3 <= 3):
-                    print ('Pressure gauge (P1) readout error')
-                    Gauge1.write(('$@001PR3?;FF').encode('utf8'))
-                    time.sleep(T_sleep)
-                    GaugeP1 = Gauge1.read(Gauge1.inWaiting()).decode('utf8')
-                    print(GaugeP1 + " ;len = " +str(len(GaugeP1)))
-                    flag3 += 1
+                    try:
+                        print ('Pressure gauge (P1) readout error')
+                        Gauge1.write(('$@001PR3?;FF').encode('utf8'))
+                        time.sleep(T_sleep)
+                        GaugeP1 = Gauge1.read(Gauge1.inWaiting()).decode('utf8')
+ #                       print(GaugeP1 + " ;len = " +str(len(GaugeP1)))
+                        flag3 += 1
+                    except UnicodeDecodeError:
+                        print ("Event lost")
+                        pass
                 #@253ACK6.41E+2;FF
                 if len(GaugeP1) == 17:
                     top_time = datetime.now()
@@ -290,6 +337,18 @@ def loop():
                     txtP1.delete(0,tkinter.END)
               #  if P1_tmp >= 90.0:
                     txtP1.insert(tkinter.END,P1_tmp)
+                    # Email stuff start
+                    timenow = time.perf_counter()
+                    if (P1_tmp > 1500.0 and timenow - timesince > 3600.0):
+                        alert = Mailer()
+                        alert.sendmail(P1_tmp, "H")
+                        toglow = 1
+                        timesince = time.perf_counter()
+                    elif (P1_tmp < 1500.0 and toglow == 1):
+                        notice = Mailer()
+                        notice.sendmail(P1_tmp, "L")
+                        toglow = 0
+                    # Email stuff end
     #            print (P1_tmp)
                     Pmax = float(txtPmax.get())
     #            print (Pmax)
@@ -377,11 +436,13 @@ def loop():
                 LiquidLevelOut = LiquidLevel.readline().decode('utf8')
                 flag5 = 0
                 while (len(LiquidLevelOut) != 49 and flag5 <= 3):
+                    print (LiquidLevelOut)
                     print ('Liquid Level Sensor readout error')
                     LiquidLevelOut = LiquidLevel.readline().decode('utf8')
                     flag5 += 1
-                print(LiquidLevelOut[0:48])
+               # print(LiquidLevelOut[0:46])
                 if len(LiquidLevelOut) == 49:
+                    print (LiquidLevelOut)
                     #A0_0540_A1_0540_A2_0540_A3_0540_A4_0540_A5_0540\n
                     #L0
                     ard_time = datetime.now()
@@ -545,6 +606,61 @@ def CompressorOff():
         Compressor.write(b'$OFF9188\r')
         time.sleep(1)
 
+def popupwin():
+    popup = tk.Toplevel()
+    popup.title("Settings")
+    popup.geometry("300x250")
+
+    def changestat():
+        val = var.get()
+        if val == "CE":
+            compstat = 1
+        elif val == "CD":
+            compstat = 0
+        elif val == "TE":
+            topstat = 1
+        elif val == "TD":
+            topstat = 0
+        elif val == "BE":
+            botstat = 1
+        elif val == "BD":
+            botstat = 0
+        elif val == "LLE":
+            LLstat = 1
+        elif val == "LLD":
+            LLstat = 0
+        else:
+            raise Exception("Invalid value provided to function.")
+    
+    # Labels
+    sett1lbl = tk.Label(popup, text="Enable/Disable Devices", pady=10, padx=5).grid(row=0, column=0)
+    comp1lbl = tk.Label(popup, text="Compressor").grid(row=1, column=0)
+    top1lbl = tk.Label(popup, text="Top pressure gauge").grid(row=2, column=0)
+    bot1lbl = tk.Label(popup, text="Bottom pressure gauge").grid(row=3, column=0)
+    LL1lbl = tk.Label(popup, text="LL/Arduino").grid(row=4, column=0)
+    sett2lbl = tk.Label(popup, text="ON/OFF Settings", padx=5, pady=10).grid(row=5, column=0)
+    comp2lbl = tk.Label(popup, text="Compressor").grid(row=6, column=0)
+
+    # Buttons
+    componbtn = tk.Button(popup, text="ON", command=CompressorOn)
+    componbtn.grid(row=6, column=1)
+    compoffbtn = tk.Button(popup, text="OFF", command=CompressorOff)
+    compoffbtn.grid(row=6, column=2)
+    exitbtn = tk.Button(popup, text="Exit", command=popup.destroy)
+    exitbtn.grid(row=7, column=2)
+
+    # Radiobuttons
+    var = tk.StringVar()
+    compen = tk.Radiobutton(popup, text="Enable", variable=var, value="CE", command=changestat).grid(row=1,column=1)
+    compdis = tk.Radiobutton(popup, text="Disable", variable=var, value="CD", command=changestat).grid(row=1,column=2)
+    topen = tk.Radiobutton(popup, text="Enable", variable=var, value="TE", command=changestat).grid(row=2,column=1)
+    topdis = tk.Radiobutton(popup, text="Disable", variable=var, value="TD", command=changestat).grid(row=2,column=2)
+    boten = tk.Radiobutton(popup, text="Enable", variable=var, value="BE", command=changestat).grid(row=3,column=1)
+    botdis = tk.Radiobutton(popup, text="Disable", variable=var, value="BD", command=changestat).grid(row=3,column=2)
+    LLen = tk.Radiobutton(popup, text="Enable", variable=var, value="LLE", command=changestat).grid(row=4,column=1)
+    LLdis = tk.Radiobutton(popup, text="Disable", variable=var, value="LLD", command=changestat).grid(row=4,column=2)
+
+
 if __name__ == '__main__':
     flg = True
     try:
@@ -556,7 +672,7 @@ if __name__ == '__main__':
         #row 1
         lblPG1=tk.Label(window,text='Pressure Gauge 1 (top)')
         lblPG1.grid(row=1,column=0,columnspan=1)
-        entPG1 = tk.Entry(width=7, justify="right")
+        entPG1 = tk.Entry(width=10, justify="right")
         #entPG1.insert(0, toppath)
        #cbPG1 = ttk.Combobox(window, values=devices, style="office.TCombobox", width=12)
        #cbPG1.set('/dev/ttyUSB0')
@@ -564,7 +680,7 @@ if __name__ == '__main__':
 
         lblPG2=tk.Label(window,text='Pressure Gauge 2 (bot)')
         lblPG2.grid(row=1,column=2,columnspan=1)
-        entPG2 = tk.Entry(width=7, justify="right")
+        entPG2 = tk.Entry(width=10, justify="right")
         #entPG2.insert(0, botpath)
        #cbPG2 = ttk.Combobox(window, values=devices, style="office.TCombobox",width=12)
        #cbPG2.set('/dev/ttyUSB1')
@@ -581,15 +697,15 @@ if __name__ == '__main__':
         txtP2.grid(row=1,column=7)
 
         btnStart = tkinter.Button(window, text='Start', command=loop)
-        btnStart.grid(row=1,column=8,padx=5)
+        btnStart.grid(row=1,column=9,padx=5)
 
         btnStop = tkinter.Button(window, text='Stop', command=stop)
-        btnStop.grid(row=1,column=9,padx=5)
+        btnStop.grid(row=1,column=10,padx=5)
 
         #row 2
         lblLL=tk.Label(window,text='Liquid Level Sensor')
         lblLL.grid(row=2,column=0)
-        entLL = tk.Entry(width=7, justify="right")
+        entLL = tk.Entry(width=10, justify="right")
         #entLL.insert(0, ardpath)
         #cbLL = ttk.Combobox(window, values=devices, style="office.TCombobox", width=12)
         #cbLL.set('/dev/ttyACM0')
@@ -597,17 +713,19 @@ if __name__ == '__main__':
 
         lblCompressor=tk.Label(window,text='Compressor')
         lblCompressor.grid(row=2,column=2)
-        entCompressor = tk.Entry(width=7, justify="right")
+        entCompressor = tk.Entry(width=10, justify="right")
         #entCompressor.insert(0, compresspath)
         #cbCompressor = ttk.Combobox(window, values=devices, style="office.TCombobox", width=12)
         #cbCompressor.set('/dev/ttyUSB2')
         entCompressor.grid(row=2,column=3)
 
-        btnCompressorOn = tkinter.Button(window, text='On', command=CompressorOn)
-        btnCompressorOn.grid(row=2,column=8,padx=5)
+        settbtn = tk.Button(window, text="Settings", command=popupwin)
+        settbtn.grid(row=2, column=9)
+#        btnCompressorOn = tkinter.Button(window, text='On', command=CompressorOn)
+#        btnCompressorOn.grid(row=2,column=9,padx=5)
 
-        btnCompressorOff = tkinter.Button(window, text='Off', command=CompressorOff)
-        btnCompressorOff.grid(row=2,column=9,padx=5)
+#        btnCompressorOff = tkinter.Button(window, text='Off', command=CompressorOff)
+#        btnCompressorOff.grid(row=2,column=10,padx=5)
 
         #row 3
         lblT1=tk.Label(window,text='T1 [deg]')
