@@ -115,8 +115,8 @@ gmail_pass = "rydqzoykdkdelgke"
 
 # Defining a class for an email object.
 class Mailer:
-    def sendmail(self, toppress, flag):
-        to = ["suraj.a@northeastern.edu", "j.leyva@northeastern.edu", \
+    def sendmail(self, toppress, flag, limit):
+        to = ["suraj.a@northeastern.edu", "j.leyva@northeastern.edu", "wessling-resnick.t@northeastern.edu" \
               "zeng.jia@northeastern.edu", "t.aramaki@northeastern.edu", "n.poudyal@northeastern.edu"]
 
         session = smt.SMTP(server, port)
@@ -125,18 +125,18 @@ class Mailer:
         session.ehlo()
 
         message_high = "ALERT: The pressure in the main chamber is %02f torr." % toppress
-        message_low = "NOTICE: The pressure is now %02f torr, which is below the threshold of 1500 torr." % toppress
+        message_low = "NOTICE: The pressure is now %02f torr, which is below the threshold of %02f torr." % (toppress, limit)
         msg = EmailMessage()
 
         session.login(gmail_username, gmail_pass)
         msg["From"] = "gramsuser@gmail.com"
         msg["To"] = ",".join(to)
 
-        if flag = "H":
+        if flag == "H":
             msg["Subject"] = "Pressure high alert"
             msg.set_content(message_high)
             session.sendmail(gmail_username, to, msg.as_string())
-        elif flag = "L":
+        elif flag == "L":
             msg["Subject"] = "Normal pressure level restored"
             msg.set_content(message_low)
             session.sendmail(gmail_username, to, msg.as_string())
@@ -339,14 +339,15 @@ def loop():
                     txtP1.insert(tkinter.END,P1_tmp)
                     # Email stuff start
                     timenow = time.perf_counter()
-                    if (P1_tmp > 1500.0 and timenow - timesince > 3600.0):
+                    P1_lim = 900.0
+                    if (P1_tmp > P1_lim  and timenow - timesince > 3600.0):
                         alert = Mailer()
-                        alert.sendmail(P1_tmp, "H")
+                        alert.sendmail(P1_tmp, "H", P1_lim)
                         toglow = 1
                         timesince = time.perf_counter()
-                    elif (P1_tmp < 1500.0 and toglow == 1):
+                    elif (P1_tmp < P1_lim and toglow == 1):
                         notice = Mailer()
-                        notice.sendmail(P1_tmp, "L")
+                        notice.sendmail(P1_tmp, "L", P1_lim)
                         toglow = 0
                     # Email stuff end
     #            print (P1_tmp)
