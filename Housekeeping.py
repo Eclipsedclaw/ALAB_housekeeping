@@ -12,6 +12,7 @@ import tkinter as tk
 import tkinter.scrolledtext
 from tkinter import ttk
 from tkinter import messagebox
+from tkinter import filedialog
 
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
@@ -101,11 +102,12 @@ master_start = datetime.now()
 timesince = 0
 toglow = 0 # if toglow = 1, an email will be sent once toppress < 1500.0. Then toglow will be set to 0 again.
 
-# Flags for port status
+# Flags for port status and save mode
 compstat = 1
 topstat = 1
 botstat = 1
 LLstat = 1
+filestat = "a"
 
 # Initializing email variables
 server = "smtp.gmail.com"
@@ -550,7 +552,7 @@ def loop():
                # Creating the pandas dataframe that will save the data and using to_csv to save it.
                 dict_to_save = {"Time":X,"EpochTime":LT,"Temp1":T1, "Temp2":T2, "Temp3":T3, "TopPress":P1, "BotPress":P2, "L0Temp":L0, "L1Temp":L1, "L2Temp":L2, "L3Temp":L3, "L4Temp":L4, "L5Temp":L5}
                 df_to_save = pd.DataFrame(dict_to_save)
-                save_file = df_to_save.to_csv(sep=",",path_or_buf=format_str)
+                save_file = df_to_save.to_csv(sep=",",path_or_buf=format_str,mode=filestat)
                 print("Saved file")
                # ax1.plot(X,T1,label="T1")
                # ax1.plot(X,T2,label="T2")
@@ -610,7 +612,7 @@ def CompressorOff():
 def popupwin():
     popup = tk.Toplevel()
     popup.title("Settings")
-    popup.geometry("300x250")
+    popup.geometry("400x300")
 
     def changestat():
         val = var.get()
@@ -632,7 +634,17 @@ def popupwin():
             LLstat = 0
         else:
             raise Exception("Invalid value provided to function.")
-    
+
+    def setsavemode():
+        val = filemode.get()
+        if val == "a":
+            filestat = val
+            format_str = filedialog.askopenfilename()
+        elif val == "w":
+            filestat = val
+        else:
+            raise Exception("Invalid value provided to function")
+
     # Labels
     sett1lbl = tk.Label(popup, text="Enable/Disable Devices", pady=10, padx=5).grid(row=0, column=0)
     comp1lbl = tk.Label(popup, text="Compressor").grid(row=1, column=0)
@@ -641,6 +653,8 @@ def popupwin():
     LL1lbl = tk.Label(popup, text="LL/Arduino").grid(row=4, column=0)
     sett2lbl = tk.Label(popup, text="ON/OFF Settings", padx=5, pady=10).grid(row=5, column=0)
     comp2lbl = tk.Label(popup, text="Compressor").grid(row=6, column=0)
+    save1lbl = tk.Label(popup, text="File Save Options", padx=5, pady=10).grid(row=7, column=0)
+    save2lbl = tk.Label(popup, text="Mode to save file:").grid(row=8, column=0)
 
     # Buttons
     componbtn = tk.Button(popup, text="ON", command=CompressorOn)
@@ -648,10 +662,11 @@ def popupwin():
     compoffbtn = tk.Button(popup, text="OFF", command=CompressorOff)
     compoffbtn.grid(row=6, column=2)
     exitbtn = tk.Button(popup, text="Exit", command=popup.destroy)
-    exitbtn.grid(row=7, column=2)
+    exitbtn.grid(row=9, column=2)
 
     # Radiobuttons
     var = tk.StringVar()
+    filemode = tk.StringVar()
     compen = tk.Radiobutton(popup, text="Enable", variable=var, value="CE", command=changestat).grid(row=1,column=1)
     compdis = tk.Radiobutton(popup, text="Disable", variable=var, value="CD", command=changestat).grid(row=1,column=2)
     topen = tk.Radiobutton(popup, text="Enable", variable=var, value="TE", command=changestat).grid(row=2,column=1)
@@ -660,7 +675,8 @@ def popupwin():
     botdis = tk.Radiobutton(popup, text="Disable", variable=var, value="BD", command=changestat).grid(row=3,column=2)
     LLen = tk.Radiobutton(popup, text="Enable", variable=var, value="LLE", command=changestat).grid(row=4,column=1)
     LLdis = tk.Radiobutton(popup, text="Disable", variable=var, value="LLD", command=changestat).grid(row=4,column=2)
-
+    fileapp = tk.Radiobutton(popup, text="Append", variable=filemode, value="a", command=setsavemode).grid(row=8,column=1)
+    filenew = tk.Radiobutton(popup, text="Write new file", variable=filemode, value="w", command=setsavemode).grid(row=8,column=2)
 
 if __name__ == '__main__':
     flg = True
