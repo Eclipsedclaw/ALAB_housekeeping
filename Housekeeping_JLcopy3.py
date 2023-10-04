@@ -554,9 +554,9 @@ def loop():
                 LT.append(time.time())
 
                # Creating the pandas dataframe that will save the data and using to_csv to save it.
-                #dict_to_save = {"Time":X,"EpochTime":LT,"Temp1":T1, "Temp2":T2, "Temp3":T3, "TopPress":P1, "BotPress":P2, "L0Temp":L0, "L1Temp":L1, "L2Temp":L2, "L3Temp":L3, "L4Temp":L4, "L5Temp":L5}
-                #df_to_save = pd.DataFrame(dict_to_save)
-                #save_file = df_to_save.to_csv(sep=",",path_or_buf=format_str,mode=filestat)
+                dict_to_save = {"Time":X,"EpochTime":LT,"Temp1":T1, "Temp2":T2, "Temp3":T3, "TopPress":P1, "BotPress":P2, "L0Temp":L0, "L1Temp":L1, "L2Temp":L2, "L3Temp":L3, "L4Temp":L4, "L5Temp":L5}
+                df_to_save = pd.DataFrame(dict_to_save)
+                save_file = df_to_save.to_csv(sep=",",path_or_buf=format_str,mode='w+')
                 #print("Saved file")
                # ax1.plot(X,T1,label="T1")
                # ax1.plot(X,T2,label="T2")
