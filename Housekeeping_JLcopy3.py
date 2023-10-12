@@ -473,6 +473,7 @@ def loop():
                     entLL.insert(tkinter.END, format_time(ard_delta))
 
                     #### Reading the ADC values over serial and converting to temp ####
+                    # All corrections are made w/ reference to DA148 room thermostat readout
                     
                     # Onboard ADC chanels
                     L_ADC = float(LiquidLevelOut[3:7])
@@ -481,7 +482,7 @@ def loop():
                     L0_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
                     L0_tmp = int(L0_tmp)
                     L0_tmpK = L0_tmp + 273.15
-                    L0_correction = L0_tmpK - 8.05 # This is added because the displayed temp was 304.15 K when the room thermometer measured 296.10 K.
+                    L0_correction = L0_tmpK + 1.76 
                     #L1
                     L_ADC = float(LiquidLevelOut[11:15])
                     L_V = float(L_ADC)*(5.0/1023.0)
@@ -489,7 +490,7 @@ def loop():
                     L1_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
                     L1_tmp = int(L1_tmp)
                     L1_tmpK = L1_tmp + 273.15
-                    L1_correction = L1_tmpK + 0 # No correction for now
+                    L1_correction = L1_tmpK + 0 
                     #L2
                     L_ADC = float(LiquidLevelOut[19:23])
                     L_V = float(L_ADC)*(5.0/1023.0)
@@ -497,7 +498,7 @@ def loop():
                     L2_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
                     L2_tmp = int(L2_tmp)
                     L2_tmpK = L2_tmp + 273.15
-                    L2_correction = L2_tmpK + 0 # No correction for now
+                    L2_correction = L2_tmpK + 0 
                     #L3
                     L_ADC = float(LiquidLevelOut[27:31])
                     L_V = float(L_ADC)*(5.0/1023.0)
@@ -505,7 +506,7 @@ def loop():
                     L3_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
                     L3_tmp = int(L3_tmp)
                     L3_tmpK = L3_tmp + 273.15
-                    L3_correction = L3_tmpK + 0 # No correction for now
+                    L3_correction = L3_tmpK + 0 
                     #L4
                     L_ADC = float(LiquidLevelOut[35:39])
                     L_V = float(L_ADC)*(5.0/1023.0)
@@ -513,7 +514,7 @@ def loop():
                     L4_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
                     L4_tmp = int(L4_tmp)
                     L4_tmpK = L4_tmp + 273.15
-                    L4_correction = L4_tmpK - 28.05 # This is added because the displayed temp was 324.15 K when the room thermometer measured 296.10 K.
+                    L4_correction = L4_tmpK - 45.15 
                     #L5
                     L_ADC = float(LiquidLevelOut[43:47])
                     L_V = float(L_ADC)*(5.0/1023.0)
@@ -521,7 +522,7 @@ def loop():
                     L5_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
                     L5_tmp = int(L5_tmp)
                     L5_tmpK = L5_tmp + 273.15
-                    L5_correction = L5_tmpK - 24.05 # This is added because the displayed temp was 320.15 K when the room temperature measured 296.10 K.
+                    L5_correction = L5_tmpK - 44.05 
                     
                     # ADS1115 ADC Channels
                     # L6
@@ -531,7 +532,7 @@ def loop():
                     L6_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
                     L6_tmp = int(L6_tmp)
                     L6_tmpK = L6_tmp + 273.15
-                    L6_correction = L6_tmpK + 0 # No correction for now
+                    L6_correction = L6_tmpK + 84.71 
                     # L7
                     L_ADC = float(LiquidLevelOut[61:67])
                     L_V = float(L_ADC)*(5.0/32767.0)
@@ -539,7 +540,7 @@ def loop():
                     L7_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
                     L7_tmp = int(L7_tmp)
                     L7_tmpK = L7_tmp + 273.15
-                    L7_correction = L7_tmpK + 0 # No correction for now
+                    L7_correction = L7_tmpK + 82 
                     # L8
                     L_ADC = float(LiquidLevelOut[71:77])
                     L_V = float(L_ADC)*(5.0/32767.0)
@@ -547,7 +548,7 @@ def loop():
                     L8_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
                     L8_tmp = int(L8_tmp)
                     L8_tmpK = L8_tmp + 273.15
-                    L8_correction = L8_tmpK + 0 # No correction for now
+                    L8_correction = L8_tmpK + 82 
                     # L9
                     L_ADC = float(LiquidLevelOut[81:87])
                     L_V = float(L_ADC)*(5.0/32767.0)
@@ -555,7 +556,7 @@ def loop():
                     L9_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
                     L9_tmp = int(L9_tmp)
                     L9_tmpK = L9_tmp + 273.15
-                    L9_correction = L9_tmpK + 0 # No correction for now
+                    L9_correction = L9_tmpK + 82 
 
                 elif len(LiquidLevelOut) != 89:
                     L0_tmpK = None
@@ -655,7 +656,7 @@ def loop():
                 ax1.plot(X,L7,label="L7")
                 ax1.plot(X,L8,label="L8")
                 ax1.plot(X,L9,label="L9")
-                ax1.legend(loc="lower left")
+                ax1.legend(loc="best")
 
                 ax2.plot(X,P1,label="P1")
                 ax2.plot(X,P2,label="P2")
