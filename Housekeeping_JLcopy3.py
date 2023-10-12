@@ -614,10 +614,10 @@ def loop():
                 L3.append(L3_correction)
                 L4.append(L4_correction)
                 L5.append(L5_correction)
-                L6.append(L5_correction)
-                L7.append(L5_correction)
-                L8.append(L5_correction)
-                L9.append(L5_correction)
+                L6.append(L6_correction)
+                L7.append(L7_correction)
+                L8.append(L8_correction)
+                L9.append(L9_correction)
                 X.append(time.perf_counter() - start_time)
                 LT.append(time.time())
 
@@ -646,7 +646,7 @@ def loop():
                # ax1.plot(X,T1,label="T1")
                # ax1.plot(X,T2,label="T2")
                # ax1.plot(X,T3,label="T3")
-                ax1.plot(X, L0, label="L0")
+                ax1.plot(X,L0,label="L0")
                 ax1.plot(X,L1,label="L1")
                 ax1.plot(X,L2,label="L2")
                 ax1.plot(X,L3,label="L3")
@@ -656,7 +656,8 @@ def loop():
                 ax1.plot(X,L7,label="L7")
                 ax1.plot(X,L8,label="L8")
                 ax1.plot(X,L9,label="L9")
-                ax1.legend(loc="best")
+                
+                ax1.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05), fancybox=True, shadow=True, ncol=5)
 
                 ax2.plot(X,P1,label="P1")
                 ax2.plot(X,P2,label="P2")
