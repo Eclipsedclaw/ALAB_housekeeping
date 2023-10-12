@@ -937,29 +937,29 @@ if __name__ == '__main__':
 
         ######### Row 6 - Misc #########
         lblPmax=tk.Label(window,text=u'Pmax [torr]')
-        lblPmax.grid(row=5,column=0)
+        lblPmax.grid(row=6,column=0)
         txtPmax=tkinter.Entry(width=7,justify='right')
-        txtPmax.grid(row=5,column=1)
+        txtPmax.grid(row=6,column=1)
         txtPmax.insert(tkinter.END,'1500')
 
         lblPmin=tk.Label(window,text=u'Pmin [torr]')
-        lblPmin.grid(row=5,column=2)
+        lblPmin.grid(row=6,column=2)
         txtPmin=tkinter.Entry(width=7,justify='right')
-        txtPmin.grid(row=5,column=3)
+        txtPmin.grid(row=6,column=3)
         txtPmin.insert(tkinter.END,'1')
 
         lblV1=tk.Label(window,text='Vout (Pin-2)')
-        lblV1.grid(row=5,column=4)
+        lblV1.grid(row=6,column=4)
         txtV1=tkinter.Entry(width=7,justify='center')
-        txtV1.grid(row=5,column=5)
+        txtV1.grid(row=6,column=5)
 
         lblV2=tk.Label(window,text='Vin (Pin-x)')
-        lblV2.grid(row=5,column=6)
+        lblV2.grid(row=6,column=6)
         txtV2=tkinter.Entry(width=7,justify='center')
-        txtV2.grid(row=5,column=7)
+        txtV2.grid(row=6,column=7)
 
         settbtn = tk.Button(window, text="Settings", command=popupwin)
-        settbtn.grid(row=5, column=8,columnspan=2)
+        settbtn.grid(row=6, column=8,columnspan=2)
 #        btnCompressorOn = tkinter.Button(window, text='On', command=CompressorOn)
 #        btnCompressorOn.grid(row=2,column=9,padx=5)
 
@@ -968,13 +968,13 @@ if __name__ == '__main__':
 
         ######### Row 7 - Figures #########
         canvas = FigureCanvasTkAgg(fig,window)
-        canvas.get_tk_widget().grid(row=6,column=0,columnspan=10,pady=5)
+        canvas.get_tk_widget().grid(row=7,column=0,columnspan=10,pady=5)
 #        canvas.get_tk_widget().pack()
 #        toolbar=NavigationToolbar2Tk(canvas,window)
 
         ######### Row 8 - Navigation Toolbar #########
         toolbarFrame = tk.Frame(master=window)
-        toolbarFrame.grid(row=7,column=0,columnspan=10)
+        toolbarFrame.grid(row=8,column=0,columnspan=10)
         toolbar = NavigationToolbar2Tk(canvas,toolbarFrame)
 
         window.mainloop()
