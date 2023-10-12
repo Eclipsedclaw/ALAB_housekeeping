@@ -457,11 +457,14 @@ def loop():
                     print (LiquidLevelOut)
                     print ('Liquid Level Sensor readout error')
                     print('Serial data packet has unexpected length: '+ str(len(LiquidLevelOut)))
+                    print()
                     LiquidLevelOut = LiquidLevel.readline().decode('utf8')
                     flag5 += 1
                # print(LiquidLevelOut[0:46])
                 if len(LiquidLevelOut) == 89:
+                    print ('Liquid Level Sensor readout succeeded')
                     print (LiquidLevelOut)
+                    print()
                     # A0_0540_A1_0540_A2_0540_A3_0540_A4_0540_A5_0540_A6_######_A7_######_A8_######_A9_######\n
                    
                     ard_time = datetime.now()
@@ -801,7 +804,9 @@ if __name__ == '__main__':
         window.title('GRAMS Housekeeping')
 #        window.withdraw()
 #        window.protocol('WM_DELETE_WINDOW', destroy)  # When you close the tkinter window.
-        #row 1
+
+
+        ######### Row 1 - Pressure Gauges Status  #########
         lblPG1=tk.Label(window,text='Pressure 1 (top)')
         lblPG1.grid(row=1,column=0,columnspan=1)
         entPG1 = tk.Entry(width=10, justify="right")
@@ -831,7 +836,7 @@ if __name__ == '__main__':
         btnStart = tkinter.Button(window, text='Start', command=loop)
         btnStart.grid(row=1,column=8,padx=5,columnspan=2)
 
-        #row 2
+        ######### Row 2 - Runtime for Level Sensors and Compressor + Heater Power + Cold Head Status  #########
         lblLL=tk.Label(window,text='Liquid Level')
         lblLL.grid(row=2,column=0)
         entLL = tk.Entry(width=10, justify="right")
@@ -853,15 +858,15 @@ if __name__ == '__main__':
         entHeaterPwr = tk.Entry(width=5, justify="right")
         entHeaterPwr.grid(row=2,column=5)
 
-        lblL5=tk.Label(window,text='Cold head [K]')
-        lblL5.grid(row=2,column=6)
-        txtL5=tkinter.Entry(width=7,justify='right')
-        txtL5.grid(row=2,column=7)
+        lblL6=tk.Label(window,text='Cold head [K]')
+        lblL6.grid(row=2,column=6)
+        txtL6=tkinter.Entry(width=7,justify='right')
+        txtL6.grid(row=2,column=7)
 
         btnStop = tkinter.Button(window, text='Stop', command=stop)
         btnStop.grid(row=2,column=8,padx=5,columnspan=2)
 
-        #row 3
+        ######### Row 3 - Compressor Status  #########
         lblT1=tk.Label(window,text='Compressor [deg]')
         lblT1.grid(row=3,column=0)
         txtT1=tkinter.Entry(width=7,justify='right')
@@ -882,12 +887,12 @@ if __name__ == '__main__':
         txtStatus=tkinter.Entry(width=7,justify='center')
         txtStatus.grid(row=3,column=8)
 
-        #row 4
-
+        ######### Row 4 - Chamber Level Sensors  #########
         lblL0 = tk.Label(window, text="L0 [K]")
         lblL0.grid(row=4, column=0)
         txtL0 = tkinter.Entry(width=7, justify="right")
         txtL0.grid(row=4, column=1)
+        
         lblL1=tk.Label(window,text='L1 [K]')
         lblL1.grid(row=4,column=2)
         txtL1=tkinter.Entry(width=7,justify='right')
@@ -913,7 +918,24 @@ if __name__ == '__main__':
 #        txtL5=tkinter.Entry(width=7,justify='right')
 #        txtL5.grid(row=4,column=11)
 
-        #row 5
+
+        ######### Row 5 - TPC LAr Level Sensors #########
+        lblL7 = tk.Label(window, text="L6-Induction Mesh [K]")
+        lblL7.grid(row=5, column=0)
+        txtL7 = tkinter.Entry(width=7, justify="right")
+        txtL7.grid(row=5, column=1)
+        
+        lblL8=tk.Label(window,text='L7-Field Ring 10 [K]')
+        lblL8.grid(row=5,column=2)
+        txtL8=tkinter.Entry(width=7,justify='right')
+        txtL8.grid(row=5,column=3)
+
+        lblL9=tk.Label(window,text='L8-Cathode Mesh [K]')
+        lblL9.grid(row=5,column=4)
+        txtL9=tkinter.Entry(width=7,justify='right')
+        txtL9.grid(row=5,column=5)
+
+        ######### Row 6 - Misc #########
         lblPmax=tk.Label(window,text=u'Pmax [torr]')
         lblPmax.grid(row=5,column=0)
         txtPmax=tkinter.Entry(width=7,justify='right')
@@ -944,13 +966,13 @@ if __name__ == '__main__':
 #        btnCompressorOff = tkinter.Button(window, text='Off', command=CompressorOff)
 #        btnCompressorOff.grid(row=2,column=10,padx=5)
 
-        #row 6: figures
+        ######### Row 7 - Figures #########
         canvas = FigureCanvasTkAgg(fig,window)
         canvas.get_tk_widget().grid(row=6,column=0,columnspan=10,pady=5)
 #        canvas.get_tk_widget().pack()
 #        toolbar=NavigationToolbar2Tk(canvas,window)
 
-        #row 7: navigation toolbar
+        ######### Row 8 - Navigation Toolbar #########
         toolbarFrame = tk.Frame(master=window)
         toolbarFrame.grid(row=7,column=0,columnspan=10)
         toolbar = NavigationToolbar2Tk(canvas,toolbarFrame)
