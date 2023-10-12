@@ -431,12 +431,18 @@ def loop():
                 ###################### Thermometry ###############################
             if LLstat == 0:
                 print("Arduino port not found/open")
+                # Onboard ADC chanels
                 L0_tmp = None
                 L1_tmp = None
                 L2_tmp = None
                 L3_tmp = None
                 L4_tmp = None
                 L5_tmp = None
+                # ADS1115 ADC Channels
+                L6_tmp = None
+                L7_tmp = None
+                L8_tmp = None
+                L9_tmp = None
             elif LLstat == 1:
                 # Liquid Level Sensor
     #            LiquidLevel.write(b'R')
@@ -444,7 +450,7 @@ def loop():
     #            LiquidLevelOut = LiquidLevel.read(LiquidLevel.inWaiting()).decode('utf8')
                 LiquidLevelOut = LiquidLevel.readline().decode('utf8')
                 flag5 = 0
-                while (len(LiquidLevelOut) != 49 and flag5 <= 3):
+                while (len(LiquidLevelOut) != 89 and flag5 <= 3):
                     print (LiquidLevelOut)
                     print ('Liquid Level Sensor readout error')
                     LiquidLevelOut = LiquidLevel.readline().decode('utf8')
@@ -452,14 +458,16 @@ def loop():
                # print(LiquidLevelOut[0:46])
                 if len(LiquidLevelOut) == 49:
                     print (LiquidLevelOut)
-                    #A0_0540_A1_0540_A2_0540_A3_0540_A4_0540_A5_0540\n
-                    #L0
+                    # A0_0540_A1_0540_A2_0540_A3_0540_A4_0540_A5_0540_A6_######_A7_######_A8_######_A9_######\n
+                   
                     ard_time = datetime.now()
                     ard_delta = ard_time - master_start
                     entLL.delete(0, tkinter.END)
                     entLL.insert(tkinter.END, format_time(ard_delta))
 
-                    # Reading the ADC values
+                    #### Reading the ADC values over serial ####
+                    
+                    # Onboard ADC chanels
                     L_ADC = float(LiquidLevelOut[3:7])
                     L_V = float(L_ADC)*(5.0/1023.0)
                     L_R = L_V*1000./(5.0-L_V)
@@ -507,6 +515,40 @@ def loop():
                     L5_tmp = int(L5_tmp)
                     L5_tmpK = L5_tmp + 273.15
                     L5_correction = L5_tmpK - 24.05 # This is added because the displayed temp was 320.15 K when the room temperature measured 296.10 K.
+                    
+                    # ADS1115 ADC Channels
+                    # L6
+                    L_ADC = float(LiquidLevelOut[:])
+                    L_V = float(L_ADC)*(5.0/65535.0)
+                    L_R = L_V*1000./(5.0-L_V)
+                    L6_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
+                    L6_tmp = int(L6_tmp)
+                    L6_tmpK = L6_tmp + 273.15
+                    L6_correction = L6_tmpK + 0 # No correction for now
+                    # L7
+                    L_ADC = float(LiquidLevelOut[:])
+                    L_V = float(L_ADC)*(5.0/65535.0)
+                    L_R = L_V*1000./(5.0-L_V)
+                    L7_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
+                    L7_tmp = int(L7_tmp)
+                    L7_tmpK = L7_tmp + 273.15
+                    L7_correction = L7_tmpK + 0 # No correction for now
+                    # L8
+                    L_ADC = float(LiquidLevelOut[:])
+                    L_V = float(L_ADC)*(5.0/65535.0)
+                    L_R = L_V*1000./(5.0-L_V)
+                    L8_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
+                    L8_tmp = int(L8_tmp)
+                    L8_tmpK = L8_tmp + 273.15
+                    L8_correction = L8_tmpK + 0 # No correction for now
+                    # L9
+                    L_ADC = float(LiquidLevelOut[:])
+                    L_V = float(L_ADC)*(5.0/65535.0)
+                    L_R = L_V*1000./(5.0-L_V)
+                    L9_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
+                    L9_tmp = int(L9_tmp)
+                    L9_tmpK = L9_tmp + 273.15
+                    L9_correction = L9_tmpK + 0 # No correction for now
 
                 elif len(LiquidLevelOut) != 43:
                     L0_tmpK = None
@@ -515,6 +557,10 @@ def loop():
                     L3_tmpK = None
                     L4_tmpK = None
                     L5_tmpK = None
+                    L6_tmpK = None
+                    L7_tmpK = None
+                    L8_tmpK = None
+                    L9_tmpK = None
 
                 txtL0.delete(0, tkinter.END)
                 txtL0.insert(tkinter.END, L0_correction)
@@ -528,6 +574,14 @@ def loop():
                 txtL4.insert(tkinter.END,L4_correction)
                 txtL5.delete(0,tkinter.END)
                 txtL5.insert(tkinter.END,L5_correction)
+                txtL6.delete(0,tkinter.END)
+                txtL6.insert(tkinter.END,L5_correction)
+                txtL7.delete(0,tkinter.END)
+                txtL7.insert(tkinter.END,L5_correction)
+                txtL8.delete(0,tkinter.END)
+                txtL8.insert(tkinter.END,L5_correction)
+                txtL9.delete(0,tkinter.END)
+                txtL9.insert(tkinter.END,L5_correction)
 
 #               print('Time : %.2f, Temperature : %.2f'%(time.perf_counter() - start_time,tempC))
 #               if len(X) > 10:
@@ -552,11 +606,32 @@ def loop():
                 L3.append(L3_correction)
                 L4.append(L4_correction)
                 L5.append(L5_correction)
+                L6.append(L5_correction)
+                L7.append(L5_correction)
+                L8.append(L5_correction)
+                L9.append(L5_correction)
                 X.append(time.perf_counter() - start_time)
                 LT.append(time.time())
 
                # Creating the pandas dataframe that will save the data and using to_csv to save it.
-                dict_to_save = {"Time":X,"EpochTime":LT,"Temp1":T1, "Temp2":T2, "Temp3":T3, "TopPress":P1, "BotPress":P2, "L0Temp":L0, "L1Temp":L1, "L2Temp":L2, "L3Temp":L3, "L4Temp":L4, "L5Temp":L5}
+                dict_to_save = {"Time":X,
+                                "EpochTime":LT,
+                                "Temp1":T1,
+                                "Temp2":T2,
+                                "Temp3":T3,
+                                "TopPress":P1,
+                                "BotPress":P2,
+                                "L0Temp":L0,
+                                "L1Temp":L1,
+                                "L2Temp":L2,
+                                "L3Temp":L3,
+                                "L4Temp":L4,
+                                "L5Temp":L5,
+                                "L5Temp":L6,
+                                "L5Temp":L7,
+                                "L5Temp":L8,
+                                "L5Temp":L9,
+                               }
                 df_to_save = pd.DataFrame(dict_to_save)
                 save_file = df_to_save.to_csv(sep=",",path_or_buf=format_str,mode='w+')
                 #print("Saved file")
@@ -569,6 +644,10 @@ def loop():
                 ax1.plot(X,L3,label="L3")
                 ax1.plot(X,L4,label="L4")
                 ax1.plot(X,L5,label="L5")
+                ax1.plot(X,L6,label="L6")
+                ax1.plot(X,L7,label="L7")
+                ax1.plot(X,L8,label="L8")
+                ax1.plot(X,L9,label="L9")
                 ax1.legend(loc="lower left")
 
                 ax2.plot(X,P1,label="P1")
