@@ -522,7 +522,7 @@ def loop():
                     
                     # ADS1115 ADC Channels
                     # L6
-                    L_ADC = float(LiquidLevelOut[51:57])
+                    L_ADC = float(LiquidLevelOut[52:57])
                     L_V = float(L_ADC)*(5.0/65535.0)
                     L_R = L_V*1000./(5.0-L_V)
                     L6_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
