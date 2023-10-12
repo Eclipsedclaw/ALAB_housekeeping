@@ -449,11 +449,12 @@ def loop():
     #            time.sleep(T_sleep)
     #            LiquidLevelOut = LiquidLevel.read(LiquidLevel.inWaiting()).decode('utf8')
                 LiquidLevelOut = LiquidLevel.readline().decode('utf8')
-                print(len(LiquidLevelOut))
+                
                 flag5 = 0
                 while (len(LiquidLevelOut) != 89 and flag5 <= 3):
                     print (LiquidLevelOut)
                     print ('Liquid Level Sensor readout error')
+                    print(len(LiquidLevelOut))
                     LiquidLevelOut = LiquidLevel.readline().decode('utf8')
                     flag5 += 1
                # print(LiquidLevelOut[0:46])
