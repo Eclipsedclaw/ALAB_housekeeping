@@ -453,14 +453,14 @@ def loop():
                 LiquidLevelOut = LiquidLevel.readline().decode('utf8')
                 
                 flag5 = 0
-                while (len(LiquidLevelOut) != 93 and flag5 <= 3):
+                while (len(LiquidLevelOut) != 89 and flag5 <= 3):
                     print (LiquidLevelOut)
                     print ('Liquid Level Sensor readout error')
                     print('Serial data packet has unexpected length: '+ str(len(LiquidLevelOut)))
                     LiquidLevelOut = LiquidLevel.readline().decode('utf8')
                     flag5 += 1
                # print(LiquidLevelOut[0:46])
-                if len(LiquidLevelOut) == 93:
+                if len(LiquidLevelOut) == 89:
                     print (LiquidLevelOut)
                     # A0_0540_A1_0540_A2_0540_A3_0540_A4_0540_A5_0540_A6_######_A7_######_A8_######_A9_######\n
                    
@@ -522,7 +522,7 @@ def loop():
                     
                     # ADS1115 ADC Channels
                     # L6
-                    L_ADC = float(LiquidLevelOut[52:57])
+                    L_ADC = float(LiquidLevelOut[51:57])
                     L_V = float(L_ADC)*(5.0/65535.0)
                     L_R = L_V*1000./(5.0-L_V)
                     L6_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
@@ -554,7 +554,7 @@ def loop():
                     L9_tmpK = L9_tmp + 273.15
                     L9_correction = L9_tmpK + 0 # No correction for now
 
-                elif len(LiquidLevelOut) != 93:
+                elif len(LiquidLevelOut) != 89:
                     L0_tmpK = None
                     L1_tmpK = None
                     L2_tmpK = None
