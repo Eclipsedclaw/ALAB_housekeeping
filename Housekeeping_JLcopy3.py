@@ -575,13 +575,13 @@ def loop():
                 txtL5.delete(0,tkinter.END)
                 txtL5.insert(tkinter.END,L5_correction)
                 txtL6.delete(0,tkinter.END)
-                txtL6.insert(tkinter.END,L5_correction)
+                txtL6.insert(tkinter.END,L6_correction)
                 txtL7.delete(0,tkinter.END)
-                txtL7.insert(tkinter.END,L5_correction)
+                txtL7.insert(tkinter.END,L7_correction)
                 txtL8.delete(0,tkinter.END)
-                txtL8.insert(tkinter.END,L5_correction)
+                txtL8.insert(tkinter.END,L8_correction)
                 txtL9.delete(0,tkinter.END)
-                txtL9.insert(tkinter.END,L5_correction)
+                txtL9.insert(tkinter.END,L9_correction)
 
 #               print('Time : %.2f, Temperature : %.2f'%(time.perf_counter() - start_time,tempC))
 #               if len(X) > 10:
