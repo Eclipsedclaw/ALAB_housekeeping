@@ -456,7 +456,7 @@ def loop():
                     LiquidLevelOut = LiquidLevel.readline().decode('utf8')
                     flag5 += 1
                # print(LiquidLevelOut[0:46])
-                if len(LiquidLevelOut) == 49:
+                if len(LiquidLevelOut) == 89:
                     print (LiquidLevelOut)
                     # A0_0540_A1_0540_A2_0540_A3_0540_A4_0540_A5_0540_A6_######_A7_######_A8_######_A9_######\n
                    
