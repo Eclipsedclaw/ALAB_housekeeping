@@ -920,19 +920,19 @@ if __name__ == '__main__':
         txtL5.grid(row=5,column=1)
         
         lblL7 = tk.Label(window, text="L6-Induction Mesh [K]")
-        lblL7.grid(row=5, column=3)
+        lblL7.grid(row=5, column=2)
         txtL7 = tkinter.Entry(width=7, justify="right")
-        txtL7.grid(row=5, column=4)
+        txtL7.grid(row=5, column=3)
         
         lblL8=tk.Label(window,text='L7-Field Ring 10 [K]')
-        lblL8.grid(row=5,column=5)
+        lblL8.grid(row=5,column=4)
         txtL8=tkinter.Entry(width=7,justify='right')
-        txtL8.grid(row=5,column=6)
+        txtL8.grid(row=5,column=5)
 
         lblL9=tk.Label(window,text='L8-Cathode Mesh [K]')
-        lblL9.grid(row=5,column=7)
+        lblL9.grid(row=5,column=6)
         txtL9=tkinter.Entry(width=7,justify='right')
-        txtL9.grid(row=5,column=8)
+        txtL9.grid(row=5,column=7)
 
         ######### Row 6 - Misc #########
         lblPmax=tk.Label(window,text=u'Pmax [torr]')
