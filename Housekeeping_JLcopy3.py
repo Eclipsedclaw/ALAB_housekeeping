@@ -526,7 +526,7 @@ def loop():
                     # ADS1115 ADC Channels
                     # L6
                     L_ADC = float(LiquidLevelOut[51:57])
-                    L_V = float(L_ADC)*(5.0/32767.0)
+                    L_V = float(L_ADC)*(5.0/16383.0)
                     L_R = L_V*1000./(5.0-L_V)
                     L6_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
                     L6_tmp = int(L6_tmp)
@@ -534,7 +534,7 @@ def loop():
                     L6_correction = L6_tmpK + 0 # No correction for now
                     # L7
                     L_ADC = float(LiquidLevelOut[61:67])
-                    L_V = float(L_ADC)*(5.0/32767.0)
+                    L_V = float(L_ADC)*(5.0/16383.0)
                     L_R = L_V*1000./(5.0-L_V)
                     L7_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
                     L7_tmp = int(L7_tmp)
@@ -542,7 +542,7 @@ def loop():
                     L7_correction = L7_tmpK + 0 # No correction for now
                     # L8
                     L_ADC = float(LiquidLevelOut[71:77])
-                    L_V = float(L_ADC)*(5.0/32767.0)
+                    L_V = float(L_ADC)*(5.0/16383.0)
                     L_R = L_V*1000./(5.0-L_V)
                     L8_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
                     L8_tmp = int(L8_tmp)
@@ -550,7 +550,7 @@ def loop():
                     L8_correction = L8_tmpK + 0 # No correction for now
                     # L9
                     L_ADC = float(LiquidLevelOut[81:87])
-                    L_V = float(L_ADC)*(5.0/32767.0)
+                    L_V = float(L_ADC)*(5.0/16383.0)
                     L_R = L_V*1000./(5.0-L_V)
                     L9_tmp = -(math.sqrt(17.59246-0.00232*L_R)-3.908)/0.00116
                     L9_tmp = int(L9_tmp)
