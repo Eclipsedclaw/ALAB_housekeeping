@@ -62,7 +62,7 @@ format_str = date_time + ".csv"
 # Plot + array creation
 plt.subplots_adjust(wspace=0.3)
 T1,T2,T3,P1,P2,X,LT = [],[],[],[],[],[],[]
-L0,L1,L2,L3,L4,L5 = [],[],[],[],[],[]
+L0,L1,L2,L3,L4,L5,L6,L7,L8,L9 = [],[],[],[],[],[],[],[],[],[]
 start_time = time.perf_counter()
 now = datetime.now()
 
@@ -469,7 +469,7 @@ def loop():
                     entLL.delete(0, tkinter.END)
                     entLL.insert(tkinter.END, format_time(ard_delta))
 
-                    #### Reading the ADC values over serial ####
+                    #### Reading the ADC values over serial and converting to temp ####
                     
                     # Onboard ADC chanels
                     L_ADC = float(LiquidLevelOut[3:7])
