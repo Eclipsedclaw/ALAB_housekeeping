@@ -557,6 +557,10 @@ def loop():
                     L9_tmp = int(L9_tmp)
                     L9_tmpK = L9_tmp + 273.15
                     L9_correction = L9_tmpK + 82 
+                    
+                    print('Cold head temp: ')
+                    print(L6_correction)   
+                    
 
                 elif len(LiquidLevelOut) != 89:
                     L0_tmpK = None
@@ -570,8 +574,7 @@ def loop():
                     L8_tmpK = None
                     L9_tmpK = None
                 
-                print('Cold head temp: ')
-                print(L6_correction)    
+             
 
                 txtL0.delete(0, tkinter.END)
                 txtL0.insert(tkinter.END, L0_correction)
