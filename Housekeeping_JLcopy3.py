@@ -569,6 +569,9 @@ def loop():
                     L7_tmpK = None
                     L8_tmpK = None
                     L9_tmpK = None
+                
+                print('Cold head temp: ')
+                print(L6_correction)    
 
                 txtL0.delete(0, tkinter.END)
                 txtL0.insert(tkinter.END, L0_correction)
