@@ -88,25 +88,26 @@ def get_pressure():
     chamberPressure.parity = 'N'
     chamberPressure.stopbits = 1
     chamberPressure.bytesize = 8
-
+    chamberPressure.write(('$@001PR3?;FF').encode('utf8'))
+    
     jacketpressurepath = "/dev/botpress"
     jacketPressure = serial.Serial(jacketpressurepath)
     jacketPressure.baudrate = 9600
     jacketPressure.parity = 'N'
     jacketPressure.stopbits = 1
     jacketPressure.bytesize = 8
+    jacketPressure.write(('$@253PR3?;FF').encode('utf8'))
 
     sleep(1)
 
-    chamberPressure.write(('$@001PR3?;FF').encode('utf8'))
     ChamberPressureOut = chamberPressure.read(chamberPressure.inWaiting()).decode('utf8')
-    chamber_pressure = ChamberPressureOut[7:14]
+    chamber_pressure = str(ChamberPressureOut[7:14])
     print(chamber_pressure)
     
-    jacketPressure.write(('$@253PR3?;FF').encode('utf8'))
     JacketPressureOut = jacketPressure.read(jacketPressure.inWaiting()).decode('utf8')
     jacket_pressure = JacketPressureOut[7:14]
-
+    if(jacket_pressure == 0):
+        jacket_pressure == NULL
     # insert
     insert_query = "INSERT INTO pressure (chamber_pressure, jacket_pressure) VALUES (%s, %s);"
     try:
