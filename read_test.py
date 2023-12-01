@@ -76,7 +76,7 @@ def get_pressure():
     # Make table if needed for compressor
     table_query = 'CREATE TABLE IF NOT EXISTS pressure (id int auto_increment, time TIMESTAMP not null DEFAULT CURRENT_TIMESTAMP ,'
     column_names = ['chamber_pressure', 'jacket_pressure']
-    column_types = ['int', 'int']
+    column_types = ['FLOAT', 'FLOAT']
     for n, t in zip(column_names, column_types):
         table_query += ' {} {},'.format(n, t)
     table_query += ' PRIMARY KEY (id));'
@@ -90,6 +90,16 @@ def get_pressure():
     chamberPressure.bytesize = 8
     chamberPressure.write(('$@001PR3?;FF').encode('utf8'))
     
+    sleep(1)
+
+    ChamberPressureOut = chamberPressure.read(chamberPressure.inWaiting()).decode('utf8')
+    if(ChamberPressureOut[7:14] == ''):
+        chamber_pressure = None
+    else:
+        chamber_pressure = float(ChamberPressureOut[7:14])
+    #print("chamber pressure is: " + str(chamber_pressure))
+    #print(type(chamber_pressure))
+
     jacketpressurepath = "/dev/botpress"
     jacketPressure = serial.Serial(jacketpressurepath)
     jacketPressure.baudrate = 9600
@@ -97,17 +107,16 @@ def get_pressure():
     jacketPressure.stopbits = 1
     jacketPressure.bytesize = 8
     jacketPressure.write(('$@253PR3?;FF').encode('utf8'))
-
+    
     sleep(1)
 
-    ChamberPressureOut = chamberPressure.read(chamberPressure.inWaiting()).decode('utf8')
-    chamber_pressure = str(ChamberPressureOut[7:14])
-    print(chamber_pressure)
-    
     JacketPressureOut = jacketPressure.read(jacketPressure.inWaiting()).decode('utf8')
-    jacket_pressure = JacketPressureOut[7:14]
-    if(jacket_pressure == 0):
-        jacket_pressure == NULL
+    if(JacketPressureOut[7:14] == ''):
+        jacket_pressure = None
+    else:
+        jacket_pressure = float(JacketPressureOut[7:14])
+    #print("jacket pressure is: " + str(jacket_pressure))
+
     # insert
     insert_query = "INSERT INTO pressure (chamber_pressure, jacket_pressure) VALUES (%s, %s);"
     try:
@@ -122,7 +131,7 @@ if __name__ == '__main__':
     sleep_sec = 1
 
     while True:
-        #get_compressor()
+        get_compressor()
         get_pressure()
         sleep(sleep_sec)
 
