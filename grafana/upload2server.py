@@ -7,14 +7,15 @@ import serial
 from serial.tools import list_ports
 import RPi.GPIO as GPIO
 import math
-    
-    
+
+
 def do_nothing(x):
     return x
 
 def unix_timestamp(i):
     return datetime.fromtimestamp(i).strftime("%Y-%m-%d %H:%M:%S.%u")
 
+# convert rtd digitized ADC into Kelvin temperature
 def convert_RTD_ADC(x, offset):
     try:
         # Validate input x
@@ -45,9 +46,10 @@ def convert_RTD_ADC(x, offset):
         #print(f"Error during calculation: {e}")
         return False
 
+# This is for connecting to mysql database
 def connect_table():
 
-    config = { 
+    config = {
             "login":{
                     "host": "192.168.1.242",
                             "port": 3306, "user": "root",
@@ -56,7 +58,7 @@ def connect_table():
                     },
                     "name": "LAr_TPCruns_data"
              }
-    
+
     conn = pymysql.connect(**config['login'])
     cursor = conn.cursor(pymysql.cursors.DictCursor)
 
@@ -64,7 +66,7 @@ def connect_table():
     cursor.execute("USE " + config['name'])
     return cursor
 
-
+# This function query compressor status and send to mysql database
 def get_compressor():
 
     cursor = connect_table()
@@ -85,15 +87,14 @@ def get_compressor():
     Compressor.bytesize = 8
 
     Compressor.write(b'$TEAA4B9\r')
-    sleep(1)
     CompressorOut = Compressor.read(Compressor.inWaiting()).decode('utf8')
     T1_temp = CompressorOut[6:8]
     T2_temp = CompressorOut[10:12]
     T3_temp = CompressorOut[14:16]
 
-    
+
     # insert
-    insert_query = "INSERT INTO compressor (T1, T2, T3) VALUES (%s, %s, %s);" 
+    insert_query = "INSERT INTO compressor (T1, T2, T3) VALUES (%s, %s, %s);"
     try:
         cursor.execute(insert_query,tuple([T1_temp, T2_temp, T3_temp]))
     except:
@@ -101,8 +102,9 @@ def get_compressor():
 
     return
 
+# This function query pressure data from the pressure gauge and send to mysql database
 def get_pressure():
-    
+
     cursor = connect_table()
     # Make table if needed for compressor
     table_query = 'CREATE TABLE IF NOT EXISTS pressure (id int auto_increment, time TIMESTAMP not null DEFAULT CURRENT_TIMESTAMP ,'
@@ -120,8 +122,6 @@ def get_pressure():
     chamberPressure.stopbits = 1
     chamberPressure.bytesize = 8
     chamberPressure.write(('$@001PR3?;FF').encode('utf8'))
-    
-    sleep(1)
 
     ChamberPressureOut = chamberPressure.read(chamberPressure.inWaiting()).decode('utf8')
     if(ChamberPressureOut[7:14] == ''):
@@ -138,8 +138,6 @@ def get_pressure():
     jacketPressure.stopbits = 1
     jacketPressure.bytesize = 8
     jacketPressure.write(('$@253PR3?;FF').encode('utf8'))
-    
-    sleep(1)
 
     JacketPressureOut = jacketPressure.read(jacketPressure.inWaiting()).decode('utf8')
     if(JacketPressureOut[7:14] == ''):
@@ -157,6 +155,7 @@ def get_pressure():
 
     return
 
+# This function query rtd readout from arduino and send to mysql database
 def get_rtd():
     cursor = connect_table()
     # Make table if needed for arduino's rtd sensors
@@ -174,8 +173,6 @@ def get_rtd():
     arduino.parity = 'N'
     arduino.stopbits = 1
     arduino.bytesize = 8
-
-    sleep(1)
 
     RTD = arduino.readline().decode('utf8')
     if(RTD[3:7] == '' or convert_RTD_ADC(RTD[3:7], 0) == False):
@@ -223,7 +220,7 @@ def get_rtd():
         pass
 
     return
-    
+
 if __name__ == '__main__':
 
     sleep_sec = 1
