@@ -7,6 +7,7 @@ import serial
 from serial.tools import list_ports
 import RPi.GPIO as GPIO
 import math
+import getpass
 
 
 def do_nothing(x):
@@ -14,6 +15,29 @@ def do_nothing(x):
 
 def unix_timestamp(i):
     return datetime.fromtimestamp(i).strftime("%Y-%m-%d %H:%M:%S.%u")
+
+def get_user_input(prompt):
+    """
+    Prompt the user for input and return the entered string.
+
+    Parameters:
+    - prompt (str): The prompt to display to the user.
+
+    Returns:
+    - str: The user-entered string.
+    """
+    user_input = input(prompt)
+    return user_input
+
+def get_password():
+    """
+    Prompt the user for a password without displaying the input.
+
+    Returns:
+    - str: The entered password.
+    """
+    password = getpass.getpass("Enter your password: ")
+    return password
 
 # convert rtd digitized ADC into Kelvin temperature
 def convert_RTD_ADC(x, offset):
@@ -47,13 +71,13 @@ def convert_RTD_ADC(x, offset):
         return False
 
 # This is for connecting to mysql database
-def connect_table():
+def connect_table(username, password):
 
     config = {
             "login":{
                     "host": "192.168.1.242",
-                            "port": 3306, "user": "root",
-                            "passwd": "darkmatter",
+                            "port": 3306, "user": username,
+                            "passwd": password,
                             "autocommit": True
                     },
                     "name": "LAr_TPCruns_data"
@@ -67,9 +91,9 @@ def connect_table():
     return cursor
 
 # This function query compressor status and send to mysql database
-def get_compressor():
+def get_compressor(username, password):
 
-    cursor = connect_table()
+    cursor = connect_table(username, password)
     # Make table if needed for compressor
     table_query = 'CREATE TABLE IF NOT EXISTS compressor (id int auto_increment, time TIMESTAMP not null DEFAULT CURRENT_TIMESTAMP ,'
     column_names = ['T1', 'T2', 'T3']
@@ -92,6 +116,7 @@ def get_compressor():
     T2_temp = CompressorOut[10:12]
     T3_temp = CompressorOut[14:16]
 
+    sleep(0.1)
 
     # insert
     insert_query = "INSERT INTO compressor (T1, T2, T3) VALUES (%s, %s, %s);"
@@ -103,9 +128,9 @@ def get_compressor():
     return
 
 # This function query pressure data from the pressure gauge and send to mysql database
-def get_pressure():
+def get_pressure(username, password):
 
-    cursor = connect_table()
+    cursor = connect_table(username, password)
     # Make table if needed for compressor
     table_query = 'CREATE TABLE IF NOT EXISTS pressure (id int auto_increment, time TIMESTAMP not null DEFAULT CURRENT_TIMESTAMP ,'
     column_names = ['chamber_pressure', 'jacket_pressure']
@@ -122,6 +147,8 @@ def get_pressure():
     chamberPressure.stopbits = 1
     chamberPressure.bytesize = 8
     chamberPressure.write(('$@001PR3?;FF').encode('utf8'))
+    
+    sleep(0.1)
 
     ChamberPressureOut = chamberPressure.read(chamberPressure.inWaiting()).decode('utf8')
     if(ChamberPressureOut[7:14] == ''):
@@ -138,6 +165,9 @@ def get_pressure():
     jacketPressure.stopbits = 1
     jacketPressure.bytesize = 8
     jacketPressure.write(('$@253PR3?;FF').encode('utf8'))
+
+    # TO DO: figure out why somehow it need to sleep for a certain time to readout normally
+    sleep(0.1)
 
     JacketPressureOut = jacketPressure.read(jacketPressure.inWaiting()).decode('utf8')
     if(JacketPressureOut[7:14] == ''):
@@ -156,8 +186,8 @@ def get_pressure():
     return
 
 # This function query rtd readout from arduino and send to mysql database
-def get_rtd():
-    cursor = connect_table()
+def get_rtd(username, password):
+    cursor = connect_table(username, password)
     # Make table if needed for arduino's rtd sensors
     table_query = 'CREATE TABLE IF NOT EXISTS rtd (id int auto_increment, time TIMESTAMP not null DEFAULT CURRENT_TIMESTAMP ,'
     column_names = ['R0', 'R1', 'R2', 'R3', 'R4', 'R5']
@@ -173,6 +203,8 @@ def get_rtd():
     arduino.parity = 'N'
     arduino.stopbits = 1
     arduino.bytesize = 8
+
+    sleep(0.1)
 
     RTD = arduino.readline().decode('utf8')
     if(RTD[3:7] == '' or convert_RTD_ADC(RTD[3:7], 0) == False):
@@ -224,11 +256,13 @@ def get_rtd():
 if __name__ == '__main__':
 
     sleep_sec = 1
-
+    username = get_user_input("Enter mySQL username: ")
+    password = get_password()
+    print("data piping into mySQL database...")
     while True:
-        get_compressor()
-        get_pressure()
-        get_rtd()
+        get_compressor(username, password)
+        get_pressure(username ,password)
+        get_rtd(username, password)
         sleep(sleep_sec)
 
 
