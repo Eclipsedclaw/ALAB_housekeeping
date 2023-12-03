@@ -8,6 +8,7 @@ from serial.tools import list_ports
 import RPi.GPIO as GPIO
 import math
 import getpass
+from lazyins import Cursor
 
 
 def do_nothing(x):
@@ -69,6 +70,8 @@ def convert_RTD_ADC(x, offset):
     except Exception as e:
         #print(f"Error during calculation: {e}")
         return False
+
+
 
 # This is for connecting to mysql database
 def connect_table(username, password):
