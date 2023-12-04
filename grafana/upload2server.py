@@ -259,9 +259,12 @@ def get_rtd(username, password):
 if __name__ == '__main__':
 
     sleep_sec = 1
-    username = get_user_input("Enter mySQL username: ")
-    password = get_password()
-    print("data piping into mySQL database...")
+    #username = get_user_input("Enter mySQL username: ")
+    #password = get_password()
+    #print("data piping into mySQL database...")
+
+    username = "root"
+    password = "darkmatter"
     while True:
         get_compressor(username, password)
         get_pressure(username ,password)
