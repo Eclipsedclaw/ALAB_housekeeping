@@ -197,13 +197,12 @@ def get_rtd():
         R5 = convert_RTD_ADC(float(RTD[43:47]), -23)    # (ADC number, offset)
     #print("R5 is " + str(R5) + "K")
 
-
-    # insert
     values_rtd = [R0, R1, R2, R3, R4, R5]
     
-    # insert
-    cursor.setup(name_rtd, types = types_rtd)
-    cursor.register(values_rtd)
+    if(R0 != None and R1 != None and R2 != None and R3 != None and R4 != None and R5 != None):
+        # insert
+        cursor.setup(name_rtd, types = types_rtd)
+        cursor.register(values_rtd)
 
     return
 
