@@ -1,4 +1,5 @@
-
+# Author: Jiancheng Zeng(JC)
+# Date: Dec 8th, 2023
 import pymysql
 from datetime import datetime
 from time import sleep
