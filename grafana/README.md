@@ -6,20 +6,19 @@ python -m pip install lazyins
 ```
 
 ## To pip the data into the database, you will need to provide environment variables to access the sql server. 
-### Change
-### **YOURHOST.COM** to your host ip.
-### **$YOURPORT** to your port(usually 3306). 
-### **$YOURUSERNAME** to mysql username.
-### **$YOURPASSWORD** to mysql password.
+### Change **YOURHOST.COM** to your host ip.
 ```bash
 echo 'export LAZYINS_HOST="$YOURHOST.COM"'>>~/.profile
 ```
+### Change **$YOURPORT** to your port(usually 3306). 
 ```bash
 echo 'export LAZYINS_PORT=$YOURPORT'>>~/.profile
 ```
+### Change **$YOURUSERNAME** to mysql username.
 ```bash
 echo 'export LAZYINS_USER="$YOURUSERNAME"'>>~/.profile
 ```
+### Change **$YOURPASSWORD** to mysql password.
 ```bash
 echo 'export LAZYINS_PASSWD="$YOURPASSWORD"'>>~/.profile
 ```
