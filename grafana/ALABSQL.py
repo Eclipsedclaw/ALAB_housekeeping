@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 
 import pymysql
 from datetime import datetime
@@ -9,8 +8,6 @@ import RPi.GPIO as GPIO
 import math
 from lazyins import Cursor
 import os
-import ALABSQL
-
 
 def do_nothing(x):
     return x
@@ -224,14 +221,4 @@ def get_rtd():
     except:
         pass
         return
-
-if __name__ == '__main__':
-
-    sleep_sec = 1
-    while True:
-        ALABSQL.get_pressure()
-        ALABSQL.get_compressor()
-        ALABSQL.get_rtd()
-        sleep(sleep_sec)
-
 
