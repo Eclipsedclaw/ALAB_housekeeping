@@ -29,6 +29,12 @@ V2Channel = 2
 GPIO.setup(V1Channel,GPIO.OUT)
 GPIO.setup(V2Channel,GPIO.OUT)
 
+# GPIO setting for heater control SSR
+HeaterCtrl = 23
+GPIO.setup(HeaterCtrl,GPIO.OUT)
+
+GPIO.output(HeaterCtrl, GPIO.HIGH)
+
 # search serial port
 ser = serial.Serial()
 devices = [info.device for info in list_ports.comports()]
@@ -301,10 +307,10 @@ def loop():
                 # Pressure gauge 1
 #               This part is for querying the address of the sensor. Uncomment if you want to display that! 
                 #Gauge1.write(('$@003AD!001;FF').encode('utf8'))
-#                Gauge1.write(('$@001AD?;FF').encode('utf8'))
-#                time.sleep(5*T_sleep)
-#                GaugeP1 = Gauge1.read(Gauge1.inWaiting()).decode('utf8')
-#                print('Main Chamber Address:' + GaugeP1 )
+                Gauge1.write(('$@001AD?;FF').encode('utf8'))
+                time.sleep(5*T_sleep)
+                GaugeP1 = Gauge1.read(Gauge1.inWaiting()).decode('utf8')
+                print('Main Chamber Address:' + GaugeP1 )
 
                 #Gauge1.write(('$@253AD!001;FF').encode('utf8'))
                 time.sleep(T_sleep)
@@ -312,8 +318,9 @@ def loop():
                 #Gauge1.write(('@253PR3?;FF').encode('utf8'))
 #               Gauge.write(b'$@253PR4?;FF')
                 time.sleep(2*T_sleep)
+                print('Main Chamber:' + GaugeP1 + " ;len = " +str(len(GaugeP1)))
                 GaugeP1 = Gauge1.read(Gauge1.inWaiting()).decode('utf8')
-#                print('Main Chamber:' + GaugeP1 + " ;len = " +str(len(GaugeP1)))
+                print('Main Chamber:' + GaugeP1 + " ;len = " +str(len(GaugeP1)))
 
                 flag3 = 0
                 while (len(GaugeP1) != 17 and flag3 <= 3):
@@ -501,7 +508,7 @@ def loop():
                     L5_tmp = int(L5_tmp)
                     L5_tmpK = L5_tmp + 273.15
                     L5_correction = L5_tmpK - 24.05 # This is added because the displayed temp was 320.15 K when the room temperature measured 296.10 K.
-
+                   
                 elif len(LiquidLevelOut) != 43:
                     L0_tmpK = None
                     L1_tmpK = None
@@ -552,7 +559,7 @@ def loop():
                # Creating the pandas dataframe that will save the data and using to_csv to save it.
                 dict_to_save = {"Time":X,"EpochTime":LT,"Temp1":T1, "Temp2":T2, "Temp3":T3, "TopPress":P1, "BotPress":P2, "L0Temp":L0, "L1Temp":L1, "L2Temp":L2, "L3Temp":L3, "L4Temp":L4, "L5Temp":L5}
                 df_to_save = pd.DataFrame(dict_to_save)
-                save_file = df_to_save.to_csv(sep=",",path_or_buf=format_str,mode=filestat)
+                save_file = df_to_save.to_csv(sep=",",path_or_buf=format_str,mode='w+')
                 print("Saved file")
                # ax1.plot(X,T1,label="T1")
                # ax1.plot(X,T2,label="T2")
