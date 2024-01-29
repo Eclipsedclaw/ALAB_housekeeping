@@ -32,7 +32,7 @@ GPIO.setup(V2Channel,GPIO.OUT)
 # Heater setting
 HeaterCtrl = 23
 GPIO.setup(HeaterCtrl,GPIO.OUT)
-GPIO.output(HeaterCtrl, GPIO.HIGH)
+#GPIO.output(HeaterCtrl, GPIO.HIGH) settings moved to second popup window
 
 # search serial port
 ser = serial.Serial()
@@ -346,7 +346,7 @@ def loop():
                     txtP1.insert(tkinter.END,P1_tmp)
                     # Email stuff start
                     timenow = time.perf_counter()
-                    P1_lim = 900.0
+                    P1_lim = 1300.0
                     if (P1_tmp > P1_lim  and timenow - timesince > 3600.0):
                         alert = Mailer()
                         alert.sendmail(P1_tmp, "H", P1_lim)
@@ -615,10 +615,27 @@ def CompressorOff():
         Compressor.write(b'$OFF9188\r')
         time.sleep(1)
 
+# Adding functionality to turn heater relay on using a button
+def HeaterOn():
+    global HeaterCtrl
+    res = messagebox.askyesno("Heater On", "Are you sure you want to turn the heater on?")
+    if res == True:
+        print ("Turning the heater on")
+        GPIO.output(HeaterCtrl, GPIO.HIGH)
+        time.sleep(1)
+
+def HeaterOff():
+    global HeaterCtrl
+    res = messagebox.askyesno("Heater Off", "Are you sure you want to turn the heater off?")
+    if res == True:
+        print ("Turning the heater off")
+        GPIO.output(HeaterCtrl, GPIO.LOW)
+        time.sleep(1)
+
 def popupwin():
     popup = tk.Toplevel()
     popup.title("Settings")
-    popup.geometry("400x300")
+    popup.geometry("400x330")
 
     def changestat():
         val = var.get()
@@ -659,16 +676,21 @@ def popupwin():
     LL1lbl = tk.Label(popup, text="LL/Arduino").grid(row=4, column=0)
     sett2lbl = tk.Label(popup, text="ON/OFF Settings", padx=5, pady=10).grid(row=5, column=0)
     comp2lbl = tk.Label(popup, text="Compressor").grid(row=6, column=0)
-    save1lbl = tk.Label(popup, text="File Save Options", padx=5, pady=10).grid(row=7, column=0)
-    save2lbl = tk.Label(popup, text="Mode to save file:").grid(row=8, column=0)
+    heatpwrlbl = tk.Label(popup, text="Heater Power").grid(row=7, column=0)
+    save1lbl = tk.Label(popup, text="File Save Options", padx=5, pady=10).grid(row=8, column=0)
+    save2lbl = tk.Label(popup, text="Mode to save file:").grid(row=9, column=0)
 
     # Buttons
     componbtn = tk.Button(popup, text="ON", command=CompressorOn)
     componbtn.grid(row=6, column=1)
     compoffbtn = tk.Button(popup, text="OFF", command=CompressorOff)
     compoffbtn.grid(row=6, column=2)
+    heatonbtn = tk.Button(popup, text="ON", command=HeaterOn)
+    heatonbtn.grid(row=7, column=1)
+    heatoffbtn = tk.Button(popup, text="OFF", command=HeaterOff)
+    heatoffbtn.grid(row=7, column=2)
     exitbtn = tk.Button(popup, text="Exit", command=popup.destroy)
-    exitbtn.grid(row=9, column=2)
+    exitbtn.grid(row=10, column=2)
 
     # Radiobuttons
     var = tk.StringVar()
