@@ -29,6 +29,11 @@ V2Channel = 2
 GPIO.setup(V1Channel,GPIO.OUT)
 GPIO.setup(V2Channel,GPIO.OUT)
 
+# Heater setting
+HeaterCtrl = 23
+GPIO.setup(HeaterCtrl,GPIO.OUT)
+GPIO.output(HeaterCtrl, GPIO.HIGH)
+
 # search serial port
 ser = serial.Serial()
 devices = [info.device for info in list_ports.comports()]
@@ -589,6 +594,7 @@ def stop():
         Compressor.close()
         Gauge1.close()
         Gauge2.close()
+        LiquidLevel.close()
         window.destroy()
 
 def CompressorOn():
