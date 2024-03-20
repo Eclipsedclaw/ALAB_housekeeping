@@ -20,6 +20,18 @@ import pandas as pd
 
 import RPi.GPIO as GPIO
 
+from time import sleep
+
+import pymysql
+from datetime import datetime
+from time import sleep
+import serial
+from serial.tools import list_ports
+import RPi.GPIO as GPIO
+import math
+from lazyins import Cursor
+import os
+
 # GPIO setting
 GPIO.setmode(GPIO.BCM)
 V1 = 'closed'
@@ -29,11 +41,10 @@ V2Channel = 2
 GPIO.setup(V1Channel,GPIO.OUT)
 GPIO.setup(V2Channel,GPIO.OUT)
 
-# GPIO setting for heater control SSR
+# Heater setting
 HeaterCtrl = 23
 GPIO.setup(HeaterCtrl,GPIO.OUT)
-
-GPIO.output(HeaterCtrl, GPIO.HIGH)
+#GPIO.output(HeaterCtrl, GPIO.HIGH) settings moved to second popup window
 
 # search serial port
 ser = serial.Serial()
@@ -42,7 +53,7 @@ print('available port: ')
 print(devices)
 
 #fig = plt.figure()
-fig = plt.figure(figsize=(9,4))
+fig = plt.figure(figsize=(8,3))
 #plt.rcParams["font.size"] = 14
 #plt.grid()
 ax1 = fig.add_subplot(1, 2, 1)
@@ -80,7 +91,7 @@ Gauge1.baudrate = 9600
 Gauge1.parity = 'N'
 Gauge1.stopbits = 1
 Gauge1.bytesize = 8
-#Gauge1.write(('$@253AD?;FF').encode('utf8'))
+#Gauge1.write(('$@001AD?;FF').encode('utf8'))
 #Gauge1.write(('$@253AD!001;FF').encode('utf8'))
 
 Gauge2 = serial.Serial()
@@ -113,7 +124,7 @@ compstat = 1
 topstat = 1
 botstat = 1
 LLstat = 1
-filestat = "a"
+filestat = "w"
 
 # Initializing email variables
 server = "smtp.gmail.com"
@@ -226,6 +237,39 @@ def loop():
                 time.sleep(T_sleep)
                 CompressorOut = Compressor.read(Compressor.inWaiting()).decode('utf8')
                 flag1 = 0
+                
+                #grafana setup
+                # Keita's module for eazy sql input
+                print("host is: " + str(os.environ.get('LAZYINS_HOST')))
+                cursor = Cursor(host=os.environ.get('LAZYINS_HOST'), port=os.environ.get('LAZYINS_PORT'), user=os.environ.get('LAZYINS_USER'), passwd=os.environ.get('LAZYINS_PASSWD'), db_name = 'LAr_TPCruns_data', table_name = 'compressor')
+                
+                # table for compressor in db, currently shows compressor temperature T1/T2/T3
+                name_compressor = ['T1', 'T2', 'T3']
+                types_compressor = ['int', 'int', 'int']
+
+                # Todo: figure out why it need to sleep for a certain amount of time
+                sleep(1)
+
+                # This is to check whether there is any values properly read
+                if(CompressorOut[6:8] == ''):
+                    T1_temp = None
+                else:
+                    T1_temp = CompressorOut[6:8]
+                if(CompressorOut[10:12] == ''):
+                    T2_temp = None
+                else:
+                    T2_temp = CompressorOut[10:12]
+                if(CompressorOut[14:16] == ''):
+                    T3_temp = None
+                else:
+                    T3_temp = CompressorOut[14:16]
+
+                values_compressor = [T1_temp, T2_temp, T3_temp]
+
+                # insert data to mysql database
+                cursor.setup(name_compressor, types = types_compressor)
+                cursor.register(values_compressor)
+        
                 while (len(CompressorOut) != 26 and flag1 <= 3):
                     print ('Compressor temperature readout error')
                     Compressor.write(b'$TEAA4B9\r')
@@ -302,15 +346,18 @@ def loop():
                 Status_tmp = None
 #            print (Status_tmp)
 
-
+            cursor = Cursor(host=os.environ.get('LAZYINS_HOST'), port=os.environ.get('LAZYINS_PORT'), user=os.environ.get('LAZYINS_USER'), passwd=os.environ.get('LAZYINS_PASSWD'), db_name = 'LAr_TPCruns_data', table_name = 'pressure')
+            # table for pressure in db
+            name_pressure = ['chamber_pressure', 'jacket_pressure']
+            types_pressure = ['float', 'float']
             if topstat == 1:
                 # Pressure gauge 1
 #               This part is for querying the address of the sensor. Uncomment if you want to display that! 
-                #Gauge1.write(('$@003AD!001;FF').encode('utf8'))
-                Gauge1.write(('$@001AD?;FF').encode('utf8'))
-                time.sleep(5*T_sleep)
-                GaugeP1 = Gauge1.read(Gauge1.inWaiting()).decode('utf8')
-                print('Main Chamber Address:' + GaugeP1 )
+                Gauge1.write(('$@253AD!001;FF').encode('utf8'))
+                #Gauge1.write(('$@254AD?;FF').encode('utf8'))
+                #time.sleep(5*T_sleep)
+                #GaugeP1 = Gauge1.read(Gauge1.inWaiting()).decode('utf8')
+                #print('Main Chamber Address:' + GaugeP1 )
 
                 #Gauge1.write(('$@253AD!001;FF').encode('utf8'))
                 time.sleep(T_sleep)
@@ -318,9 +365,8 @@ def loop():
                 #Gauge1.write(('@253PR3?;FF').encode('utf8'))
 #               Gauge.write(b'$@253PR4?;FF')
                 time.sleep(2*T_sleep)
-                print('Main Chamber:' + GaugeP1 + " ;len = " +str(len(GaugeP1)))
                 GaugeP1 = Gauge1.read(Gauge1.inWaiting()).decode('utf8')
-                print('Main Chamber:' + GaugeP1 + " ;len = " +str(len(GaugeP1)))
+#                print('Main Chamber:' + GaugeP1 + " ;len = " +str(len(GaugeP1)))
 
                 flag3 = 0
                 while (len(GaugeP1) != 17 and flag3 <= 3):
@@ -348,7 +394,7 @@ def loop():
                     txtP1.insert(tkinter.END,P1_tmp)
                     # Email stuff start
                     timenow = time.perf_counter()
-                    P1_lim = 900.0
+                    P1_lim = 1300.0
                     if (P1_tmp > P1_lim  and timenow - timesince > 3600.0):
                         alert = Mailer()
                         alert.sendmail(P1_tmp, "H", P1_lim)
@@ -429,7 +475,18 @@ def loop():
             elif botstat == 0:
                 print("Bottom pressure gauge port not found/open")
                 P2_tmp = None
+            
+            values_pressure = [P1_tmp, P2_tmp]
+            # insert
+            cursor.setup(name_pressure, types = types_pressure)
+            cursor.register(values_pressure)
                 ###################### Thermometry ###############################
+            
+            cursor = Cursor(host=os.environ.get('LAZYINS_HOST'), port=os.environ.get('LAZYINS_PORT'), user=os.environ.get('LAZYINS_USER'), passwd=os.environ.get('LAZYINS_PASSWD'), db_name = 'LAr_TPCruns_data', table_name = 'rtd')
+            # table for pressure in db
+            name_rtd = ['R0', 'R1', 'R2', 'R3', 'R4', 'R5']
+            types_rtd = ['FLOAT', 'FLOAT', 'FLOAT', 'FLOAT', 'FLOAT', 'FLOAT']
+            
             if LLstat == 0:
                 print("Arduino port not found/open")
                 L0_tmp = None
@@ -508,7 +565,7 @@ def loop():
                     L5_tmp = int(L5_tmp)
                     L5_tmpK = L5_tmp + 273.15
                     L5_correction = L5_tmpK - 24.05 # This is added because the displayed temp was 320.15 K when the room temperature measured 296.10 K.
-                   
+
                 elif len(LiquidLevelOut) != 43:
                     L0_tmpK = None
                     L1_tmpK = None
@@ -555,11 +612,18 @@ def loop():
                 L5.append(L5_correction)
                 X.append(time.perf_counter() - start_time)
                 LT.append(time.time())
+                
+                values_rtd = [float(L0_correction), float(L1_correction), float(L2_correction), float(L3_correction), float(L4_correction), float(L5_correction)]
+
+                if(L0 != None and L1 != None and L2 != None and L3 != None and L4 != None and L5 != None):
+                    # insert
+                    cursor.setup(name_rtd, types = types_rtd)
+                    cursor.register(values_rtd)
 
                # Creating the pandas dataframe that will save the data and using to_csv to save it.
                 dict_to_save = {"Time":X,"EpochTime":LT,"Temp1":T1, "Temp2":T2, "Temp3":T3, "TopPress":P1, "BotPress":P2, "L0Temp":L0, "L1Temp":L1, "L2Temp":L2, "L3Temp":L3, "L4Temp":L4, "L5Temp":L5}
                 df_to_save = pd.DataFrame(dict_to_save)
-                save_file = df_to_save.to_csv(sep=",",path_or_buf=format_str,mode='w+')
+                save_file = df_to_save.to_csv(sep=",",path_or_buf=format_str,mode=filestat)
                 print("Saved file")
                # ax1.plot(X,T1,label="T1")
                # ax1.plot(X,T2,label="T2")
@@ -596,6 +660,7 @@ def stop():
         Compressor.close()
         Gauge1.close()
         Gauge2.close()
+        LiquidLevel.close()
         window.destroy()
 
 def CompressorOn():
@@ -616,10 +681,27 @@ def CompressorOff():
         Compressor.write(b'$OFF9188\r')
         time.sleep(1)
 
+# Adding functionality to turn heater relay on using a button
+def HeaterOn():
+    global HeaterCtrl
+    res = messagebox.askyesno("Heater On", "Are you sure you want to turn the heater on?")
+    if res == True:
+        print ("Turning the heater on")
+        GPIO.output(HeaterCtrl, GPIO.HIGH)
+        time.sleep(1)
+
+def HeaterOff():
+    global HeaterCtrl
+    res = messagebox.askyesno("Heater Off", "Are you sure you want to turn the heater off?")
+    if res == True:
+        print ("Turning the heater off")
+        GPIO.output(HeaterCtrl, GPIO.LOW)
+        time.sleep(1)
+
 def popupwin():
     popup = tk.Toplevel()
     popup.title("Settings")
-    popup.geometry("400x300")
+    popup.geometry("400x330")
 
     def changestat():
         val = var.get()
@@ -643,6 +725,7 @@ def popupwin():
             raise Exception("Invalid value provided to function.")
 
     def setsavemode():
+       # pass
         val = filemode.get()
         if val == "a":
             filestat = val
@@ -660,16 +743,21 @@ def popupwin():
     LL1lbl = tk.Label(popup, text="LL/Arduino").grid(row=4, column=0)
     sett2lbl = tk.Label(popup, text="ON/OFF Settings", padx=5, pady=10).grid(row=5, column=0)
     comp2lbl = tk.Label(popup, text="Compressor").grid(row=6, column=0)
-    save1lbl = tk.Label(popup, text="File Save Options", padx=5, pady=10).grid(row=7, column=0)
-    save2lbl = tk.Label(popup, text="Mode to save file:").grid(row=8, column=0)
+    heatpwrlbl = tk.Label(popup, text="Heater Power").grid(row=7, column=0)
+    save1lbl = tk.Label(popup, text="File Save Options", padx=5, pady=10).grid(row=8, column=0)
+    save2lbl = tk.Label(popup, text="Mode to save file:").grid(row=9, column=0)
 
     # Buttons
     componbtn = tk.Button(popup, text="ON", command=CompressorOn)
     componbtn.grid(row=6, column=1)
     compoffbtn = tk.Button(popup, text="OFF", command=CompressorOff)
     compoffbtn.grid(row=6, column=2)
+    heatonbtn = tk.Button(popup, text="ON", command=HeaterOn)
+    heatonbtn.grid(row=7, column=1)
+    heatoffbtn = tk.Button(popup, text="OFF", command=HeaterOff)
+    heatoffbtn.grid(row=7, column=2)
     exitbtn = tk.Button(popup, text="Exit", command=popup.destroy)
-    exitbtn.grid(row=9, column=2)
+    exitbtn.grid(row=10, column=2)
 
     # Radiobuttons
     var = tk.StringVar()
@@ -839,7 +927,7 @@ if __name__ == '__main__':
         toolbar = NavigationToolbar2Tk(canvas,toolbarFrame)
 
         window.mainloop()
-
+    
     except KeyboardInterrupt:
         stop()
 
