@@ -110,7 +110,7 @@ LiquidLevel.stopbits = 1
 LiquidLevel.bytesize = 8
 
 Error = 0
-T_sleep = 0.1 #sleep time
+T_sleep = 0.6 #sleep time
 
 # Time start for showing live times for all sensors
 master_start = datetime.now()
@@ -235,13 +235,17 @@ def loop():
                 # Compressor temperature
                 Compressor.write(b'$TEAA4B9\r')
                 time.sleep(T_sleep)
-                CompressorOut = Compressor.read(Compressor.inWaiting()).decode('utf8')
+                try:
+                    CompressorOut = Compressor.read(Compressor.inWaiting()).decode('utf8')
+                    print(CompressorOut)
+                except UnicodeDecodeError:
+                    CompressorOut = None
                 flag1 = 0
                 
                 #grafana setup
                 # Keita's module for eazy sql input
                 print("host is: " + str(os.environ.get('LAZYINS_HOST')))
-                
+    
                 try:
                     cursor = Cursor(host=os.environ.get('LAZYINS_HOST'), port=os.environ.get('LAZYINS_PORT'), user=os.environ.get('LAZYINS_USER'), passwd=os.environ.get('LAZYINS_PASSWD'), db_name = 'LAr_TPCruns_data', table_name = 'compressor')
                 except:
@@ -274,12 +278,15 @@ def loop():
                 # insert data to mysql database
                 cursor.setup(name_compressor, types = types_compressor)
                 cursor.register(values_compressor)
-        
+
                 while (len(CompressorOut) != 26 and flag1 <= 3):
                     print ('Compressor temperature readout error')
                     Compressor.write(b'$TEAA4B9\r')
                     time.sleep(T_sleep)
-                    CompressorOut = Compressor.read(Compressor.inWaiting()).decode('utf8')
+                    try:
+                        CompressorOut = Compressor.read(Compressor.inWaiting()).decode('utf8')
+                    except UnicodeDecodeError:
+                        CompressorOut = None
                     flag1 += 1
                 #$TEA,021,015,015,000,6F37
                 print (CompressorOut)
@@ -318,22 +325,63 @@ def loop():
                     T1_tmp = None
                     T2_tmp = None
                     T3_tmp = None
+                """try:
+                    cursor = Cursor(host=os.environ.get('LAZYINS_HOST'), port=os.environ.get('LAZYINS_PORT'), user=os.environ.get('LAZYINS_USER'), passwd=os.environ.get('LAZYINS_PASSWD'), db_name = 'LAr_TPCruns_data', table_name = 'compressor')
+                except:
+                    time.sleep(T_sleep)
+                    cursor = Cursor(host=os.environ.get('LAZYINS_HOST'), port=os.environ.get('LAZYINS_PORT'), user=os.environ.get('LAZYINS_USER'), passwd=os.environ.get('LAZYINS_PASSWD'), db_name = 'LAr_TPCruns_data', table_name = 'compressor')
+
+                # table for compressor in db, currently shows compressor temperature T1/T2/T3
+                name_compressor = ['T1', 'T2', 'T3']
+                types_compressor = ['int', 'int', 'int']
+
+                # Todo: figure out why it need to sleep for a certain amount of time
+                sleep(1)
+
+                # This is to check whether there is any values properly read
+                if(CompressorOut[6:8] == ''):
+                    T1_temp = None
+                else:
+                    T1_temp = CompressorOut[6:8]
+                if(CompressorOut[10:12] == ''):
+                    T2_temp = None
+                else:
+                    T2_temp = CompressorOut[10:12]
+                if(CompressorOut[14:16] == ''):
+                    T3_temp = None
+                else:
+                    T3_temp = CompressorOut[14:16]
+
+                values_compressor = [T1_temp, T2_temp, T3_temp]
+
+                # insert data to mysql database
+                cursor.setup(name_compressor, types = types_compressor)
+                cursor.register(values_compressor)"""
+                
+                
                 # Compressor status
                 Compressor.write(b'$STA3504\r')
                 time.sleep(T_sleep)
-                CompressorOut = Compressor.read(Compressor.inWaiting()).decode('utf8')
+                try:
+                    CompressorOutStat = Compressor.read(Compressor.inWaiting()).decode('utf8')
+                    print(CompressorOutStat)
+                except UnicodeDecodeError:
+                    CompressorOutStat = None
                 flag2 = 0
-                while (len(CompressorOut) != 15 and flag2 <= 3):
+                while (len(CompressorOutStat) != 15 and flag2 <= 3):
                     print ('Compressor status readout error')
                     Compressor.write(b'$STA3504\r')
                     time.sleep(T_sleep)
-                    CompressorOut = Compressor.read(Compressor.inWaiting()).decode('utf8')
+                    try:
+                        CompressorOutStat = Compressor.read(Compressor.inWaiting()).decode('utf8')
+                    except UnicodeDecodeError:
+                        CompressorOutStat = None
                     flag2 += 1
                 #$STA,0000,FAD0
-                print (CompressorOut)
+                print (CompressorOutStat)
     #            print (len(CompressorOut))
                 if len(CompressorOut) == 15:
-                    Status_tmp = CompressorOut[5:9]
+                    Status_tmp = CompressorOutStat[5:9]
                     if(Status_tmp == '0000' and Error == 0): Status = 'OFF'
                     elif(Status_tmp == '0301'and Error == 0): Status = 'OK'
                     else:
@@ -341,7 +389,7 @@ def loop():
                         Error = 1
                     txtStatus.delete(0,tkinter.END)
                     txtStatus.insert(tkinter.END,Status)
-                elif len(CompressorOut) != 15:
+                elif len(CompressorOutStat) != 15:
                     Status_tmp = None
             elif compstat == 0:
                 print("Compressor port not found/open")
