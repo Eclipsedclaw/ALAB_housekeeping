@@ -110,7 +110,7 @@ LiquidLevel.stopbits = 1
 LiquidLevel.bytesize = 8
 
 Error = 0
-T_sleep = 0.6 #sleep time
+T_sleep = 0.1 #sleep time
 
 # Time start for showing live times for all sensors
 master_start = datetime.now()
@@ -376,10 +376,10 @@ def loop():
                         time.sleep(T_sleep)
                         GaugeP1 = Gauge1.read(Gauge1.inWaiting()).decode('utf8')
  #                       print(GaugeP1 + " ;len = " +str(len(GaugeP1)))
-                        flag3 += 1
                     except UnicodeDecodeError:
                         print ("Event lost")
                         pass
+                    flag3 += 1
                 #@253ACK6.41E+2;FF
                 if len(GaugeP1) == 17:
                     top_time = datetime.now()
@@ -444,10 +444,8 @@ def loop():
                 Gauge2.write(('$@253PR3?;FF').encode('utf8'))
 
                 time.sleep(T_sleep)
-
                 GaugeP2 = Gauge2.read(Gauge2.inWaiting()).decode('utf8')
                 print('Jacket:' + GaugeP2 + " ;len = " +str(len(GaugeP2)))
-
                 flag4 = 0
                 while (len(GaugeP2) != 17 and flag4 <= 3):
                     print ('Pressure gauge (P2) readout error')
