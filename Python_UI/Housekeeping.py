@@ -142,9 +142,9 @@ class Mailer:
         session.ehlo()
         session.starttls()
         session.ehlo()
-
-        message_high = "ALERT: The pressure in the main chamber is %02f torr." % toppress
-        message_low = "NOTICE: The pressure is now %02f torr, which is below the threshold of %02f torr." % (toppress, limit)
+	# Just added small mod to keep the value displayed in emails to two decimal places.
+        message_high = "ALERT: The pressure in the main chamber is %.02f torr." % toppress
+        message_low = "NOTICE: The pressure is now %.02f torr, which is below the threshold of %02f torr." % (toppress, limit)
         msg = EmailMessage()
 
         session.login(gmail_username, gmail_pass)
@@ -258,7 +258,8 @@ def loop():
 
                 # Todo: figure out why it need to sleep for a certain amount of time
                 sleep(1)
-
+                #for debugging
+                print(CompressorOut)
                 # This is to check whether there is any values properly read
                 if(CompressorOut[6:8] == ''):
                     T1_temp = None
@@ -380,7 +381,7 @@ def loop():
                 #$STA,0000,FAD0
                 print (CompressorOutStat)
     #            print (len(CompressorOut))
-                if len(CompressorOut) == 15:
+                if len(CompressorOutStat) == 15:
                     Status_tmp = CompressorOutStat[5:9]
                     if(Status_tmp == '0000' and Error == 0): Status = 'OFF'
                     elif(Status_tmp == '0301'and Error == 0): Status = 'OK'
