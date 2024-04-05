@@ -245,11 +245,12 @@ def loop():
                 #grafana setup
                 # Keita's module for eazy sql input
                 print("host is: " + str(os.environ.get('LAZYINS_HOST')))
-    
+
                 try:
                     cursor = Cursor(host=os.environ.get('LAZYINS_HOST'), port=os.environ.get('LAZYINS_PORT'), user=os.environ.get('LAZYINS_USER'), passwd=os.environ.get('LAZYINS_PASSWD'), db_name = 'LAr_TPCruns_data', table_name = 'compressor')
-                except:
-                    time.sleep(T_sleep)
+                except NameError:
+                    print("database compressor chart read error!")
+                else:
                     cursor = Cursor(host=os.environ.get('LAZYINS_HOST'), port=os.environ.get('LAZYINS_PORT'), user=os.environ.get('LAZYINS_USER'), passwd=os.environ.get('LAZYINS_PASSWD'), db_name = 'LAr_TPCruns_data', table_name = 'compressor')
 
                 # table for compressor in db, currently shows compressor temperature T1/T2/T3
@@ -257,7 +258,7 @@ def loop():
                 types_compressor = ['int', 'int', 'int']
 
                 # Todo: figure out why it need to sleep for a certain amount of time
-                sleep(1)
+                sleep(0.1)
                 #for debugging
                 print(CompressorOut)
                 # This is to check whether there is any values properly read
@@ -402,8 +403,9 @@ def loop():
 
             try:
                 cursor = Cursor(host=os.environ.get('LAZYINS_HOST'), port=os.environ.get('LAZYINS_PORT'), user=os.environ.get('LAZYINS_USER'), passwd=os.environ.get('LAZYINS_PASSWD'), db_name = 'LAr_TPCruns_data', table_name = 'pressure')
-            except:
-                time.sleep(T_sleep)
+            except NameError:
+                print("database pressure chart read error!")
+            else:
                 cursor = Cursor(host=os.environ.get('LAZYINS_HOST'), port=os.environ.get('LAZYINS_PORT'), user=os.environ.get('LAZYINS_USER'), passwd=os.environ.get('LAZYINS_PASSWD'), db_name = 'LAr_TPCruns_data', table_name = 'pressure')
             
             # table for pressure in db
@@ -423,7 +425,7 @@ def loop():
                 Gauge1.write(('$@001PR3?;FF').encode('utf8'))
                 #Gauge1.write(('@253PR3?;FF').encode('utf8'))
 #               Gauge.write(b'$@253PR4?;FF')
-                time.sleep(2*T_sleep)
+                time.sleep(T_sleep)
                 GaugeP1 = Gauge1.read(Gauge1.inWaiting()).decode('utf8')
 #                print('Main Chamber:' + GaugeP1 + " ;len = " +str(len(GaugeP1)))
 
@@ -499,7 +501,7 @@ def loop():
             if botstat == 1:
                 # Presusre gauge 2
                 #Gauge2.write(('$@253AD!002;FF').encode('utf8'))
-                time.sleep(2*T_sleep)
+                time.sleep(T_sleep)
                 Gauge2.write(('$@253PR3?;FF').encode('utf8'))
 
                 time.sleep(T_sleep)
@@ -541,8 +543,9 @@ def loop():
             
             try:
                 cursor = Cursor(host=os.environ.get('LAZYINS_HOST'), port=os.environ.get('LAZYINS_PORT'), user=os.environ.get('LAZYINS_USER'), passwd=os.environ.get('LAZYINS_PASSWD'), db_name = 'LAr_TPCruns_data', table_name = 'rtd')
-            except:
-                time.sleep(T_sleep)
+            except NameError:
+                print("database rtd chart read error!")
+            else:
                 cursor = Cursor(host=os.environ.get('LAZYINS_HOST'), port=os.environ.get('LAZYINS_PORT'), user=os.environ.get('LAZYINS_USER'), passwd=os.environ.get('LAZYINS_PASSWD'), db_name = 'LAr_TPCruns_data', table_name = 'rtd')
             
             # table for pressure in db
@@ -732,7 +735,7 @@ def CompressorOn():
     if res == True:
         print ('turning on the compressor')
         Compressor.write(b'$ON177CF\r')
-        time.sleep(1)
+        time.sleep(0.1)
 
 def CompressorOff():
     global Compressor
@@ -741,7 +744,7 @@ def CompressorOff():
     if res == True:
         print ('turning off the compressor')
         Compressor.write(b'$OFF9188\r')
-        time.sleep(1)
+        time.sleep(0.1)
 
 # Adding functionality to turn heater relay on using a button
 def HeaterOn():
