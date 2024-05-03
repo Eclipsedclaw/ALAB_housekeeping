@@ -414,15 +414,17 @@ def loop():
             if topstat == 1:
                 # Pressure gauge 1
 #               This part is for querying the address of the sensor. Uncomment if you want to display that! 
-                Gauge1.write(('$@253AD!001;FF').encode('utf8'))
+                #Gauge1.write(('$@253AD!001;FF').encode('utf8'))
                 #Gauge1.write(('$@254AD?;FF').encode('utf8'))
+                Gauge1.write(('@001PR3?;FF').encode('utf8'))
+
                 #time.sleep(5*T_sleep)
-                #GaugeP1 = Gauge1.read(Gauge1.inWaiting()).decode('utf8')
-                #print('Main Chamber Address:' + GaugeP1 )
+                GaugeP1 = Gauge1.read(Gauge1.inWaiting()).decode('utf8')
+                print('Main Chamber Address:' + GaugeP1 )
 
                 #Gauge1.write(('$@253AD!001;FF').encode('utf8'))
-                time.sleep(T_sleep)
-                Gauge1.write(('$@001PR3?;FF').encode('utf8'))
+                #time.sleep(T_sleep)
+                #Gauge1.write(('$@001PR3?;FF').encode('utf8'))
                 #Gauge1.write(('@253PR3?;FF').encode('utf8'))
 #               Gauge.write(b'$@253PR4?;FF')
                 time.sleep(T_sleep)
@@ -433,10 +435,10 @@ def loop():
                 while (len(GaugeP1) != 17 and flag3 <= 3):
                     try:
                         print ('Pressure gauge (P1) readout error')
-                        Gauge1.write(('$@001PR3?;FF').encode('utf8'))
+                        Gauge1.write(('@001PR3?;FF').encode('utf8'))
                         time.sleep(T_sleep)
                         GaugeP1 = Gauge1.read(Gauge1.inWaiting()).decode('utf8')
- #                       print(GaugeP1 + " ;len = " +str(len(GaugeP1)))
+                        print(GaugeP1 + " ;len = " +str(len(GaugeP1)))
                     except UnicodeDecodeError:
                         print ("Event lost")
                         pass
@@ -502,7 +504,7 @@ def loop():
                 # Presusre gauge 2
                 #Gauge2.write(('$@253AD!002;FF').encode('utf8'))
                 time.sleep(T_sleep)
-                Gauge2.write(('$@253PR3?;FF').encode('utf8'))
+                Gauge2.write(('@253PR3?;FF').encode('utf8'))
 
                 time.sleep(T_sleep)
                 GaugeP2 = Gauge2.read(Gauge2.inWaiting()).decode('utf8')
