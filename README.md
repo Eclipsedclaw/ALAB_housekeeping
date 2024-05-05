@@ -1,9 +1,14 @@
-### To use python GUI, go to
+### To use pyQt5 python GUI, go to pyqt5
 ```bash
-./Python_UI/
+cd ./pyqt5/
 ```
 
-### To use mySQL database and grafana, go to
+### To use python GUI, go to Python_UI
 ```bash
-./grafana/
+cd ./Python_UI/
+```
+
+### To use mySQL database and grafana, go to grafana
+```bash
+cd ./grafana/
 ```
