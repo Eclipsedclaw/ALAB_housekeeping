@@ -11,118 +11,28 @@ from PyQt5.QtGui import QColor
 import ALABHK_query
 import threading
 import time
+import RPi.GPIO as GPIO
 
-# For turn on compressor pop out control
-# TODO: need to combine button function with actual GPIO input/output
-class CompressorControlONDialog(QDialog):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        
-        self.setWindowTitle("Compressor Control")
-        
-        layout = QVBoxLayout()
-        layout.addWidget(QLabel("<html>""<p>Are you sure you want to TURN ON cold head? <br>""<span style='color:red;'>Make sure water cooler is operating!</span></p>""</html>"))
-        
-        yesButton = QPushButton("Yes")
-        yesButton.clicked.connect(self.accept)  # Accept the dialog when "Yes" is clicked
-        layout.addWidget(yesButton)
-        
-        noButton = QPushButton("No")
-        noButton.clicked.connect(self.reject)  # Reject the dialog when "No" is clicked
-        layout.addWidget(noButton)
-        
-        self.setLayout(layout)
 
-# For turn off compressor pop out control
-# TODO: need to combine button function with actual GPIO input/output
-class CompressorControlOFFDialog(QDialog):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        
-        self.setWindowTitle("Compressor Control")
-        
-        layout = QVBoxLayout()
-        layout.addWidget(QLabel("Are you sure you want to TURN OFF compressor?"))
-        
-        yesButton = QPushButton("Yes")
-        yesButton.clicked.connect(self.accept)  # Accept the dialog when "Yes" is clicked
-        layout.addWidget(yesButton)
-        
-        noButton = QPushButton("No")
-        noButton.clicked.connect(self.reject)  # Reject the dialog when "No" is clicked
-        layout.addWidget(noButton)
-        
-        self.setLayout(layout)
 
-# For turn on heaters pop out control
-# TODO: need to combine button function with actual GPIO input/output
-class HeaterControlONDialog(QDialog):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        
-        self.setWindowTitle("Heaters Control")
-        
-        layout = QVBoxLayout()
-        layout.addWidget(QLabel("<html>""<p>Are you sure you want to TURN ON heaters? ""</html>"))
-        
-        yesButton = QPushButton("Yes")
-        yesButton.clicked.connect(self.accept)  # Accept the dialog when "Yes" is clicked
-        layout.addWidget(yesButton)
-        
-        noButton = QPushButton("No")
-        noButton.clicked.connect(self.reject)  # Reject the dialog when "No" is clicked
-        layout.addWidget(noButton)
-        
-        self.setLayout(layout)
-
-# For turn off heaters pop out control
-# TODO: need to combine button function with actual GPIO input/output
-class HeaterControlOFFDialog(QDialog):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        
-        self.setWindowTitle("Heaters Control")
-        
-        layout = QVBoxLayout()
-        layout.addWidget(QLabel("Are you sure you want to TURN OFF heaters?"))
-        
-        yesButton = QPushButton("Yes")
-        yesButton.clicked.connect(self.accept)  # Accept the dialog when "Yes" is clicked
-        layout.addWidget(yesButton)
-        
-        noButton = QPushButton("No")
-        noButton.clicked.connect(self.reject)  # Reject the dialog when "No" is clicked
-        layout.addWidget(noButton)
-        
-        self.setLayout(layout)
-
-# For exit
-class StopandquitDialog(QDialog):
-    def __init__(self, app, parent=None):
-        super().__init__(parent)
-        
-        self.setWindowTitle("Exit Housekeeping")
-        self.app = app  # Store the QApplication instance
-        
-        layout = QVBoxLayout()
-        layout.addWidget(QLabel("Are you sure you want to Exit?"))
-        
-        yesButton = QPushButton("Yes")
-        yesButton.clicked.connect(self.on_yes_clicked)  # Close the application when "Yes" is clicked
-        layout.addWidget(yesButton)
-        
-        noButton = QPushButton("No")
-        noButton.clicked.connect(self.reject)  # Reject the dialog when "No" is clicked
-        layout.addWidget(noButton)
-        
-        self.setLayout(layout)
-
-    def on_yes_clicked(self):
-        self.app.quit()  # Close the application
 
 class WidgetGallery(QDialog):
     def __init__(self, parent=None):
         super(WidgetGallery, self).__init__(parent)
+
+        # GPIO setting
+        GPIO.setmode(GPIO.BCM)
+        V1 = 'closed'
+        V2 = 'closed'
+        V1Channel = 2
+        V2Channel = 2
+        GPIO.setup(V1Channel,GPIO.OUT)
+        GPIO.setup(V2Channel,GPIO.OUT)
+
+        # Heater setting
+        GPIO_pin = 23
+        GPIO.setup(GPIO_pin,GPIO.OUT)
+
 
         # Set the geometry of the main window
         self.setGeometry(100, 100, 650, 400)  # (x, y, width, height)
@@ -145,7 +55,7 @@ class WidgetGallery(QDialog):
         disableWidgetsCheckBox = QCheckBox("&Lock changes")
 
         # define global table for data query
-        self.compressorWidget = QTableWidget(3, 1)
+        self.compressorWidget = QTableWidget(4, 1)
         self.rtdWidget = QTableWidget(10, 1)
         self.pressureWidget = QTableWidget(2, 1)
 
@@ -310,7 +220,7 @@ class WidgetGallery(QDialog):
         compressorTab = QWidget()
         self.compressorWidget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         # Customize row headers
-        row_headers_rtd = ["Helium discharge", "Water outlet", "Water inlet"]
+        row_headers_rtd = ["Helium discharge", "Water outlet", "Water inlet", "Return Preesure/PSIG"]
         for i, text in enumerate(row_headers_rtd):
             item = QTableWidgetItem(text)
             self.compressorWidget.setVerticalHeaderItem(i, item)
@@ -405,3 +315,126 @@ class WidgetGallery(QDialog):
 
         # Repeat this process every 1 seconds
         QTimer.singleShot(1000, self.pumpDataIntoTables)
+
+# For turn on compressor pop out control
+class CompressorControlONDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        
+        self.setWindowTitle("Compressor Control")
+        
+        layout = QVBoxLayout()
+        layout.addWidget(QLabel("<html>""<p>Are you sure you want to TURN ON cold head? <br>""<span style='color:red;'>Make sure water cooler is operating!</span></p>""</html>"))
+        
+        yesButton = QPushButton("Yes")
+        yesButton.clicked.connect(self.ONClicked)  # Accept the dialog when "Yes" is clicked
+        layout.addWidget(yesButton)
+        
+        noButton = QPushButton("No")
+        noButton.clicked.connect(self.reject)  # Reject the dialog when "No" is clicked
+        layout.addWidget(noButton)
+        
+        self.setLayout(layout)
+    
+    def ONClicked(self):
+        ALABHK_query.compressor_ON()
+        self.accept()  # Accept the dialog
+
+
+# For turn off compressor pop out control
+class CompressorControlOFFDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        
+        self.setWindowTitle("Compressor Control")
+        
+        layout = QVBoxLayout()
+        layout.addWidget(QLabel("Are you sure you want to TURN OFF compressor?"))
+        
+        yesButton = QPushButton("Yes")
+        yesButton.clicked.connect(self.OFFClicked)  # Accept the dialog when "Yes" is clicked
+        layout.addWidget(yesButton)
+        
+        noButton = QPushButton("No")
+        noButton.clicked.connect(self.reject)  # Reject the dialog when "No" is clicked
+        layout.addWidget(noButton)
+        
+        self.setLayout(layout)
+
+    def OFFClicked(self):
+        ALABHK_query.compressor_OFF()
+        self.accept()  # Accept the dialog
+
+# For turn on heaters pop out control
+class HeaterControlONDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        
+        self.setWindowTitle("Heaters Control")
+        
+        layout = QVBoxLayout()
+        layout.addWidget(QLabel("<html>""<p>Are you sure you want to TURN ON heaters? ""</html>"))
+        
+        yesButton = QPushButton("Yes")
+        yesButton.clicked.connect(self.HeaterOnClicked)  # Accept the dialog when "Yes" is clicked
+        layout.addWidget(yesButton)
+        
+        noButton = QPushButton("No")
+        noButton.clicked.connect(self.reject)  # Reject the dialog when "No" is clicked
+        layout.addWidget(noButton)
+        
+        self.setLayout(layout)
+    
+    def HeaterOnClicked(self):
+        GPIO_pin = 23
+        ALABHK_query.HeaterON(GPIO_pin)
+        self.accept()
+
+# For turn off heaters pop out control
+class HeaterControlOFFDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        
+        self.setWindowTitle("Heaters Control")
+        
+        layout = QVBoxLayout()
+        layout.addWidget(QLabel("Are you sure you want to TURN OFF heaters?"))
+        
+        yesButton = QPushButton("Yes")
+        yesButton.clicked.connect(self.HeaterOFFClicked)  # Accept the dialog when "Yes" is clicked
+        layout.addWidget(yesButton)
+        
+        noButton = QPushButton("No")
+        noButton.clicked.connect(self.reject)  # Reject the dialog when "No" is clicked
+        layout.addWidget(noButton)
+        
+        self.setLayout(layout)
+
+    def HeaterOFFClicked(self):
+        GPIO_pin = 23
+        ALABHK_query.HeaterOFF(GPIO_pin)
+        self.accept()
+
+# For exit
+class StopandquitDialog(QDialog):
+    def __init__(self, app, parent=None):
+        super().__init__(parent)
+        
+        self.setWindowTitle("Exit Housekeeping")
+        self.app = app  # Store the QApplication instance
+        
+        layout = QVBoxLayout()
+        layout.addWidget(QLabel("Are you sure you want to Exit?"))
+        
+        yesButton = QPushButton("Yes")
+        yesButton.clicked.connect(self.on_yes_clicked)  # Close the application when "Yes" is clicked
+        layout.addWidget(yesButton)
+        
+        noButton = QPushButton("No")
+        noButton.clicked.connect(self.reject)  # Reject the dialog when "No" is clicked
+        layout.addWidget(noButton)
+        
+        self.setLayout(layout)
+
+    def on_yes_clicked(self):
+        self.app.quit()  # Close the application

@@ -1,6 +1,7 @@
 # Author: Jiancheng Zeng(JC)
 # Date: May 5th, 2024
 
+import time
 import pymysql
 from datetime import datetime
 from time import sleep
@@ -46,6 +47,37 @@ def convert_RTD_ADC(x, offset):
         #print(f"Error during calculation: {e}")
         return False
 
+def compressor_ON():
+    # Fixed compressor address, configured by Robin
+    compresspath = "/dev/compress"
+    Compressor = serial.Serial(compresspath)
+    
+    # Standard baud rates include 110, 300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 38400, 57600, 115200, 128000 and 256000 bits per second.
+    Compressor.baudrate = 9600
+    Compressor.parity = 'N'
+    Compressor.stopbits = 1
+    Compressor.bytesize = 8
+
+    Compressor.write(b'$ON177CF\r')
+    time.sleep(0.1)
+    print("\nCompressor is ON!\n")
+    return
+
+def compressor_OFF():
+    # Fixed compressor address, configured by Robin
+    compresspath = "/dev/compress"
+    Compressor = serial.Serial(compresspath)
+    
+    # Standard baud rates include 110, 300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 38400, 57600, 115200, 128000 and 256000 bits per second.
+    Compressor.baudrate = 9600
+    Compressor.parity = 'N'
+    Compressor.stopbits = 1
+    Compressor.bytesize = 8
+
+    Compressor.write(b'$OFF9188\r')
+    time.sleep(0.1)
+    print("\nCompressor is OFF!\n")
+    return
 
 # This function query compressor status and send to mysql database
 def get_compressor():
@@ -54,8 +86,8 @@ def get_compressor():
         cursor = Cursor(host=os.environ.get('LAZYINS_HOST'), port=os.environ.get('LAZYINS_PORT'), user=os.environ.get('LAZYINS_USER'), passwd=os.environ.get('LAZYINS_PASSWD'), db_name = 'LAr_TPCruns_data', table_name = 'compressor')
 
         # table for compressor in db, currently shows compressor temperature T1/T2/T3
-        name_compressor = ['T1', 'T2', 'T3']
-        types_compressor = ['int', 'int', 'int']
+        name_compressor = ['T1', 'T2', 'T3', 'P_Return']
+        types_compressor = ['int', 'int', 'int', 'int']
 
         # Fixed compressor address, configured by Robin
         compresspath = "/dev/compress"
@@ -71,29 +103,40 @@ def get_compressor():
         Compressor.write(b'$TEAA4B9\r')
         # Todo: figure out why it need to sleep for a certain amount of time
         sleep(0.5)
-        CompressorOut = Compressor.read(Compressor.inWaiting()).decode('utf8')
+        CompressorOut_T = Compressor.read(Compressor.inWaiting()).decode('utf8')
 
         # This is to check whether there is any values properly read
-        if(CompressorOut[6:8] == ''):
+        if(CompressorOut_T[6:8] == ''):
             T1_temp = None
         else:
-            T1_temp = CompressorOut[6:8]
-        if(CompressorOut[10:12] == ''):
+            T1_temp = CompressorOut_T[6:8]
+        if(CompressorOut_T[10:12] == ''):
             T2_temp = None
         else:
-            T2_temp = CompressorOut[10:12]
-        if(CompressorOut[14:16] == ''):
+            T2_temp = CompressorOut_T[10:12]
+        if(CompressorOut_T[14:16] == ''):
             T3_temp = None
         else:
-            T3_temp = CompressorOut[14:16]
+            T3_temp = CompressorOut_T[14:16]
 
-        values_compressor = [T1_temp, T2_temp, T3_temp]
+        # Compressor return pressure
+        Compressor.write(b'$PRA95F7\r')
+        # Todo: figure out why it need to sleep for a certain amount of time
+        sleep(0.5)
+        CompressorOut_P = Compressor.read(Compressor.inWaiting()).decode('utf8')
+
+        if(CompressorOut_P[5:8] == ''):
+            P_R_temp = None
+        else:
+            P_R_temp = CompressorOut_P[5:8]
+
+        values_compressor = [T1_temp, T2_temp, T3_temp, P_R_temp]
 
         # insert data to mysql database
         cursor.setup(name_compressor, types = types_compressor)
         cursor.register(values_compressor)
 
-        print("Current compressor temperatures: ", values_compressor)
+        print("Current compressor status['T1', 'T2', 'T3', 'P_R']: ", values_compressor)
         return values_compressor
     # If can't connect to database, drop this query
     except:
@@ -228,3 +271,14 @@ def get_rtd():
         pass
         return None
 
+def HeaterON(GPIO_pin):
+    GPIO.output(GPIO_pin, GPIO.HIGH)
+    time.sleep(0.1)
+    print("\nHeaters are ON!\n")
+    return
+
+def HeaterOFF(GPIO_pin):
+    GPIO.output(GPIO_pin, GPIO.LOW)
+    time.sleep(0.1)
+    print("\nHeaters are OFF!\n")
+    return
