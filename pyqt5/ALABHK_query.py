@@ -42,7 +42,7 @@ def convert_RTD_ADC(x, offset):
             L_tmp = -(math.sqrt(17.59246 - 0.00232 * L_R) - 3.908) / 0.00116
             L_tmpK = L_tmp + 273.15
             L_correction = L_tmpK + offset_float  # No correction for now
-            return float(L_correction)
+            return round(float(L_correction), 2)    # Round to 2 digits
     except Exception as e:
         #print(f"Error during calculation: {e}")
         return False
@@ -222,40 +222,42 @@ def get_rtd():
         sleep(0.1)
 
         RTD = arduino.readline().decode('utf8')
+        print("RTD is: ", RTD)
+        print("convert is: ", convert_RTD_ADC(RTD[3:7], 0))
         if(RTD[3:7] == '' or convert_RTD_ADC(RTD[3:7], 0) == False):
             R0 = None
         else:
-            R0 = convert_RTD_ADC(float(RTD[3:7]), 0)    # (ADC number, offset)
+            R0 = convert_RTD_ADC(float(RTD[3:7]), -1)    # (ADC number, offset)
         #print("R0 is " + str(R0) + "K")
 
         if(RTD[11:15] == '' or convert_RTD_ADC(RTD[11:15], 0) == False):
             R1 = None
         else:
-            R1 = convert_RTD_ADC(float(RTD[11:15]), 0)    # (ADC number, offset)
+            R1 = convert_RTD_ADC(float(RTD[11:15]), -1)    # (ADC number, offset)
         #print("R1 is " + str(R1) + "K")
 
         if(RTD[19:23] == '' or convert_RTD_ADC(RTD[19:23], 0) == False):
             R2 = None
         else:
-            R2 = convert_RTD_ADC(float(RTD[19:23]), 0)    # (ADC number, offset)
+            R2 = convert_RTD_ADC(float(RTD[19:23]), 27)    # (ADC number, offset)
         #print("R2 is " + str(R2) + "K")
 
         if(RTD[27:31] == '' or convert_RTD_ADC(RTD[27:31], 0) == False):
             R3 = None
         else:
-            R3 = convert_RTD_ADC(float(RTD[27:31]), 0)    # (ADC number, offset)
+            R3 = convert_RTD_ADC(float(RTD[27:31]), -2)    # (ADC number, offset)
         #print("R3 is " + str(R3) + "K")
 
         if(RTD[35:39] == '' or convert_RTD_ADC(RTD[35:39], 0) == False):
             R4 = None
         else:
-            R4 = convert_RTD_ADC(float(RTD[35:39]), -30)    # (ADC number, offset)
+            R4 = convert_RTD_ADC(float(RTD[35:39]), -3)    # (ADC number, offset)
         #print("R4 is " + str(R4) + "K")
 
         if(RTD[43:47] == '' or convert_RTD_ADC(RTD[43:47], 0) == False):
             R5 = None
         else:
-            R5 = convert_RTD_ADC(float(RTD[43:47]), -23)    # (ADC number, offset)
+            R5 = convert_RTD_ADC(float(RTD[43:47]), 2)    # (ADC number, offset)
         #print("R5 is " + str(R5) + "K")
 
         values_rtd = [R0, R1, R2, R3, R4, R5]
