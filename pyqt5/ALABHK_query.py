@@ -11,6 +11,8 @@ import RPi.GPIO as GPIO
 import math
 from lazyins import Cursor
 import os
+from gpiozero import LED
+
 
 def do_nothing(x):
     return x
@@ -81,6 +83,7 @@ def compressor_OFF():
 
 # This function query compressor status and send to mysql database
 def get_compressor():
+    print("Getting compressor data now...")
     try:
         # Keita's module for eazy sql input
         cursor = Cursor(host=os.environ.get('LAZYINS_HOST'), port=os.environ.get('LAZYINS_PORT'), user=os.environ.get('LAZYINS_USER'), passwd=os.environ.get('LAZYINS_PASSWD'), db_name = 'LAr_TPCruns_data', table_name = 'compressor')
@@ -146,6 +149,7 @@ def get_compressor():
 
 # This function query pressure data from the pressure gauge and send to mysql database
 def get_pressure():
+    print("Getting pressure data now...")
 
     try:
         cursor = Cursor(host=os.environ.get('LAZYINS_HOST'), port=os.environ.get('LAZYINS_PORT'), user=os.environ.get('LAZYINS_USER'), passwd=os.environ.get('LAZYINS_PASSWD'), db_name = 'LAr_TPCruns_data', table_name = 'pressure')
@@ -206,9 +210,10 @@ def get_pressure():
 
 # This function query rtd readout from arduino and send to mysql database
 def get_rtd():
+    print("Getting RTD data now...")
     try:
         cursor = Cursor(host=os.environ.get('LAZYINS_HOST'), port=os.environ.get('LAZYINS_PORT'), user=os.environ.get('LAZYINS_USER'), passwd=os.environ.get('LAZYINS_PASSWD'), db_name = 'LAr_TPCruns_data', table_name = 'rtd')
-
+        print("Host is " + str(os.environ.get('LAZYINS_HOST')))
         # table for pressure in db
         name_rtd = ['R0', 'R1', 'R2', 'R3', 'R4', 'R5']
         types_rtd = ['FLOAT', 'FLOAT', 'FLOAT', 'FLOAT', 'FLOAT', 'FLOAT']
@@ -274,13 +279,20 @@ def get_rtd():
         return None
 
 def HeaterON(GPIO_pin):
-    GPIO.output(GPIO_pin, GPIO.HIGH)
+    try:
+        GPIO.output(GPIO_pin, GPIO.HIGH)
+    except:
+        Heater_control = LED(GPIO_pin)
+        Heater_control.blink(on_time=100, off_time=0.01)
     time.sleep(0.1)
     print("\nHeaters are ON!\n")
     return
 
 def HeaterOFF(GPIO_pin):
-    GPIO.output(GPIO_pin, GPIO.LOW)
+    try:
+        Heater_control = LED(pin=GPIO_pin)
+        Heater_control.off()
+    except:
+        GPIO.output(GPIO_pin, GPIO.LOW)
     time.sleep(0.1)
     print("\nHeaters are OFF!\n")
-    return

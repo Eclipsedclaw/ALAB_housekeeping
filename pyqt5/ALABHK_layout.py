@@ -12,26 +12,35 @@ import ALABHK_query
 import threading
 import time
 import RPi.GPIO as GPIO
+import serial
+from serial.tools import list_ports
 
-
+# search serial port
+ser = serial.Serial()
+devices = [info.device for info in list_ports.comports()]
+print('available port: ')
+print(devices)
 
 
 class WidgetGallery(QDialog):
     def __init__(self, parent=None):
         super(WidgetGallery, self).__init__(parent)
-
-        # GPIO setting
-        GPIO.setmode(GPIO.BCM)
-        V1 = 'closed'
-        V2 = 'closed'
-        V1Channel = 2
-        V2Channel = 2
-        GPIO.setup(V1Channel,GPIO.OUT)
-        GPIO.setup(V2Channel,GPIO.OUT)
+        
+        try:
+            # GPIO setting
+            GPIO.setmode(GPIO.BCM)
+            V1 = 'closed'
+            V2 = 'closed'
+            V1Channel = 2
+            V2Channel = 2
+            GPIO.setup(V1Channel,GPIO.OUT)
+            GPIO.setup(V2Channel,GPIO.OUT)
+        except:
+            print("Current device not compatiable with RPi.GPIO module!")
 
         # Heater setting
         GPIO_pin = 23
-        GPIO.setup(GPIO_pin,GPIO.OUT)
+
 
 
         # Set the geometry of the main window
