@@ -44,7 +44,7 @@ def convert_RTD_ADC(x, offset):
             L_tmp = -(math.sqrt(17.59246 - 0.00232 * L_R) - 3.908) / 0.00116
             L_tmpK = L_tmp + 273.15
             L_correction = L_tmpK + offset_float  # No correction for now
-            return float(L_correction)
+            return round(float(L_correction), 2)    # Round to 2 digits
     except Exception as e:
         #print(f"Error during calculation: {e}")
         return False
@@ -227,6 +227,8 @@ def get_rtd():
         sleep(0.1)
 
         RTD = arduino.readline().decode('utf8')
+        print("RTD is: ", RTD)
+        print("convert is: ", convert_RTD_ADC(RTD[3:7], 0))
         if(RTD[3:7] == '' or convert_RTD_ADC(RTD[3:7], 0) == False):
             R0 = None
         else:
