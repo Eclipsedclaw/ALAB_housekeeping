@@ -242,7 +242,7 @@ def get_rtd():
         if(RTD[19:23] == '' or convert_RTD_ADC(RTD[19:23], 0) == False):
             R2 = None
         else:
-            R2 = convert_RTD_ADC(float(RTD[19:23]), 27)    # (ADC number, offset)
+            R2 = convert_RTD_ADC(float(RTD[19:23]), -2)    # (ADC number, offset)
         #print("R2 is " + str(R2) + "K")
 
         if(RTD[27:31] == '' or convert_RTD_ADC(RTD[27:31], 0) == False):
