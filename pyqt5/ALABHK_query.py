@@ -46,7 +46,7 @@ def convert_RTD_ADC(x, offset):
             L_correction = L_tmpK + offset_float  # No correction for now
             return round(float(L_correction), 2)    # Round to 2 digits
     except Exception as e:
-        #print(f"Error during calculation: {e}")
+        print(f"Error during data querying")
         return False
 
 def compressor_ON():
@@ -142,7 +142,8 @@ def get_compressor():
         print("Current compressor status['T1', 'T2', 'T3', 'P_R']: ", values_compressor)
         return values_compressor
     # If can't connect to database, drop this query
-    except:
+    except Exception as e:
+        print("Error in try block:", e)
         pass
         return None
 
@@ -165,17 +166,17 @@ def get_pressure():
         chamberPressure.parity = 'N'
         chamberPressure.stopbits = 1
         chamberPressure.bytesize = 8
-        chamberPressure.write(('$@001PR3?;FF').encode('utf8'))
+        chamberPressure.write(('@001PR3?;FF').encode('utf8'))
 
         sleep(0.1)
 
-        ChamberPressureOut = chamberPressure.read(chamberPressure.inWaiting()).decode('utf8')
-        if(ChamberPressureOut[7:14] == ''):
-            chamber_pressure = None
-        else:
+        try:
+            ChamberPressureOut = chamberPressure.read(chamberPressure.inWaiting()).decode('utf8')
             chamber_pressure = float(ChamberPressureOut[7:14])
-            #print("chamber pressure is: " + str(chamber_pressure))
-            #print(type(chamber_pressure))
+        except Exception as e:
+            print("Error in chamber pressure query:", e)
+            chamber_pressure = None
+
 
         # Fixed pressure gauge value, configured by Robin
         jacketpressurepath = "/dev/botpress"
@@ -184,17 +185,17 @@ def get_pressure():
         jacketPressure.parity = 'N'
         jacketPressure.stopbits = 1
         jacketPressure.bytesize = 8
-        jacketPressure.write(('$@253PR3?;FF').encode('utf8'))
+        jacketPressure.write(('@002PR3?;FF').encode('utf8'))
 
         # Todo: figure out why somehow it need to sleep for a certain time to readout normally
         sleep(0.1)
 
-        JacketPressureOut = jacketPressure.read(jacketPressure.inWaiting()).decode('utf8')
-        if(JacketPressureOut[7:14] == ''):
-            jacket_pressure = None
-        else:
+        try:
+            JacketPressureOut = jacketPressure.read(jacketPressure.inWaiting()).decode('utf8')
             jacket_pressure = float(JacketPressureOut[7:14])
-            #print("jacket pressure is: " + str(jacket_pressure))
+        except Exception as e:
+            print("Error in jacket pressure query:", e)
+            jacket_pressure = None
 
         values_pressure = [chamber_pressure, jacket_pressure]
 
@@ -204,7 +205,8 @@ def get_pressure():
 
         print("Current pressure: ", values_pressure)
         return values_pressure
-    except:
+    except Exception as e:
+        print("Error in try block:", e)
         pass
         return None
 
@@ -274,7 +276,9 @@ def get_rtd():
 
         print("Current rtd leveling sensors: ",values_rtd)
         return values_rtd
-    except:
+    except Exception as e:
+        print("Error in try block:", e)
+        #print("rtd data querying error")
         pass
         return None
 
