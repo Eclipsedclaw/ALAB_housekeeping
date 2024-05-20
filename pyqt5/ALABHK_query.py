@@ -176,6 +176,9 @@ def get_pressure():
         except Exception as e:
             print("Error in chamber pressure query:", e)
             chamber_pressure = None
+        finally:
+            # Ensure the port is closed properly
+            chamberPressure.close()
 
 
         # Fixed pressure gauge value, configured by Robin
@@ -206,7 +209,7 @@ def get_pressure():
         print("Current pressure: ", values_pressure)
         return values_pressure
     except Exception as e:
-        print("Error in try block:", e)
+        print("Error in pressure query:", e)
         pass
         return None
 

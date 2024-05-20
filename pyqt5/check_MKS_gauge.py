@@ -7,23 +7,23 @@ devices = [info.device for info in list_ports.comports()]
 print('available port: ')
 print(devices)
 
-def MKS_serial_command(MKS_command, serial_path):
+def MKS_serial_command(MKS_command, serial_path, serial_baudrate = 9600, serial_parity = 'N', serial_stopbits = 1, serial_bytesize = 8):
     while True:
-        # Fixed pressure gauge value, configured by Robin
         MKSpath = serial_path
         MKS = serial.Serial(MKSpath)
-        MKS.baudrate = 9600
-        MKS.parity = 'N'
-        MKS.stopbits = 1
-        MKS.bytesize = 8
+        MKS.baudrate = serial_baudrate
+        MKS.parity = serial_parity
+        MKS.stopbits = serial_stopbits
+        MKS.bytesize = serial_bytesize
 
         print("You are sending command: ", MKS_command, " to device: ", serial_path)
         MKS.write((MKS_command).encode('utf-8'))
         time.sleep(0.1)
         
-        print("serial output is: ",MKS.read(MKS.inWaiting()))
+        readout = MKS.read(MKS.inWaiting())
+        print("serial output is: ", readout)
 
-        serial_out = MKS.read(MKS.inWaiting()).decode('utf-8')
+        serial_out = readout.decode('utf-8')
 
         print("serial output after utf-8 decode is: ",serial_out)
         return serial_out
@@ -32,5 +32,5 @@ def MKS_serial_command(MKS_command, serial_path):
     #    return None
 
 
-MKS_serial_command(MKS_command='@254AD?;FF', serial_path='/dev/toppress')
+MKS_serial_command(MKS_command='@254AD?;FF?', serial_path='/dev/botpress')
 
