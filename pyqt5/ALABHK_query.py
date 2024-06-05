@@ -272,10 +272,10 @@ def get_rtd():
 
         values_rtd = [R0, R1, R2, R3, R4, R5]
 
-        if(R0 != None and R1 != None and R2 != None and R3 != None and R4 != None and R5 != None):
+        #if(R0 != None and R1 != None and R2 != None and R3 != None and R4 != None and R5 != None):
             # insert
-            cursor.setup(name_rtd, types = types_rtd)
-            cursor.register(values_rtd)
+        cursor.setup(name_rtd, types = types_rtd)
+        cursor.register(values_rtd)
 
         print("Current rtd leveling sensors: ",values_rtd)
         return values_rtd
