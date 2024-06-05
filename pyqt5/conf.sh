@@ -22,7 +22,7 @@ else
 fi
 
 # Reload udev rules to apply the changes
-sudo udevadm control --reload-rules
+sudo /etc/init.d/udev restart  
 
 # Trigger the rules to apply to already connected devices
 sudo udevadm trigger
@@ -35,17 +35,17 @@ sudo bash -c "echo 'export LAZYINS_HOST=\"$hostname\"' >> /home/pi/.bashrc"
 # Prompt the user for the database port
 read -p "Please enter the port: " port
 # Add the hostname to database
-sudo bash -c "echo 'export LAZYINS_HOST=\"$port\"' >> /home/pi/.bashrc"
+sudo bash -c "echo 'export LAZYINS_PORT=\"$port\"' >> /home/pi/.bashrc"
 
 # Prompt the user for the database username
 read -p "Please enter the username: " username
 # Add the hostname to database
-sudo bash -c "echo 'export LAZYINS_HOST=\"$username\"' >> /home/pi/.bashrc"
+sudo bash -c "echo 'export LAZYINS_USER=\"$username\"' >> /home/pi/.bashrc"
 
 # Prompt the user for the database passwd
 read -p "Please enter the password: " passwd
 # Add the hostname to database
-sudo bash -c "echo 'export LAZYINS_HOST=\"$passwd\"' >> /home/pi/.bashrc"
+sudo bash -c "echo 'export LAZYINS_PASSWD=\"$passwd\"' >> /home/pi/.bashrc"
 
 # Check if the darabase commands was successful
 if [ $? -eq 0 ]; then
