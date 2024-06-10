@@ -71,12 +71,11 @@ def get_rtd():
         arduino.stopbits = 1
         arduino.bytesize = 8
 
-        sleep(0.1)
+        sleep(1)
         try:
             RTD = arduino.readline().decode('utf8')
 
             print("RTD is: ", RTD)
-            print("convert is: ", convert_RTD_ADC(RTD[3:7], 0))
             if(RTD[3:7] == '' or convert_RTD_ADC(RTD[3:7], 0) == False):
                 R0 = None
             else:

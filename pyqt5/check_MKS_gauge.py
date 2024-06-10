@@ -32,5 +32,5 @@ def MKS_serial_command(MKS_command, serial_path, serial_baudrate = 9600, serial_
     #    return None
 
 
-MKS_serial_command(MKS_command='@254AD?;FF?', serial_path='/dev/botpress')
+MKS_serial_command(MKS_command='@254AD?;FF', serial_path='/dev/toppress')
 
