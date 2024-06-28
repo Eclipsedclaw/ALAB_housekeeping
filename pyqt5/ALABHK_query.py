@@ -239,53 +239,56 @@ def get_rtd():
         sleep(0.1)
         RTD = arduino.readline().decode('utf8')
 
-        print("RTD is: ", RTD)
+        print("RTD is: ", RTD, ", and rtd length is", len(RTD))
         print("convert is: ", convert_RTD_ADC(RTD[3:7], 0))
-        if(RTD[3:7] == '' or convert_RTD_ADC(RTD[3:7], 0) == False):
-            R0 = None
+        if(len(RTD)==49):
+            if(RTD[3:7] == '' or convert_RTD_ADC(RTD[3:7], 0) == False):
+                R0 = None
+            else:
+                R0 = convert_RTD_ADC(float(RTD[3:7]), -1)    # (ADC number, offset)
+            #print("R0 is " + str(R0) + "K")
+
+            if(RTD[11:15] == '' or convert_RTD_ADC(RTD[11:15], 0) == False):
+                R1 = None
+            else:
+                R1 = convert_RTD_ADC(float(RTD[11:15]), -1)    # (ADC number, offset)
+            #print("R1 is " + str(R1) + "K")
+
+            if(RTD[19:23] == '' or convert_RTD_ADC(RTD[19:23], 0) == False):
+                R2 = None
+            else:
+                R2 = convert_RTD_ADC(float(RTD[19:23]), -2)    # (ADC number, offset)
+            #print("R2 is " + str(R2) + "K")
+
+            if(RTD[27:31] == '' or convert_RTD_ADC(RTD[27:31], 0) == False):
+                R3 = None
+            else:
+                R3 = convert_RTD_ADC(float(RTD[27:31]), -2)    # (ADC number, offset)
+            #print("R3 is " + str(R3) + "K")
+
+            if(RTD[35:39] == '' or convert_RTD_ADC(RTD[35:39], 0) == False):
+                R4 = None
+            else:
+                R4 = convert_RTD_ADC(float(RTD[35:39]), -3)    # (ADC number, offset)
+            #print("R4 is " + str(R4) + "K")
+
+            if(RTD[43:47] == '' or convert_RTD_ADC(RTD[43:47], 0) == False):
+                R5 = None
+            else:
+                R5 = convert_RTD_ADC(float(RTD[43:47]), 2)    # (ADC number, offset)
+            #print("R5 is " + str(R5) + "K")
+
+            values_rtd = [R0, R1, R2, R3, R4, R5]
+
+            #if(R0 != None and R1 != None and R2 != None and R3 != None and R4 != None and R5 != None):
+                # insert
+            cursor.setup(name_rtd, types = types_rtd)
+            cursor.register(values_rtd)
+
+            print("Current rtd leveling sensors: ",values_rtd)
+            return values_rtd
         else:
-            R0 = convert_RTD_ADC(float(RTD[3:7]), -1)    # (ADC number, offset)
-        #print("R0 is " + str(R0) + "K")
-
-        if(RTD[11:15] == '' or convert_RTD_ADC(RTD[11:15], 0) == False):
-            R1 = None
-        else:
-            R1 = convert_RTD_ADC(float(RTD[11:15]), -1)    # (ADC number, offset)
-        #print("R1 is " + str(R1) + "K")
-
-        if(RTD[19:23] == '' or convert_RTD_ADC(RTD[19:23], 0) == False):
-            R2 = None
-        else:
-            R2 = convert_RTD_ADC(float(RTD[19:23]), -2)    # (ADC number, offset)
-        #print("R2 is " + str(R2) + "K")
-
-        if(RTD[27:31] == '' or convert_RTD_ADC(RTD[27:31], 0) == False):
-            R3 = None
-        else:
-            R3 = convert_RTD_ADC(float(RTD[27:31]), -2)    # (ADC number, offset)
-        #print("R3 is " + str(R3) + "K")
-
-        if(RTD[35:39] == '' or convert_RTD_ADC(RTD[35:39], 0) == False):
-            R4 = None
-        else:
-            R4 = convert_RTD_ADC(float(RTD[35:39]), -3)    # (ADC number, offset)
-        #print("R4 is " + str(R4) + "K")
-
-        if(RTD[43:47] == '' or convert_RTD_ADC(RTD[43:47], 0) == False):
-            R5 = None
-        else:
-            R5 = convert_RTD_ADC(float(RTD[43:47]), 2)    # (ADC number, offset)
-        #print("R5 is " + str(R5) + "K")
-
-        values_rtd = [R0, R1, R2, R3, R4, R5]
-
-        #if(R0 != None and R1 != None and R2 != None and R3 != None and R4 != None and R5 != None):
-            # insert
-        cursor.setup(name_rtd, types = types_rtd)
-        cursor.register(values_rtd)
-
-        print("Current rtd leveling sensors: ",values_rtd)
-        return values_rtd
+            print("serial readout error")
     except Exception as e:
         print("Error in try block:", e)
         #print("rtd data querying error")
@@ -296,17 +299,20 @@ def HeaterON(GPIO_pin):
     try:
         GPIO.output(GPIO_pin, GPIO.HIGH)
     except:
-        Heater_control = LED(GPIO_pin)
+        Heater_control = LED(pin=GPIO_pin)
         Heater_control.blink(on_time=100, off_time=0.01)
+
+        #Heater_control.close()
+        #Heater_control
     time.sleep(0.1)
     print("\nHeaters are ON!\n")
     return
 
 def HeaterOFF(GPIO_pin):
     try:
+        GPIO.output(GPIO_pin, GPIO.LOW)
+    except:
         Heater_control = LED(pin=GPIO_pin)
         Heater_control.off()
-    except:
-        GPIO.output(GPIO_pin, GPIO.LOW)
     time.sleep(0.1)
     print("\nHeaters are OFF!\n")
