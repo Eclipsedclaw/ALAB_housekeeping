@@ -29,31 +29,32 @@ def do_nothing(x):
 def convert_RTD_ADC(x, bits, offset):
     try:
         # Validate input x
-        x_float = float(x)
+        x_int = int(x)
     except ValueError:
         #print("Error: Input 'x' is not a valid numeric value.")
         return False
 
     try:
         # Validate input offset
-        offset_float = float(offset)
+        offset_int = int(offset)
     except ValueError:
         #print("Error: Input 'offset' is not a valid numeric value.")
         return False
 
     # Perform the calculations
     try:
-        L_V = x_float * (5.0 / 2^bits - 1)
-        if(L_V == 5.0):
+        L_V = x_int * (5 / pow(2, bits))
+        if(L_V == 5):
+            print("denominator error!")
             return False
         else:
             L_R = L_V * 1000. / (5.0 - L_V)
             L_tmp = -(math.sqrt(17.59246 - 0.00232 * L_R) - 3.908) / 0.00116
             L_tmpK = L_tmp + 273.15
-            L_correction = L_tmpK + offset_float  # No correction for now
+            L_correction = L_tmpK + offset_int  # No correction for now
             return round(float(L_correction), 2)    # Round to 2 digits
     except Exception as e:
-        print(f"Error during data querying")
+        print(f"Error for converting adc")
         return False
 
 def compressor_ON():
@@ -299,7 +300,7 @@ def get_rtd():
 def get_MHADC():
     print("Getting MHADC data now...")
     try:
-        cursor = Cursor(host=os.environ.get('LAZYINS_HOST'), port=os.environ.get('LAZYINS_PORT'), user=os.environ.get('LAZYINS_USER'), passwd=os.environ.get('LAZYINS_PASSWD'), db_name = 'LAr_TPCruns_data', table_name = 'rtd')
+        cursor = Cursor(host=os.environ.get('LAZYINS_HOST'), port=os.environ.get('LAZYINS_PORT'), user=os.environ.get('LAZYINS_USER'), passwd=os.environ.get('LAZYINS_PASSWD'), db_name = 'LAr_TPCruns_data', table_name = 'MHADC_240723')
         print("Host is " + str(os.environ.get('LAZYINS_HOST')))
         # table for pressure in db
         name_MHADC = ['R0', 'R1', 'R2', 'R3', 'R4', 'R5']
