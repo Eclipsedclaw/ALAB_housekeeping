@@ -26,7 +26,7 @@ def do_nothing(x):
     return x
 
 # convert rtd digitized ADC into Kelvin temperature
-def convert_RTD_ADC(x, offset):
+def convert_RTD_ADC(x, bits, offset):
     try:
         # Validate input x
         x_float = float(x)
@@ -43,7 +43,7 @@ def convert_RTD_ADC(x, offset):
 
     # Perform the calculations
     try:
-        L_V = x_float * (5.0 / 1023.0)
+        L_V = x_float * (5.0 / 2^bits - 1)
         if(L_V == 5.0):
             return False
         else:
@@ -240,42 +240,42 @@ def get_rtd():
         RTD = arduino.readline().decode('utf8')
 
         print("RTD is: ", RTD, ", and rtd length is", len(RTD))
-        print("convert is: ", convert_RTD_ADC(RTD[3:7], 0))
+        print("convert is: ", convert_RTD_ADC(RTD[3:7], bits=10, offset=0))
         if(len(RTD)==49):
-            if(RTD[3:7] == '' or convert_RTD_ADC(RTD[3:7], 0) == False):
+            if(RTD[3:7] == '' or convert_RTD_ADC(RTD[3:7], bits=10, offset=0) == False):
                 R0 = None
             else:
-                R0 = convert_RTD_ADC(float(RTD[3:7]), -1)    # (ADC number, offset)
+                R0 = convert_RTD_ADC(float(RTD[3:7]), bits=10, offset=-1)    # (ADC number, offset)
             #print("R0 is " + str(R0) + "K")
 
-            if(RTD[11:15] == '' or convert_RTD_ADC(RTD[11:15], 0) == False):
+            if(RTD[11:15] == '' or convert_RTD_ADC(RTD[11:15], bits=10, offset=0) == False):
                 R1 = None
             else:
-                R1 = convert_RTD_ADC(float(RTD[11:15]), -1)    # (ADC number, offset)
+                R1 = convert_RTD_ADC(float(RTD[11:15]), bits=10, offset=-1)    # (ADC number, offset)
             #print("R1 is " + str(R1) + "K")
 
-            if(RTD[19:23] == '' or convert_RTD_ADC(RTD[19:23], 0) == False):
+            if(RTD[19:23] == '' or convert_RTD_ADC(RTD[19:23], bits=10, offset=0) == False):
                 R2 = None
             else:
-                R2 = convert_RTD_ADC(float(RTD[19:23]), -2)    # (ADC number, offset)
+                R2 = convert_RTD_ADC(float(RTD[19:23]), bits=10, offset=-2)    # (ADC number, offset)
             #print("R2 is " + str(R2) + "K")
 
-            if(RTD[27:31] == '' or convert_RTD_ADC(RTD[27:31], 0) == False):
+            if(RTD[27:31] == '' or convert_RTD_ADC(RTD[27:31], bits=10, offset=0) == False):
                 R3 = None
             else:
-                R3 = convert_RTD_ADC(float(RTD[27:31]), -2)    # (ADC number, offset)
+                R3 = convert_RTD_ADC(float(RTD[27:31]), bits=10, offset=-2)    # (ADC number, offset)
             #print("R3 is " + str(R3) + "K")
 
-            if(RTD[35:39] == '' or convert_RTD_ADC(RTD[35:39], 0) == False):
+            if(RTD[35:39] == '' or convert_RTD_ADC(RTD[35:39], bits=10, offset=0) == False):
                 R4 = None
             else:
-                R4 = convert_RTD_ADC(float(RTD[35:39]), -3)    # (ADC number, offset)
+                R4 = convert_RTD_ADC(float(RTD[35:39]), bits=10, offset=-3)    # (ADC number, offset)
             #print("R4 is " + str(R4) + "K")
 
-            if(RTD[43:47] == '' or convert_RTD_ADC(RTD[43:47], 0) == False):
+            if(RTD[43:47] == '' or convert_RTD_ADC(RTD[43:47], bits=10, offset=0) == False):
                 R5 = None
             else:
-                R5 = convert_RTD_ADC(float(RTD[43:47]), 2)    # (ADC number, offset)
+                R5 = convert_RTD_ADC(float(RTD[43:47]), bits=10, offset=2)    # (ADC number, offset)
             #print("R5 is " + str(R5) + "K")
 
             values_rtd = [R0, R1, R2, R3, R4, R5]
@@ -289,6 +289,78 @@ def get_rtd():
             return values_rtd
         else:
             print("serial readout error")
+    except Exception as e:
+        print("Error in try block:", e)
+        #print("rtd data querying error")
+        pass
+        return None
+
+# This function query readout from MHADC board and send to mysql database
+def get_MHADC():
+    print("Getting MHADC data now...")
+    try:
+        cursor = Cursor(host=os.environ.get('LAZYINS_HOST'), port=os.environ.get('LAZYINS_PORT'), user=os.environ.get('LAZYINS_USER'), passwd=os.environ.get('LAZYINS_PASSWD'), db_name = 'LAr_TPCruns_data', table_name = 'rtd')
+        print("Host is " + str(os.environ.get('LAZYINS_HOST')))
+        # table for pressure in db
+        name_MHADC = ['R0', 'R1', 'R2', 'R3', 'R4', 'R5']
+        types_MHADC = ['FLOAT', 'FLOAT', 'FLOAT', 'FLOAT', 'FLOAT', 'FLOAT']
+        MHADCpath = "/dev/ttyACM0"
+        MHADC = serial.Serial(MHADCpath)
+        MHADC.baudrate = 115200
+
+        sleep(0.1)
+        MHADC_readout = MHADC.readline().decode('utf8')
+
+        print("MHADC readout is: ", MHADC_readout, ", and data string length is", len(MHADC_readout))
+        print("convert is: ", convert_RTD_ADC(MHADC_readout[3:7], bits=12, offset=0))
+        if(len(MHADC_readout)==135):
+            if(MHADC_readout[3:7] == '' or convert_RTD_ADC(MHADC_readout[3:7], bits=12, offset=0) == False):
+                R0 = None
+            else:
+                R0 = convert_RTD_ADC(float(MHADC_readout[3:7]), bits=12, offset=-1)    # (ADC number, offset)
+            #print("R0 is " + str(R0) + "K")
+
+            if(MHADC_readout[11:15] == '' or convert_RTD_ADC(MHADC_readout[11:15], bits=12, offset=0) == False):
+                R1 = None
+            else:
+                R1 = convert_RTD_ADC(float(MHADC_readout[11:15]), bits=12, offset=-1)    # (ADC number, offset)
+            #print("R1 is " + str(R1) + "K")
+
+            if(MHADC_readout[19:23] == '' or convert_RTD_ADC(MHADC_readout[19:23], bits=12, offset=0) == False):
+                R2 = None
+            else:
+                R2 = convert_RTD_ADC(float(MHADC_readout[19:23]), bits=12, offset=-2)    # (ADC number, offset)
+            #print("R2 is " + str(R2) + "K")
+
+            if(MHADC_readout[27:31] == '' or convert_RTD_ADC(MHADC_readout[27:31], bits=12, offset=0) == False):
+                R3 = None
+            else:
+                R3 = convert_RTD_ADC(float(MHADC_readout[27:31]), bits=12, offset=-2)    # (ADC number, offset)
+            #print("R3 is " + str(R3) + "K")
+
+            if(MHADC_readout[35:39] == '' or convert_RTD_ADC(MHADC_readout[35:39], bits=12, offset=0) == False):
+                R4 = None
+            else:
+                R4 = convert_RTD_ADC(float(MHADC_readout[35:39]), bits=12, offset=-3)    # (ADC number, offset)
+            #print("R4 is " + str(R4) + "K")
+
+            if(MHADC_readout[43:47] == '' or convert_RTD_ADC(MHADC_readout[43:47], bits=12, offset=0) == False):
+                R5 = None
+            else:
+                R5 = convert_RTD_ADC(float(MHADC_readout[43:47]), bits=12, offset=2)    # (ADC number, offset)
+            #print("R5 is " + str(R5) + "K")
+
+            values_MHADC = [R0, R1, R2, R3, R4, R5]
+
+            #if(R0 != None and R1 != None and R2 != None and R3 != None and R4 != None and R5 != None):
+                # insert
+            cursor.setup(name_MHADC, types = types_MHADC)
+            cursor.register(values_MHADC)
+
+            print("Current MHADC serial output: ",values_MHADC)
+            return values_MHADC
+        else:
+            print("serial readout string corrupted!")
     except Exception as e:
         print("Error in try block:", e)
         #print("rtd data querying error")

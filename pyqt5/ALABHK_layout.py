@@ -312,7 +312,7 @@ class WidgetGallery(QDialog):
 
         # Retrieve data and update tables concurrently
         threads = []
-        threads.append(threading.Thread(target=updateDataAndTable, args=(self.rtdWidget, ALABHK_query.get_rtd)))
+        threads.append(threading.Thread(target=updateDataAndTable, args=(self.rtdWidget, ALABHK_query.get_MHADC)))
         threads.append(threading.Thread(target=updateDataAndTable, args=(self.compressorWidget, ALABHK_query.get_compressor)))
         threads.append(threading.Thread(target=updateDataAndTable, args=(self.pressureWidget, ALABHK_query.get_pressure)))
 
