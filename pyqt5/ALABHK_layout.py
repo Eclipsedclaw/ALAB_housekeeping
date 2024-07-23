@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import (QApplication, QCheckBox, QComboBox, QDateTimeEdit,
         QDial, QDialog, QGridLayout, QGroupBox, QHBoxLayout, QLabel, QLineEdit,
         QProgressBar, QPushButton, QRadioButton, QScrollBar, QSizePolicy,
         QSlider, QSpinBox, QStyleFactory, QTableWidget, QTabWidget, QTextEdit,
-        QVBoxLayout, QWidget, QTableWidgetItem, QHeaderView)
+        QVBoxLayout, QWidget, QTableWidgetItem, QHeaderView, QFrame)
 from PyQt5.QtGui import QColor
 import ALABHK_query
 import threading
@@ -28,13 +28,13 @@ class StopFlags:
         if cls._instance is None:
             cls._instance = super().__new__(cls)
             cls._instance.flag_HK_pumping_data = threading.Event()
-            cls._instance.flag_HK_pumping_data.set()  # Set to True initially
+            cls._instance.flag_HK_pumping_data.clear()  # Set to False initially
 
             cls._instance.flag_compressor_status = threading.Event()
-            cls._instance.flag_compressor_status.set()  # Set to True initially
+            cls._instance.flag_compressor_status.clear()  # Set to False initially
 
             cls._instance.flag_heater_status = threading.Event()
-            cls._instance.flag_heater_status.set()  # Set to True initially
+            cls._instance.flag_heater_status.clear()  # Set to False initially
 
         return cls._instance
 
@@ -259,7 +259,10 @@ class WidgetGallery(QDialog):
         compressorButtonLayout.addWidget(compressorONButton)  # compressor TURN ON button
         compressorButtonLayout.addWidget(compressorOFFButton)  # compressor TURN OFF button
 
-        # Layout all the buttons and texts
+       
+
+
+        # Main layout for ControlGroupBox
         layout = QVBoxLayout()
         layout.addWidget(HKONButton, alignment=Qt.AlignLeft)  # Align left horizontally
         layout.addWidget(HKOFFButton, alignment=Qt.AlignLeft)  # Align left horizontally
@@ -267,11 +270,9 @@ class WidgetGallery(QDialog):
         layout.addWidget(HeaterText, alignment=Qt.AlignLeft)  # Align left horizontally
         layout.addLayout(heaterButtonLayout)  # Add TURN ON and TURN OFF buttons side by side
         layout.addWidget(CompressorText, alignment=Qt.AlignLeft)
-        layout.addLayout(compressorButtonLayout)  # Add TURN ON and TURN OFF buttons side by side
+        layout.addLayout(compressorButtonLayout)  # Add TURN ON and TURN OFF buttons side by side        layout.addWidget(indicatorLayout)
         layout.addStretch(1)
         self.ControlGroupBox.setLayout(layout)
-
-
 
     # Layout for data
     def createDataTabWidget(self):
@@ -379,9 +380,10 @@ class WidgetGallery(QDialog):
 
         # Retrieve data and update tables concurrently
         threads = []
-        threads.append(threading.Thread(target=updateDataAndTable, args=(self.rtdWidget, ALABHK_query.get_MHADC)))
+        threads.append(threading.Thread(target=updateDataAndTable, args=(self.rtdWidget, ALABHK_query.get_rtd)))
         threads.append(threading.Thread(target=updateDataAndTable, args=(self.compressorWidget, ALABHK_query.get_compressor)))
         threads.append(threading.Thread(target=updateDataAndTable, args=(self.pressureWidget, ALABHK_query.get_pressure)))
+        #threads.append(threading.Thread(target=updateDataAndTable, args=(self.pressureWidget, ALABHK_query.get_pressure)))
 
         for thread in threads:
             thread.start()
@@ -415,7 +417,9 @@ class CompressorControlONDialog(QDialog):
         self.setLayout(layout)
     
     def ONClicked(self):
+        stop_flags = StopFlags()
         ALABHK_query.compressor_ON()
+        stop_flags.set_compressor_status
         self.accept()  # Accept the dialog
 
 
@@ -440,7 +444,9 @@ class CompressorControlOFFDialog(QDialog):
         self.setLayout(layout)
 
     def OFFClicked(self):
+        stop_flags = StopFlags()
         ALABHK_query.compressor_OFF()
+        stop_flags.clear_compressor_status()
         self.accept()  # Accept the dialog
 
 # For turn on heaters pop out control
@@ -464,8 +470,10 @@ class HeaterControlONDialog(QDialog):
         self.setLayout(layout)
     
     def HeaterOnClicked(self):
+        stop_flags = StopFlags()
         GPIO_pin = 23
         ALABHK_query.HeaterON(GPIO_pin)
+        stop_flags.set_heater_status()
         self.accept()
 
 # For turn off heaters pop out control
@@ -489,8 +497,10 @@ class HeaterControlOFFDialog(QDialog):
         self.setLayout(layout)
 
     def HeaterOFFClicked(self):
+        stop_flags = StopFlags()
         GPIO_pin = 23
         ALABHK_query.HeaterOFF(GPIO_pin)
+        stop_flags.clear_heater_status()  # Stop data pumping
         self.accept()
 
 # For stop data pumping
@@ -520,5 +530,5 @@ class StopandquitDialog(QDialog):
         print("You just clicked STOP the HK!")
         stop_flags = StopFlags()
         stop_flags.clear_HK_pumping_data()  # Stop data pumping
-        stop_flags.print_flags_status()
+        #stop_flags.print_flags_status()
         self.accept()

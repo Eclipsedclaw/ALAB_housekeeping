@@ -23,9 +23,9 @@ def test_MHADC(serial_path, serial_baudrate = 115200):
         return serial_out
 
 
-test_data = test_MHADC(serial_path='/dev/ttyACM0')
-print(test_data[11:15])
-print(convert_RTD_ADC(test_data[11:15], bits=12, offset=0))
+test_data = test_MHADC(serial_path='/dev/ttyACM1')
+print("second rtd readout bits are: ",test_data[11:15])
+print("temperature conversion for this is: ", convert_RTD_ADC(test_data[11:15], bits=12, offset=0))
 
 
 if(len(test_data)==135):

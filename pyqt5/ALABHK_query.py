@@ -158,6 +158,7 @@ def get_compressor():
 
 # This function query pressure data from the pressure gauge and send to mysql database
 def get_pressure():
+    
     print("Getting pressure data now...")
 
     try:
@@ -225,7 +226,7 @@ def get_pressure():
 def get_rtd():
     print("Getting RTD data now...")
     try:
-        cursor = Cursor(host=os.environ.get('LAZYINS_HOST'), port=os.environ.get('LAZYINS_PORT'), user=os.environ.get('LAZYINS_USER'), passwd=os.environ.get('LAZYINS_PASSWD'), db_name = 'LAr_TPCruns_data', table_name = 'rtd')
+        cursor = Cursor(host=os.environ.get('LAZYINS_HOST'), port=os.environ.get('LAZYINS_PORT'), user=os.environ.get('LAZYINS_USER'), passwd=os.environ.get('LAZYINS_PASSWD'), db_name = 'LAr_TPCruns_data', table_name = 'arduino_240723')
         print("Host is " + str(os.environ.get('LAZYINS_HOST')))
         # table for pressure in db
         name_rtd = ['R0', 'R1', 'R2', 'R3', 'R4', 'R5']
