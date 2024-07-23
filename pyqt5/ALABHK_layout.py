@@ -21,9 +21,62 @@ devices = [info.device for info in list_ports.comports()]
 print('available port: ')
 print(devices)
 
+class StopFlags:
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance.flag_HK_pumping_data = threading.Event()
+            cls._instance.flag_HK_pumping_data.set()  # Set to True initially
+
+            cls._instance.flag_compressor_status = threading.Event()
+            cls._instance.flag_compressor_status.set()  # Set to True initially
+
+            cls._instance.flag_heater_status = threading.Event()
+            cls._instance.flag_heater_status.set()  # Set to True initially
+
+        return cls._instance
+
+    def set_HK_pumping_data(self):
+        self.flag_HK_pumping_data.set()
+
+    def is_HK_pumping_data_set(self):
+        return self.flag_HK_pumping_data.is_set()
+
+    def clear_HK_pumping_data(self):
+        self.flag_HK_pumping_data.clear()
+
+    def set_compressor_status(self):
+        self.flag_compressor_status.set()
+
+    def is_compressor_status_set(self):
+        return self.flag_compressor_status.is_set()
+
+    def clear_compressor_status(self):
+        self.flag_compressor_status.clear()
+
+    def set_heater_status(self):
+        self.flag_heater_status.set()
+
+    def is_heater_status_set(self):
+        return self.flag_heater_status.is_set()
+
+    def clear_heater_status(self):
+        self.flag_heater_status.clear()
+
+    def print_flags_status(self):
+        print(f"flag_HK_pumping_data: {self.is_HK_pumping_data_set()}")
+        print(f"flag_compressor_status: {self.is_compressor_status_set()}")
+        print(f"flag_heater_status: {self.is_heater_status_set()}")
+
 
 class WidgetGallery(QDialog):
+
+
     def __init__(self, parent=None):
+        self.flag_data_pumping = True  # Flag to control the data pumping
+
         super(WidgetGallery, self).__init__(parent)
         
         try:
@@ -52,7 +105,7 @@ class WidgetGallery(QDialog):
         styleComboBox.addItems(QStyleFactory.keys())
 
         # link to grafana viewer
-        grafanaText = QLabel("<a href='http://aramakilab.neu.edu:3000/d/f12ea01c-2b65-43c9-bd97-90bd0ddd0dfb/aramaki-lab-housekeeping?orgId=1&refresh=5s'>click here for Grafana Monitor</a>")
+        grafanaText = QLabel("<a href='http://aramakilab.neu.edu:3000'>click here for Grafana Monitor</a>")
         grafanaText.setTextFormat(Qt.RichText)
         grafanaText.setOpenExternalLinks(True)
 
@@ -152,6 +205,7 @@ class WidgetGallery(QDialog):
         HKONButton = QPushButton("START HOUSEKEEPING SYSTEM")
         HKONButton.setDefault(False)
         HKONButton.setMaximumWidth(250)  # Set maximum width
+        HKONButton.clicked.connect(self.active_data_pump_flag)  # Connect to function for active flag
         HKONButton.clicked.connect(self.pumpDataIntoTables)  # Connect to function for HK start running
         HKONButton.setStyleSheet("background-color: lightgreen")  # Set button color to light green
 
@@ -287,9 +341,22 @@ class WidgetGallery(QDialog):
         self.DataTabWidget.addTab(pressureTab, "&Pressure")
         self.DataTabWidget.addTab(compressorTab, "&Compressor")
 
+    def active_data_pump_flag(self):
+        stop_flags = StopFlags()
+        stop_flags.set_HK_pumping_data()
+
     # Data pumping with multi-thread enabled
-    # TODO: Figure out the rtd delay, could be issue from Arduino
+    # TODO: pump flag indicators into database as well
     def pumpDataIntoTables(self):
+
+        stop_flags = StopFlags()
+        stop_flags.print_flags_status()
+
+
+        if not stop_flags.is_HK_pumping_data_set():
+            print("data stop pumping!")
+            return
+        
         # Define functions for updating each table
         def updateTableData(tableWidget, data):
             tableWidget.clearContents()
@@ -324,6 +391,8 @@ class WidgetGallery(QDialog):
 
         # Repeat this process every 1 seconds
         QTimer.singleShot(1000, self.pumpDataIntoTables)
+    
+
 
 # For turn on compressor pop out control
 class CompressorControlONDialog(QDialog):
@@ -424,8 +493,10 @@ class HeaterControlOFFDialog(QDialog):
         ALABHK_query.HeaterOFF(GPIO_pin)
         self.accept()
 
-# For exit
+# For stop data pumping
 class StopandquitDialog(QDialog):
+
+
     def __init__(self, app, parent=None):
         super().__init__(parent)
         
@@ -446,4 +517,8 @@ class StopandquitDialog(QDialog):
         self.setLayout(layout)
 
     def on_yes_clicked(self):
-        self.app.quit()  # Close the application
+        print("You just clicked STOP the HK!")
+        stop_flags = StopFlags()
+        stop_flags.clear_HK_pumping_data()  # Stop data pumping
+        stop_flags.print_flags_status()
+        self.accept()
