@@ -514,7 +514,7 @@ class StopandquitDialog(QDialog):
         self.app = app  # Store the QApplication instance
         
         layout = QVBoxLayout()
-        layout.addWidget(QLabel("Are you sure you want to Exit?"))
+        layout.addWidget(QLabel("Are you sure you want to Stop data pumping?"))
         
         yesButton = QPushButton("Yes")
         yesButton.clicked.connect(self.on_yes_clicked)  # Close the application when "Yes" is clicked

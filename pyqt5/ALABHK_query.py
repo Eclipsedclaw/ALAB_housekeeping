@@ -153,7 +153,7 @@ def get_compressor():
     except Exception as e:
         print("Error in try block:", e)
         pass
-        return None
+        return [None, None, None, None]
 
 
 # This function query pressure data from the pressure gauge and send to mysql database
@@ -168,46 +168,53 @@ def get_pressure():
         name_pressure = ['chamber_pressure', 'jacket_pressure']
         types_pressure = ['float', 'float']
 
-        # Fixed pressure gauge value, configured by Robin
-        chamberpressurepath = "/dev/toppress"
-        chamberPressure = serial.Serial(chamberpressurepath)
-        chamberPressure.baudrate = 9600
-        chamberPressure.parity = 'N'
-        chamberPressure.stopbits = 1
-        chamberPressure.bytesize = 8
-        chamberPressure.write(('@001PR3?;FF').encode('utf8'))
+        try:
+            # Fixed pressure gauge value, configured by Robin
+            chamberpressurepath = "/dev/toppress"
+            chamberPressure = serial.Serial(chamberpressurepath)
+            chamberPressure.baudrate = 9600
+            chamberPressure.parity = 'N'
+            chamberPressure.stopbits = 1
+            chamberPressure.bytesize = 8
+            chamberPressure.write(('@001PR3?;FF').encode('utf8'))
 
-        sleep(0.1)
+            sleep(0.1)
+
+            try:
+                ChamberPressureOut = chamberPressure.read(chamberPressure.inWaiting()).decode('utf8')
+                chamber_pressure = float(ChamberPressureOut[7:14])
+            except Exception as e:
+                print("Error in chamber pressure query:", e)
+                chamber_pressure = None
+            finally:
+                # Ensure the port is closed properly
+                chamberPressure.close()
+        except Exception as e:
+                print("Error in chamber gauge serial setup:", e)
+                chamber_pressure = None
 
         try:
-            ChamberPressureOut = chamberPressure.read(chamberPressure.inWaiting()).decode('utf8')
-            chamber_pressure = float(ChamberPressureOut[7:14])
+            # Fixed pressure gauge value, configured by Robin
+            jacketpressurepath = "/dev/botpress"
+            jacketPressure = serial.Serial(jacketpressurepath)
+            jacketPressure.baudrate = 9600
+            jacketPressure.parity = 'N'
+            jacketPressure.stopbits = 1
+            jacketPressure.bytesize = 8
+            jacketPressure.write(('@002PR3?;FF').encode('utf8'))
+
+            # Todo: figure out why somehow it need to sleep for a certain time to readout normally
+            sleep(0.1)
+
+            try:
+                JacketPressureOut = jacketPressure.read(jacketPressure.inWaiting()).decode('utf8')
+                jacket_pressure = float(JacketPressureOut[7:14])
+            except Exception as e:
+                print("Error in jacket pressure query:", e)
+                jacket_pressure = None
         except Exception as e:
-            print("Error in chamber pressure query:", e)
-            chamber_pressure = None
-        finally:
-            # Ensure the port is closed properly
-            chamberPressure.close()
-
-
-        # Fixed pressure gauge value, configured by Robin
-        jacketpressurepath = "/dev/botpress"
-        jacketPressure = serial.Serial(jacketpressurepath)
-        jacketPressure.baudrate = 9600
-        jacketPressure.parity = 'N'
-        jacketPressure.stopbits = 1
-        jacketPressure.bytesize = 8
-        jacketPressure.write(('@002PR3?;FF').encode('utf8'))
-
-        # Todo: figure out why somehow it need to sleep for a certain time to readout normally
-        sleep(0.1)
-
-        try:
-            JacketPressureOut = jacketPressure.read(jacketPressure.inWaiting()).decode('utf8')
-            jacket_pressure = float(JacketPressureOut[7:14])
-        except Exception as e:
-            print("Error in jacket pressure query:", e)
-            jacket_pressure = None
+                print("Error in jacket gauge serial setup:", e)
+                chamber_pressure = None
 
         values_pressure = [chamber_pressure, jacket_pressure]
 
@@ -220,7 +227,16 @@ def get_pressure():
     except Exception as e:
         print("Error in pressure query:", e)
         pass
-        return None
+        values_pressure = [None, None]
+        cursor = Cursor(host=os.environ.get('LAZYINS_HOST'), port=os.environ.get('LAZYINS_PORT'), user=os.environ.get('LAZYINS_USER'), passwd=os.environ.get('LAZYINS_PASSWD'), db_name = 'LAr_TPCruns_data', table_name = 'pressure')
+
+        # table for pressure in db
+        name_pressure = ['chamber_pressure', 'jacket_pressure']
+        types_pressure = ['float', 'float']
+        # insert
+        cursor.setup(name_pressure, types = types_pressure)
+        cursor.register(values_pressure)
+        return values_pressure
 
 # This function query rtd readout from arduino and send to mysql database
 def get_rtd():
