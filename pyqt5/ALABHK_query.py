@@ -170,9 +170,9 @@ def get_pressure():
 
         try:
             # Fixed pressure gauge value, configured by Robin
-            chamberpressurepath = "/dev/toppress"
+            chamberpressurepath = "/dev/ttyUSB1"
             chamberPressure = serial.Serial(chamberpressurepath)
-            chamberPressure.baudrate = 9600
+            chamberPressure.baudrate = 115200
             chamberPressure.parity = 'N'
             chamberPressure.stopbits = 1
             chamberPressure.bytesize = 8
@@ -195,9 +195,10 @@ def get_pressure():
 
         try:
             # Fixed pressure gauge value, configured by Robin
-            jacketpressurepath = "/dev/botpress"
+            #jacketpressurepath = "/dev/botpress"
+            jacketpressurepath = "/dev/ttyUSB2"
             jacketPressure = serial.Serial(jacketpressurepath)
-            jacketPressure.baudrate = 9600
+            jacketPressure.baudrate = 115200
             jacketPressure.parity = 'N'
             jacketPressure.stopbits = 1
             jacketPressure.bytesize = 8

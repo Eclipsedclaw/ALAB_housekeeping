@@ -7,7 +7,7 @@ devices = [info.device for info in list_ports.comports()]
 print('available port: ')
 print(devices)
 
-def MKS_serial_command(MKS_command, serial_path, serial_baudrate = 9600, serial_parity = 'N', serial_stopbits = 1, serial_bytesize = 8):
+def MKS_serial_command(MKS_command, serial_path, serial_baudrate = 115200, serial_parity = 'N', serial_stopbits = 1, serial_bytesize = 8):
     while True:
         MKSpath = serial_path
         MKS = serial.Serial(MKSpath)
@@ -21,6 +21,7 @@ def MKS_serial_command(MKS_command, serial_path, serial_baudrate = 9600, serial_
         time.sleep(0.1)
         
         readout = MKS.read(MKS.inWaiting())
+        #readout = MKS.readline()
         print("serial output is: ", readout)
 
         serial_out = readout.decode('utf-8')
