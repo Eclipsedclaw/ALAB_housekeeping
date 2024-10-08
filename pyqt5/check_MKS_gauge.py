@@ -3,11 +3,7 @@ import serial
 from serial.tools import list_ports
 from lazyins import Cursor
 import os
-
-# search serial port
-devices = [info.device for info in list_ports.comports()]
-print('available port: ')
-print(devices)
+import re
 
 def MKS_serial_command(MKS_command, serial_path, serial_baudrate = 115200, serial_parity = 'N', serial_stopbits = 1, serial_bytesize = 8):
     while True:
@@ -57,26 +53,17 @@ def pump_data(serial_path, serial_baudrate = 115200, serial_parity = 'N', serial
                 command = "@002PR"+str(i+1)+"?;FF"
                 MKS.write((command).encode('utf8'))
                 time.sleep(0.1)
-                if(i==1 or i==3):
-                    try:
-                        ChamberPressureOut = MKS.read(MKS.inWaiting()).decode('utf8')
-                        print("ChamberPressureOut for PR"+str(i+1)+" string is: "+ str(ChamberPressureOut))
-                        chamber_pressure.append(abs(float(ChamberPressureOut[7:15])))
-                    except Exception as e:
-                        print("Error in chamber pressure query:", e)
-                    finally:
-                        print("")
-                    time.sleep(0.1)
-                else:
-                    try:
-                        ChamberPressureOut = MKS.read(MKS.inWaiting()).decode('utf8')
-                        print("ChamberPressureOut for PR"+str(i+1)+" string is: "+ str(ChamberPressureOut))
-                        chamber_pressure.append(float(ChamberPressureOut[7:14]))
-                    except Exception as e:
-                        print("Error in chamber pressure query:", e)
-                    finally:
-                        print("")
-                    time.sleep(0.1)
+                try:
+                    ChamberPressureOut = MKS.read(MKS.inWaiting()).decode('utf8')
+                    print("ChamberPressureOut for PR"+str(i+1)+" string is: "+ str(ChamberPressureOut))
+                    match = re.search(r'@002ACK(.*?)\;FF', ChamberPressureOut)
+                    chamber_pressure.append(abs(float(match.group(1))))
+                except Exception as e:
+                    print("Error in chamber pressure query:", e)
+                finally:
+                    print("")
+                time.sleep(0.1)
+
             # Ensure the port is closed properly
             MKS.close()
             values_pressure = chamber_pressure
@@ -93,13 +80,13 @@ def pump_data(serial_path, serial_baudrate = 115200, serial_parity = 'N', serial
             return None
 
 
-MKS_serial_command(MKS_command='@254AD?;FF', serial_path='/dev/cu.usbserial-0001')
+MKS_serial_command(MKS_command='@002GT!AIR;FF', serial_path='/dev/ttyUSB0')
 
 #pump_data(MKS_command='@002PR3?;FF', serial_path='/dev/cu.usbserial-0001')
 
 try:
     while True:
-        pump_data(serial_path='/dev/cu.usbserial-0001')
+        pump_data(serial_path='/dev/ttyUSB0')
         time.sleep(0.1)  # Delay for 0.1 second
 except KeyboardInterrupt:
     print("Process interrupted by the user.")
