@@ -1,7 +1,8 @@
 ### Install requested packages
 Make sure you have installed requested packages before you start to use the script.
 ```bash
-pip install
+pip install pymysql --break-system-packages
+pip install lazyins --break-system-packages
 ```
 
 ### Setup system variables for mysql database
