@@ -11,15 +11,15 @@ Change <span style="color:red"> **HOSTNAME** </span>to the mysql server hostname
 ```bash
 sudo bash -c "echo 'export LAZYINS_HOST=\"HOSTNAME\"' >> $HOME/.bashrc"
 ```
-Change <span style="color:red"> **PORTNUMBER** </span>to the mysql server hostname
+Change <span style="color:red"> **PORTNUMBER** </span>to the mysql server port number, most of the case the default number us 3306
 ```bash
 sudo bash -c "echo 'export LAZYINS_PORT=\"PORTNUMBER\"' >> $HOME/.bashrc"
 ```
-Change <span style="color:red"> **USERNAME** </span>to the mysql server hostname
+Change <span style="color:red"> **USERNAME** </span>to the mysql server user name
 ```bash
 sudo bash -c "echo 'export LAZYINS_USER=\"USERNAME\"' >> $HOME/.bashrc"
 ```
-Change <span style="color:red"> **PASSWD** </span>to the mysql server hostname
+Change <span style="color:red"> **PASSWD** </span>to the mysql server password
 ```bash
 sudo bash -c "echo 'export LAZYINS_PASSWD=\"PASSWD\"' >> $HOME/.bashrc"
 ```
