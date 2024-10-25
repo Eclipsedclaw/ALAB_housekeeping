@@ -5,6 +5,9 @@ from lazyins import Cursor
 import os
 import re
 import readline
+import mysql.connector
+
+
 
 def complete_path(text, state):
     incomplete_path = pathlib.Path(text)
@@ -92,8 +95,40 @@ print(devices)
 
 port_path = input("Please enter the data port: ")
 MKS_address = input("Please enter MKS gauge address: ")
+
+
+config = {
+    'user': os.environ.get('LAZYINS_USER'),
+    'password': os.environ.get('LAZYINS_PASSWD'),
+    'host': os.environ.get('LAZYINS_HOST'),
+    'port': os.environ.get('LAZYINS_PORT')
+}
+
+# Get database name from user input
+connection = mysql.connector.connect(**config)
+cursor = connection.cursor()
+cursor.execute("SHOW DATABASES")
+databases = cursor.fetchall()
+print("Databases available:")
+for db in databases:
+    print(f" - {db[0]}")
+
 db_name = input("Please enter the database that you want to use: ")
-chart_name = input("Please enter the chart name that you want to pump data to: ")
+
+cursor.execute(f"USE {db_name}")
+
+# Get table name (chart name) from user input
+cursor.execute("SHOW TABLES")
+tables = cursor.fetchall()
+print(f"Tables in database '{db_name}':")
+for table in tables:
+    print(f" - {table[0]}")
+chart_name = input("Please enter the chart (table) name that you want to pump data to: ")
+
+
+cursor.close()
+connection.close()
+
 
 print("Query data from ", port_path, " to DATABASE ", db_name, "/", chart_name)
 
