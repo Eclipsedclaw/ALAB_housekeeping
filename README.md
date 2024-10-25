@@ -1,3 +1,8 @@
+### To use script that directly pump MKS pressure gauge data to database, go to MKS_gauge
+```bash
+cd ./MKS_gauge/
+```
+
 ### To use pyQt5 python GUI, go to pyqt5
 ```bash
 cd ./pyqt5/
