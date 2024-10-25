@@ -765,6 +765,23 @@ def HeaterOff():
         GPIO.output(HeaterCtrl, GPIO.LOW)
         time.sleep(1)
 
+# Adding functionality to turn heater relay on using a button
+def HeaterOn():
+    global HeaterCtrl
+    res = messagebox.askyesno("Heater On", "Are you sure you want to turn the heater on?")
+    if res == True:
+        print ("Turning the heater on")
+        GPIO.output(HeaterCtrl, GPIO.HIGH)
+        time.sleep(1)
+
+def HeaterOff():
+    global HeaterCtrl
+    res = messagebox.askyesno("Heater Off", "Are you sure you want to turn the heater off?")
+    if res == True:
+        print ("Turning the heater off")
+        GPIO.output(HeaterCtrl, GPIO.LOW)
+        time.sleep(1)
+
 def popupwin():
     popup = tk.Toplevel()
     popup.title("Settings")

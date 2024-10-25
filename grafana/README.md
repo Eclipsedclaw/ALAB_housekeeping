@@ -27,3 +27,5 @@ echo 'export LAZYINS_PASSWD="$YOURPASSWORD"'>>~/.profile
 ```bash
 python upload2server_lazyins.py
 ```
+
+## Currently Aramaki Lab HK Grafana viewer running at: [http://jianchengjc.com:3000/d/f12ea01c-2b65-43c9-bd97-90bd0ddd0dfb/aramaki-lab-housekeeping?orgId=1&refresh=5s](http://jianchengjc.com:3000/d/f12ea01c-2b65-43c9-bd97-90bd0ddd0dfb/aramaki-lab-housekeeping?orgId=1&refresh=5s)
