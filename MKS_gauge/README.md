@@ -3,6 +3,7 @@ Make sure you have installed requested packages before you start to use the scri
 ```bash
 pip install pymysql --break-system-packages
 pip install lazyins --break-system-packages
+pip install mysql-connector-python --break-system-packages
 ```
 
 ### Setup system variables for mysql database
