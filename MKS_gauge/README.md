@@ -25,3 +25,8 @@ Change <span style="color:red"> **PASSWD** </span>to the mysql server password
 ```bash
 sudo bash -c "echo 'export LAZYINS_PASSWD=\"PASSWD\"' >> $HOME/.bashrc"
 ```
+
+### After you finished steps above, you can simply run the python script MKS2database.py and follow the prompt
+```bash
+python MKS2database.py
+```
