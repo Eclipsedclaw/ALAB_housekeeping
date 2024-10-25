@@ -12,7 +12,7 @@ from serial.tools import list_ports
 #)
 
 ser = serial.Serial(
-port = "/dev/ttyUSB2",
+port = "/dev/ttyUSB0",
 baudrate = 9600,
 bytesize = serial.EIGHTBITS, 
 parity = serial.PARITY_NONE,

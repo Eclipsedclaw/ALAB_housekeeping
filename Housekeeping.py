@@ -32,6 +32,12 @@ import math
 from lazyins import Cursor
 import os
 
+# Set the environment variable
+os.environ['LAZYINS_HOST'] = 'aramakilab.neu.edu'
+os.environ['LAZYINS_PORT'] = '3306'
+os.environ['LAZYINS_USER'] = 'root'
+os.environ['LAZYINS_PASSWD'] = 'darkmatter'
+
 # GPIO setting
 GPIO.setmode(GPIO.BCM)
 V1 = 'closed'
@@ -142,9 +148,9 @@ class Mailer:
         session.ehlo()
         session.starttls()
         session.ehlo()
-	# Just added small mod to keep the value displayed in emails to two decimal places.
-        message_high = "ALERT: The pressure in the main chamber is %.02f torr." % toppress
-        message_low = "NOTICE: The pressure is now %.02f torr, which is below the threshold of %02f torr." % (toppress, limit)
+
+        message_high = "ALERT: The pressure in the main chamber is %02f torr." % toppress
+        message_low = "NOTICE: The pressure is now %02f torr, which is below the threshold of %02f torr." % (toppress, limit)
         msg = EmailMessage()
 
         session.login(gmail_username, gmail_pass)
@@ -235,32 +241,21 @@ def loop():
                 # Compressor temperature
                 Compressor.write(b'$TEAA4B9\r')
                 time.sleep(T_sleep)
-                try:
-                    CompressorOut = Compressor.read(Compressor.inWaiting()).decode('utf8')
-                    print(CompressorOut)
-                except UnicodeDecodeError:
-                    CompressorOut = None
+                CompressorOut = Compressor.read(Compressor.inWaiting()).decode('utf8')
                 flag1 = 0
                 
                 #grafana setup
                 # Keita's module for eazy sql input
                 print("host is: " + str(os.environ.get('LAZYINS_HOST')))
-
-                try:
-                    cursor = Cursor(host=os.environ.get('LAZYINS_HOST'), port=os.environ.get('LAZYINS_PORT'), user=os.environ.get('LAZYINS_USER'), passwd=os.environ.get('LAZYINS_PASSWD'), db_name = 'LAr_TPCruns_data', table_name = 'compressor')
-                except NameError:
-                    print("database compressor chart read error!")
-                else:
-                    cursor = Cursor(host=os.environ.get('LAZYINS_HOST'), port=os.environ.get('LAZYINS_PORT'), user=os.environ.get('LAZYINS_USER'), passwd=os.environ.get('LAZYINS_PASSWD'), db_name = 'LAr_TPCruns_data', table_name = 'compressor')
-
+                cursor = Cursor(host=os.environ.get('LAZYINS_HOST'), port=os.environ.get('LAZYINS_PORT'), user=os.environ.get('LAZYINS_USER'), passwd=os.environ.get('LAZYINS_PASSWD'), db_name = 'LAr_TPCruns_data', table_name = 'compressor')
+                
                 # table for compressor in db, currently shows compressor temperature T1/T2/T3
                 name_compressor = ['T1', 'T2', 'T3']
                 types_compressor = ['int', 'int', 'int']
 
                 # Todo: figure out why it need to sleep for a certain amount of time
-                sleep(0.1)
-                #for debugging
-                print(CompressorOut)
+                sleep(1)
+
                 # This is to check whether there is any values properly read
                 if(CompressorOut[6:8] == ''):
                     T1_temp = None
@@ -280,15 +275,12 @@ def loop():
                 # insert data to mysql database
                 cursor.setup(name_compressor, types = types_compressor)
                 cursor.register(values_compressor)
-
+        
                 while (len(CompressorOut) != 26 and flag1 <= 3):
                     print ('Compressor temperature readout error')
                     Compressor.write(b'$TEAA4B9\r')
                     time.sleep(T_sleep)
-                    try:
-                        CompressorOut = Compressor.read(Compressor.inWaiting()).decode('utf8')
-                    except UnicodeDecodeError:
-                        CompressorOut = None
+                    CompressorOut = Compressor.read(Compressor.inWaiting()).decode('utf8')
                     flag1 += 1
                 #$TEA,021,015,015,000,6F37
                 print (CompressorOut)
@@ -327,63 +319,22 @@ def loop():
                     T1_tmp = None
                     T2_tmp = None
                     T3_tmp = None
-                """try:
-                    cursor = Cursor(host=os.environ.get('LAZYINS_HOST'), port=os.environ.get('LAZYINS_PORT'), user=os.environ.get('LAZYINS_USER'), passwd=os.environ.get('LAZYINS_PASSWD'), db_name = 'LAr_TPCruns_data', table_name = 'compressor')
-                except:
-                    time.sleep(T_sleep)
-                    cursor = Cursor(host=os.environ.get('LAZYINS_HOST'), port=os.environ.get('LAZYINS_PORT'), user=os.environ.get('LAZYINS_USER'), passwd=os.environ.get('LAZYINS_PASSWD'), db_name = 'LAr_TPCruns_data', table_name = 'compressor')
-
-                # table for compressor in db, currently shows compressor temperature T1/T2/T3
-                name_compressor = ['T1', 'T2', 'T3']
-                types_compressor = ['int', 'int', 'int']
-
-                # Todo: figure out why it need to sleep for a certain amount of time
-                sleep(1)
-
-                # This is to check whether there is any values properly read
-                if(CompressorOut[6:8] == ''):
-                    T1_temp = None
-                else:
-                    T1_temp = CompressorOut[6:8]
-                if(CompressorOut[10:12] == ''):
-                    T2_temp = None
-                else:
-                    T2_temp = CompressorOut[10:12]
-                if(CompressorOut[14:16] == ''):
-                    T3_temp = None
-                else:
-                    T3_temp = CompressorOut[14:16]
-
-                values_compressor = [T1_temp, T2_temp, T3_temp]
-
-                # insert data to mysql database
-                cursor.setup(name_compressor, types = types_compressor)
-                cursor.register(values_compressor)"""
-                
-                
                 # Compressor status
                 Compressor.write(b'$STA3504\r')
                 time.sleep(T_sleep)
-                try:
-                    CompressorOutStat = Compressor.read(Compressor.inWaiting()).decode('utf8')
-                    print(CompressorOutStat)
-                except UnicodeDecodeError:
-                    CompressorOutStat = None
+                CompressorOut = Compressor.read(Compressor.inWaiting()).decode('utf8')
                 flag2 = 0
-                while (len(CompressorOutStat) != 15 and flag2 <= 3):
+                while (len(CompressorOut) != 15 and flag2 <= 3):
                     print ('Compressor status readout error')
                     Compressor.write(b'$STA3504\r')
                     time.sleep(T_sleep)
-                    try:
-                        CompressorOutStat = Compressor.read(Compressor.inWaiting()).decode('utf8')
-                    except UnicodeDecodeError:
-                        CompressorOutStat = None
+                    CompressorOut = Compressor.read(Compressor.inWaiting()).decode('utf8')
                     flag2 += 1
                 #$STA,0000,FAD0
-                print (CompressorOutStat)
+                print (CompressorOut)
     #            print (len(CompressorOut))
-                if len(CompressorOutStat) == 15:
-                    Status_tmp = CompressorOutStat[5:9]
+                if len(CompressorOut) == 15:
+                    Status_tmp = CompressorOut[5:9]
                     if(Status_tmp == '0000' and Error == 0): Status = 'OFF'
                     elif(Status_tmp == '0301'and Error == 0): Status = 'OK'
                     else:
@@ -391,7 +342,7 @@ def loop():
                         Error = 1
                     txtStatus.delete(0,tkinter.END)
                     txtStatus.insert(tkinter.END,Status)
-                elif len(CompressorOutStat) != 15:
+                elif len(CompressorOut) != 15:
                     Status_tmp = None
             elif compstat == 0:
                 print("Compressor port not found/open")
@@ -401,33 +352,25 @@ def loop():
                 Status_tmp = None
 #            print (Status_tmp)
 
-            try:
-                cursor = Cursor(host=os.environ.get('LAZYINS_HOST'), port=os.environ.get('LAZYINS_PORT'), user=os.environ.get('LAZYINS_USER'), passwd=os.environ.get('LAZYINS_PASSWD'), db_name = 'LAr_TPCruns_data', table_name = 'pressure')
-            except NameError:
-                print("database pressure chart read error!")
-            else:
-                cursor = Cursor(host=os.environ.get('LAZYINS_HOST'), port=os.environ.get('LAZYINS_PORT'), user=os.environ.get('LAZYINS_USER'), passwd=os.environ.get('LAZYINS_PASSWD'), db_name = 'LAr_TPCruns_data', table_name = 'pressure')
-            
+            cursor = Cursor(host=os.environ.get('LAZYINS_HOST'), port=os.environ.get('LAZYINS_PORT'), user=os.environ.get('LAZYINS_USER'), passwd=os.environ.get('LAZYINS_PASSWD'), db_name = 'LAr_TPCruns_data', table_name = 'pressure')
             # table for pressure in db
             name_pressure = ['chamber_pressure', 'jacket_pressure']
             types_pressure = ['float', 'float']
             if topstat == 1:
                 # Pressure gauge 1
 #               This part is for querying the address of the sensor. Uncomment if you want to display that! 
-                #Gauge1.write(('$@253AD!001;FF').encode('utf8'))
+                Gauge1.write(('$@253AD!001;FF').encode('utf8'))
                 #Gauge1.write(('$@254AD?;FF').encode('utf8'))
-                Gauge1.write(('@001PR3?;FF').encode('utf8'))
-
                 #time.sleep(5*T_sleep)
-                GaugeP1 = Gauge1.read(Gauge1.inWaiting()).decode('utf8')
-                print('Main Chamber Address:' + GaugeP1 )
+                #GaugeP1 = Gauge1.read(Gauge1.inWaiting()).decode('utf8')
+                #print('Main Chamber Address:' + GaugeP1 )
 
                 #Gauge1.write(('$@253AD!001;FF').encode('utf8'))
-                #time.sleep(T_sleep)
-                #Gauge1.write(('$@001PR3?;FF').encode('utf8'))
+                time.sleep(T_sleep)
+                Gauge1.write(('$@001PR3?;FF').encode('utf8'))
                 #Gauge1.write(('@253PR3?;FF').encode('utf8'))
 #               Gauge.write(b'$@253PR4?;FF')
-                time.sleep(T_sleep)
+                time.sleep(2*T_sleep)
                 GaugeP1 = Gauge1.read(Gauge1.inWaiting()).decode('utf8')
 #                print('Main Chamber:' + GaugeP1 + " ;len = " +str(len(GaugeP1)))
 
@@ -435,14 +378,14 @@ def loop():
                 while (len(GaugeP1) != 17 and flag3 <= 3):
                     try:
                         print ('Pressure gauge (P1) readout error')
-                        Gauge1.write(('@001PR3?;FF').encode('utf8'))
+                        Gauge1.write(('$@001PR3?;FF').encode('utf8'))
                         time.sleep(T_sleep)
                         GaugeP1 = Gauge1.read(Gauge1.inWaiting()).decode('utf8')
-                        print(GaugeP1 + " ;len = " +str(len(GaugeP1)))
+ #                       print(GaugeP1 + " ;len = " +str(len(GaugeP1)))
+                        flag3 += 1
                     except UnicodeDecodeError:
                         print ("Event lost")
                         pass
-                    flag3 += 1
                 #@253ACK6.41E+2;FF
                 if len(GaugeP1) == 17:
                     top_time = datetime.now()
@@ -503,12 +446,14 @@ def loop():
             if botstat == 1:
                 # Presusre gauge 2
                 #Gauge2.write(('$@253AD!002;FF').encode('utf8'))
-                time.sleep(T_sleep)
-                Gauge2.write(('@253PR3?;FF').encode('utf8'))
+                time.sleep(2*T_sleep)
+                Gauge2.write(('$@253PR3?;FF').encode('utf8'))
 
                 time.sleep(T_sleep)
+
                 GaugeP2 = Gauge2.read(Gauge2.inWaiting()).decode('utf8')
                 print('Jacket:' + GaugeP2 + " ;len = " +str(len(GaugeP2)))
+
                 flag4 = 0
                 while (len(GaugeP2) != 17 and flag4 <= 3):
                     print ('Pressure gauge (P2) readout error')
@@ -543,13 +488,7 @@ def loop():
             cursor.register(values_pressure)
                 ###################### Thermometry ###############################
             
-            try:
-                cursor = Cursor(host=os.environ.get('LAZYINS_HOST'), port=os.environ.get('LAZYINS_PORT'), user=os.environ.get('LAZYINS_USER'), passwd=os.environ.get('LAZYINS_PASSWD'), db_name = 'LAr_TPCruns_data', table_name = 'rtd')
-            except NameError:
-                print("database rtd chart read error!")
-            else:
-                cursor = Cursor(host=os.environ.get('LAZYINS_HOST'), port=os.environ.get('LAZYINS_PORT'), user=os.environ.get('LAZYINS_USER'), passwd=os.environ.get('LAZYINS_PASSWD'), db_name = 'LAr_TPCruns_data', table_name = 'rtd')
-            
+            cursor = Cursor(host=os.environ.get('LAZYINS_HOST'), port=os.environ.get('LAZYINS_PORT'), user=os.environ.get('LAZYINS_USER'), passwd=os.environ.get('LAZYINS_PASSWD'), db_name = 'LAr_TPCruns_data', table_name = 'rtd')
             # table for pressure in db
             name_rtd = ['R0', 'R1', 'R2', 'R3', 'R4', 'R5']
             types_rtd = ['FLOAT', 'FLOAT', 'FLOAT', 'FLOAT', 'FLOAT', 'FLOAT']
@@ -737,7 +676,7 @@ def CompressorOn():
     if res == True:
         print ('turning on the compressor')
         Compressor.write(b'$ON177CF\r')
-        time.sleep(0.1)
+        time.sleep(1)
 
 def CompressorOff():
     global Compressor
@@ -746,23 +685,6 @@ def CompressorOff():
     if res == True:
         print ('turning off the compressor')
         Compressor.write(b'$OFF9188\r')
-        time.sleep(0.1)
-
-# Adding functionality to turn heater relay on using a button
-def HeaterOn():
-    global HeaterCtrl
-    res = messagebox.askyesno("Heater On", "Are you sure you want to turn the heater on?")
-    if res == True:
-        print ("Turning the heater on")
-        GPIO.output(HeaterCtrl, GPIO.HIGH)
-        time.sleep(1)
-
-def HeaterOff():
-    global HeaterCtrl
-    res = messagebox.askyesno("Heater Off", "Are you sure you want to turn the heater off?")
-    if res == True:
-        print ("Turning the heater off")
-        GPIO.output(HeaterCtrl, GPIO.LOW)
         time.sleep(1)
 
 # Adding functionality to turn heater relay on using a button

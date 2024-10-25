@@ -446,6 +446,7 @@ def loop():
                 L8_tmp = None
                 L9_tmp = None
             elif LLstat == 1:
+                print(LLstat)
                 # Liquid Level Sensor
     #            LiquidLevel.write(b'R')
     #            time.sleep(T_sleep)
