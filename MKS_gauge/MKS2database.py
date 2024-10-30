@@ -5,6 +5,7 @@ from lazyins import Cursor
 import os
 import re
 import readline
+import pathlib
 import mysql.connector
 
 
