@@ -88,6 +88,33 @@ def pump_data(serial_path,  db_name, table_name, MKS_address, serial_baudrate = 
             pass
             return None
 
+
+def MKS_serial_command(MKS_command, serial_path, serial_baudrate = 115200, serial_parity = 'N', serial_stopbits = 1, serial_bytesize = 8):
+    while True:
+        MKSpath = serial_path
+        MKS = serial.Serial(MKSpath)
+        MKS.baudrate = serial_baudrate
+        MKS.parity = serial_parity
+        MKS.stopbits = serial_stopbits
+        MKS.bytesize = serial_bytesize
+
+        print("You are sending command: ", MKS_command, " to device: ", serial_path)
+        MKS.write((MKS_command).encode('utf-8'))
+        time.sleep(0.1)
+        
+        readout = MKS.read(MKS.inWaiting())
+        print("serial output is: ", readout)
+
+        serial_out = readout.decode('utf-8')
+
+        print("serial output after utf-8 decode is: ",serial_out)
+        MKS.close()
+        return serial_out
+    #except Exception as e:
+    #    print("Error in MKS serial communication:", e)
+    #    return None
+
+
 # search serial port
 ser = serial.Serial()
 devices = [info.device for info in list_ports.comports()]
@@ -95,6 +122,8 @@ print('available port: ')
 print(devices)
 
 port_path = input("Please enter the data port: ")
+print("MKS gauge port address serial reply:")
+MKS_serial_command(MKS_command='@254AD?FF', serial_path=port_path, serial_baudrate = 115200, serial_parity = 'N', serial_stopbits = 1, serial_bytesize = 8)
 MKS_address = input("Please enter MKS gauge address: ")
 
 

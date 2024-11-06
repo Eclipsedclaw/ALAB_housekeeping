@@ -79,14 +79,17 @@ def pump_data(serial_path, serial_baudrate = 115200, serial_parity = 'N', serial
             pass
             return None
 
+devices = [info.device for info in list_ports.comports()]
+print('available port: ')
+print(devices)
 
-MKS_serial_command(MKS_command='@002GT!AIR;FF', serial_path='/dev/ttyUSB0')
+MKS_serial_command(MKS_command='@0254AD?;FF', serial_path='/dev/ttyUSB1')
 
 #pump_data(MKS_command='@002PR3?;FF', serial_path='/dev/cu.usbserial-0001')
 
 try:
     while True:
-        pump_data(serial_path='/dev/ttyUSB0')
+        pump_data(serial_path='/dev/ttyUSB1')
         time.sleep(0.1)  # Delay for 0.1 second
 except KeyboardInterrupt:
     print("Process interrupted by the user.")
