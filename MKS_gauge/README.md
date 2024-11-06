@@ -4,6 +4,8 @@ Make sure you have installed requested packages before you start to use the scri
 pip install pymysql --break-system-packages
 pip install lazyins --break-system-packages
 pip install mysql-connector-python --break-system-packages
+pip install openpyxl --break-system-packages
+pip install pandas --break-system-pa
 ```
 
 ### Setup system variables for mysql database
