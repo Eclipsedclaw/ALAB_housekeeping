@@ -9,9 +9,9 @@ fi
 
 # setup USB port symlink
 # sudo bash -c 'echo "ACTION==\"add\", SUBSYSTEM==\"tty\", ATTRS{idVendor}==\"06cd\", ATTRS{idProduct}==\"0121\", SYMLINK+=\"toppress\"" >> /etc/udev/rules.d/99-myusb.rules'
-sudo bash -c 'echo "ACTION==\"add\", SUBSYSTEM==\"tty\", ATTRS{idVendor}==\"2341\", ATTRS{idProduct}==\"0043\", SYMLINK+=\"arduino\"" >> /etc/udev/rules.d/99-myusb.rules'
+#sudo bash -c 'echo "ACTION==\"add\", SUBSYSTEM==\"tty\", ATTRS{idVendor}==\"2341\", ATTRS{idProduct}==\"0043\", SYMLINK+=\"arduino\"" >> /etc/udev/rules.d/99-myusb.rules'
 # sudo bash -c 'echo "ACTION==\"add\", SUBSYSTEM==\"tty\", ATTRS{serial}==\"DCAWb115819\", SYMLINK+=\"botpress\"" >> /etc/udev/rules.d/99-myusb.rules'
-sudo bash -c 'echo "ACTION==\"add\", SUBSYSTEM==\"tty\", ATTRS{serial}==\"EJCZb11A920\", SYMLINK+=\"compress\"" >> /etc/udev/rules.d/99-myusb.rules'
+#sudo bash -c 'echo "ACTION==\"add\", SUBSYSTEM==\"tty\", ATTRS{serial}==\"EJCZb11A920\", SYMLINK+=\"compress\"" >> /etc/udev/rules.d/99-myusb.rules'
 
 # Check if the command was successful
 if [ $? -eq 0 ]; then
@@ -58,6 +58,7 @@ fi
 #install required modules
 pip install pymysql --break-system-packages
 pip install lazyins --break-system-packages
+pip install mysql-connector-python-rf --break-system-packages
 
 # reboot system
 echo "Please reboot to let usb symlink work"

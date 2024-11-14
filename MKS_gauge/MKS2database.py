@@ -123,7 +123,8 @@ print(devices)
 
 port_path = input("Please enter the data port: ")
 print("MKS gauge port address serial reply:")
-MKS_serial_command(MKS_command='@254AD?FF', serial_path=port_path, serial_baudrate = 115200, serial_parity = 'N', serial_stopbits = 1, serial_bytesize = 8)
+MKS_serial_command(MKS_command='@254AD?;FF', serial_path=port_path, serial_baudrate = 115200, serial_parity = 'N', serial_stopbits = 1, serial_bytesize = 8)
+
 MKS_address = input("Please enter MKS gauge address: ")
 
 
