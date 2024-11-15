@@ -39,8 +39,7 @@ readline.set_completer(complete_path)
 
 def pump_data(serial_path,  db_name, table_name, MKS_address, serial_baudrate = 115200, serial_parity = 'N', serial_stopbits = 1, serial_bytesize = 8):
     while True:
-        MKSpath = serial_path
-        MKS = serial.Serial(MKSpath)
+        MKS = serial.Serial(serial_path)
         MKS.baudrate = serial_baudrate
         MKS.parity = serial_parity
         MKS.stopbits = serial_stopbits
@@ -91,8 +90,7 @@ def pump_data(serial_path,  db_name, table_name, MKS_address, serial_baudrate = 
 
 def MKS_serial_command(MKS_command, serial_path, serial_baudrate = 115200, serial_parity = 'N', serial_stopbits = 1, serial_bytesize = 8):
     while True:
-        MKSpath = serial_path
-        MKS = serial.Serial(MKSpath)
+        MKS = serial.Serial(serial_path)
         MKS.baudrate = serial_baudrate
         MKS.parity = serial_parity
         MKS.stopbits = serial_stopbits
