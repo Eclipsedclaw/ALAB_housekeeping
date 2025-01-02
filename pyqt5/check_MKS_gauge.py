@@ -7,7 +7,7 @@ devices = [info.device for info in list_ports.comports()]
 print('available port: ')
 print(devices)
 
-def MKS_serial_command(MKS_command, serial_path, serial_baudrate = 9600, serial_parity = 'N', serial_stopbits = 1, serial_bytesize = 8):
+def MKS_serial_command(MKS_command, serial_path, serial_baudrate = 115200, serial_parity = 'N', serial_stopbits = 1, serial_bytesize = 8):
     while True:
         MKSpath = serial_path
         MKS = serial.Serial(MKSpath)
@@ -32,5 +32,5 @@ def MKS_serial_command(MKS_command, serial_path, serial_baudrate = 9600, serial_
     #    return None
 
 
-MKS_serial_command(MKS_command='@254AD?;FF', serial_path='/dev/ttyUSB1')
+MKS_serial_command(MKS_command='@254AD?;FF', serial_path='/dev/ttyUSB0')
 

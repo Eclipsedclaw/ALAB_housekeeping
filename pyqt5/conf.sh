@@ -30,22 +30,22 @@ sudo udevadm trigger
 # Prompt the user for the database hostname
 read -p "Please enter the hostname: " hostname
 # Add the hostname to database
-sudo bash -c "echo 'export LAZYINS_HOST=\"$hostname\"' >> /home/pi/.bashrc"
+sudo bash -c "echo 'export LAZYINS_HOST=\"$hostname\"' >> /home/pgramshub/.bashrc"
 
 # Prompt the user for the database port
 read -p "Please enter the port: " port
 # Add the hostname to database
-sudo bash -c "echo 'export LAZYINS_PORT=\"$port\"' >> /home/pi/.bashrc"
+sudo bash -c "echo 'export LAZYINS_PORT=\"$port\"' >> /home/pgramshub/.bashrc"
 
 # Prompt the user for the database username
 read -p "Please enter the username: " username
 # Add the hostname to database
-sudo bash -c "echo 'export LAZYINS_USER=\"$username\"' >> /home/pi/.bashrc"
+sudo bash -c "echo 'export LAZYINS_USER=\"$username\"' >> /home/pgramshub/.bashrc"
 
 # Prompt the user for the database passwd
 read -p "Please enter the password: " passwd
 # Add the hostname to database
-sudo bash -c "echo 'export LAZYINS_PASSWD=\"$passwd\"' >> /home/pi/.bashrc"
+sudo bash -c "echo 'export LAZYINS_PASSWD=\"$passwd\"' >> /home/pgramshub/.bashrc"
 
 # Check if the darabase commands was successful
 if [ $? -eq 0 ]; then
@@ -56,8 +56,7 @@ else
 fi
 
 #install required modules
-pip install pymysql --break-system-packages
-pip install lazyins --break-system-packages
-
+pip install pymysql 
+pip install lazyins 
 # reboot system
 echo "Please reboot to let usb symlink work"

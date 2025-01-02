@@ -7,11 +7,9 @@ from datetime import datetime
 from time import sleep
 import serial
 from serial.tools import list_ports
-import RPi.GPIO as GPIO
 import math
 from lazyins import Cursor
 import os
-from gpiozero import LED
 import signal
 
 class TimeoutException(Exception):
@@ -73,7 +71,7 @@ def get_rtd():
 
         sleep(1)
         try:
-            RTD = arduino.readline().decode('utf8')
+            RTD = arduino.readline().decode().strip()
 
             print("RTD is: ", RTD)
             if(RTD[3:7] == '' or convert_RTD_ADC(RTD[3:7], 0) == False):
