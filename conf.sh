@@ -59,6 +59,7 @@ fi
 pip install pymysql --break-system-packages
 pip install lazyins --break-system-packages
 pip install mysql-connector-python-rf --break-system-packages
+pip install mysql-connector-python --break-system-packages
 
 # reboot system
 echo "Please reboot to let usb symlink work"
