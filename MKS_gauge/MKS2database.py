@@ -63,8 +63,12 @@ def pump_data(serial_path,  db_name, table_name, MKS_address, serial_baudrate = 
                 try:
                     ChamberPressureOut = MKS.read(MKS.inWaiting()).decode('utf8')
                     print("ChamberPressureOut for PR"+str(i+1)+" string is: "+ str(ChamberPressureOut))
-                    match = re.search(fr'@{MKS_address}ACK(.*?)\;FF', ChamberPressureOut)
-                    chamber_pressure.append(abs(float(match.group(1))))
+                    try:
+                        match = re.search(fr'@{MKS_address}ACK(.*?)\;FF', ChamberPressureOut)
+                        chamber_pressure.append(abs(float(match.group(1))))
+                    except Exception as e:
+                        print("Error for readout PR"+str(i+1)+"!")
+                        chamber_pressure.append(0)
                 except Exception as e:
                     print("Error in chamber pressure query:", e)
                 finally:
