@@ -7,11 +7,11 @@ from datetime import datetime
 from time import sleep
 import serial
 from serial.tools import list_ports
-import RPi.GPIO as GPIO
+#import RPi.GPIO as GPIO
 import math
 from lazyins import Cursor
 import os
-from gpiozero import LED
+#from gpiozero import LED
 import signal
 
 class TimeoutException(Exception):
@@ -64,7 +64,7 @@ def get_rtd():
         # table for pressure in db
         name_rtd = ['R0', 'R1', 'R2', 'R3', 'R4', 'R5']
         types_rtd = ['FLOAT', 'FLOAT', 'FLOAT', 'FLOAT', 'FLOAT', 'FLOAT']
-        ardpath = "/dev/arduino"
+        ardpath = "/dev/ttyACM0"
         arduino = serial.Serial(ardpath)
         arduino.baudrate = 9600
         arduino.parity = 'N'
@@ -72,6 +72,11 @@ def get_rtd():
         arduino.bytesize = 8
 
         sleep(1)
+        
+        RTD = arduino.readline().decode('utf8')
+
+        print("RTD is: ", RTD)
+
         try:
             RTD = arduino.readline().decode('utf8')
 
