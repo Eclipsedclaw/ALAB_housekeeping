@@ -68,7 +68,7 @@ def pump_data(serial_path,  db_name, table_name, MKS_address, serial_baudrate = 
                         chamber_pressure.append(abs(float(match.group(1))))
                     except Exception as e:
                         print("Error for readout PR"+str(i+1)+"!")
-                        chamber_pressure.append(0)
+                        chamber_pressure.append("None")
                 except Exception as e:
                     print("Error in chamber pressure query:", e)
                 finally:
@@ -81,8 +81,11 @@ def pump_data(serial_path,  db_name, table_name, MKS_address, serial_baudrate = 
             print(values_pressure)
 
             # insert
-            cursor.setup(name_pressure, types = types_pressure)
-            cursor.register(values_pressure)
+            if(all(element is None for element in values_pressure)):
+                print("ALL MKS readout shows NONE! Check communication connection!")
+            else:
+                cursor.setup(name_pressure, types = types_pressure)
+                cursor.register(values_pressure)
 
             print("Current pressure: ", values_pressure)
             return values_pressure

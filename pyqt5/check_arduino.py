@@ -39,7 +39,7 @@ def convert_RTD_ADC(x, offset):
     # Perform the calculations
     try:
         L_V = x_float * (5.0 / 1023.0)
-        if(L_V == 5.0):
+        if(L_V == 5.0 or x==1023):
             return False
         else:
             L_R = L_V * 1000. / (5.0 - L_V)
