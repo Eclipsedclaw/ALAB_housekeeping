@@ -49,7 +49,6 @@ config = {
     'host': os.environ.get('LAZYINS_HOST'),
     'port': os.environ.get('LAZYINS_PORT')
 }
-print(config)
 
 # Get database name from user input
 connection = mysql.connector.connect(**config)
@@ -107,9 +106,9 @@ try:
         for row in reader:
             if len(row) >= 6:
                 try:
-                    # Parse and convert to UTC
-                    date_obj = datetime.strptime(row[0].strip(), '%m/%d/%y %H:%M')
-                    date_obj = date_obj - timedelta(hours=5)  # UTC conversion
+                    # Parse new date format "Mar 20, 2025 17:49"
+                    date_obj = datetime.strptime(row[0].strip(), '%b %d, %Y %H:%M')
+                    date_obj = date_obj - timedelta(hours=-4)  # UTC conversion
                     
                     # Skip if timestamp already exists
                     if date_obj in existing_timestamps:
