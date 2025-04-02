@@ -7,12 +7,6 @@ if [ "$EUID" -ne 0 ]; then
   exit
 fi
 
-# setup USB port symlink
-# sudo bash -c 'echo "ACTION==\"add\", SUBSYSTEM==\"tty\", ATTRS{idVendor}==\"06cd\", ATTRS{idProduct}==\"0121\", SYMLINK+=\"toppress\"" >> /etc/udev/rules.d/99-myusb.rules'
-#sudo bash -c 'echo "ACTION==\"add\", SUBSYSTEM==\"tty\", ATTRS{idVendor}==\"2341\", ATTRS{idProduct}==\"0043\", SYMLINK+=\"arduino\"" >> /etc/udev/rules.d/99-myusb.rules'
-# sudo bash -c 'echo "ACTION==\"add\", SUBSYSTEM==\"tty\", ATTRS{serial}==\"DCAWb115819\", SYMLINK+=\"botpress\"" >> /etc/udev/rules.d/99-myusb.rules'
-#sudo bash -c 'echo "ACTION==\"add\", SUBSYSTEM==\"tty\", ATTRS{serial}==\"EJCZb11A920\", SYMLINK+=\"compress\"" >> /etc/udev/rules.d/99-myusb.rules'
-
 # Check if the command was successful
 if [ $? -eq 0 ]; then
     echo "Udev rule added successfully."
@@ -30,22 +24,22 @@ sudo udevadm trigger
 # Prompt the user for the database hostname
 read -p "Please enter the hostname: " hostname
 # Add the hostname to database
-sudo bash -c "echo 'export LAZYINS_HOST=\"$hostname\"' >> /home/pi/.bashrc"
+sudo bash -c "echo 'export LAZYINS_HOST=\"$hostname\"' >> \"\$HOME/.bashrc\""
 
 # Prompt the user for the database port
-read -p "Please enter the port: " port
+read -p "Please enter the mysql listening port: " port
 # Add the hostname to database
-sudo bash -c "echo 'export LAZYINS_PORT=\"$port\"' >> /home/pi/.bashrc"
+sudo bash -c "echo 'export LAZYINS_PORT=\"$port\"' >> \"\$HOME/.bashrc\""
 
 # Prompt the user for the database username
-read -p "Please enter the username: " username
+read -p "Please enter the mysql username: " username
 # Add the hostname to database
-sudo bash -c "echo 'export LAZYINS_USER=\"$username\"' >> /home/pi/.bashrc"
+sudo bash -c "echo 'export LAZYINS_USER=\"$username\"' >> \"\$HOME/.bashrc\""
 
 # Prompt the user for the database passwd
-read -p "Please enter the password: " passwd
+read -p "Please enter the mysql password: " passwd
 # Add the hostname to database
-sudo bash -c "echo 'export LAZYINS_PASSWD=\"$passwd\"' >> /home/pi/.bashrc"
+sudo bash -c "echo 'export LAZYINS_PASSWD=\"$passwd\"' >> \"\$HOME/.bashrc\""
 
 # Check if the darabase commands was successful
 if [ $? -eq 0 ]; then
@@ -60,6 +54,3 @@ pip install pymysql --break-system-packages
 pip install lazyins --break-system-packages
 pip install mysql-connector-python-rf --break-system-packages
 pip install mysql-connector-python --break-system-packages
-
-# reboot system
-echo "Please reboot to let usb symlink work"
