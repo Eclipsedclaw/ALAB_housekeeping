@@ -26,6 +26,7 @@ def convert_RTD_ADC(x, offset):
 
     # Perform the calculations
     try:
+        # In lab we are using 3.3V as board power supply thes none of the ADC could exceed 2715
         L_V = x_float * (3.3 / 2715.0)
         if(x>=2715):
             print("Open circuit!")
@@ -35,7 +36,10 @@ def convert_RTD_ADC(x, offset):
             L_tmp = -(math.sqrt(17.59246 - 0.00232 * L_R) - 3.908) / 0.00116
             L_tmpK = L_tmp + 273.15
             L_correction = L_tmpK + offset_float  # No correction for now
-            return round(float(L_correction), 2)    # Round to 2 digits
+            if L_correction > 73:
+                return round(float(L_correction), 2)    # Round to 2 digits
+            else:
+                return None
     except Exception as e:
         print(f"Error during data querying")
         return None
