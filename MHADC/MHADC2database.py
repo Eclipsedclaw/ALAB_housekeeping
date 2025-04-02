@@ -120,8 +120,8 @@ baud_rate = 9600
 command = "a"
 
 
-max_retries = 5  # Maximum number of retries
-retry_delay = 5   # Delay between retries in seconds
+max_retries = 100  # Maximum number of retries
+retry_delay = 20   # Delay between retries in seconds
 
 for attempt in range(max_retries):
 
