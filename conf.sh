@@ -21,25 +21,52 @@ sudo /etc/init.d/udev restart
 # Trigger the rules to apply to already connected devices
 sudo udevadm trigger
 
-# Prompt the user for the database hostname
+# Get the original user's home directory (even when run with sudo)
+REAL_USER=$(who am i | awk '{print $1}')
+USER_HOME=$(getent passwd "$REAL_USER" | cut -d: -f6)
+BASH_RC="$USER_HOME/.bashrc"
+
+# Function to add/update a variable in .bashrc
+update_bashrc() {
+  local var_name="$1"
+  local var_value="$2"
+  
+  if grep -q "export $var_name=" "$BASH_RC"; then
+    # Update existing variable
+    if sed -i "/export $var_name=/c\export $var_name=\"$var_value\"" "$BASH_RC"; then
+      echo "[SUCCESS] Updated $var_name in $BASH_RC"
+    else
+      echo "[ERROR] Failed to update $var_name" >&2
+      return 1
+    fi
+  else
+    # Add new variable
+    if echo "export $var_name=\"$var_value\"" >> "$BASH_RC"; then
+      echo "[SUCCESS] Added $var_name to $BASH_RC"
+    else
+      echo "[ERROR] Failed to add $var_name" >&2
+      return 1
+    fi
+  fi
+}
+
+# Prompt for inputs
 read -p "Please enter the hostname: " hostname
-# Add the hostname to database
-sudo bash -c "echo 'export LAZYINS_HOST=\"$hostname\"' >> \"\$HOME/.bashrc\""
+update_bashrc "LAZYINS_HOST" "$hostname"
 
-# Prompt the user for the database port
-read -p "Please enter the mysql listening port: " port
-# Add the hostname to database
-sudo bash -c "echo 'export LAZYINS_PORT=\"$port\"' >> \"\$HOME/.bashrc\""
+read -p "Please enter the MySQL listening port: " port
+update_bashrc "LAZYINS_PORT" "$port"
 
-# Prompt the user for the database username
-read -p "Please enter the mysql username: " username
-# Add the hostname to database
-sudo bash -c "echo 'export LAZYINS_USER=\"$username\"' >> \"\$HOME/.bashrc\""
+read -p "Please enter the MySQL username: " username
+update_bashrc "LAZYINS_USER" "$username"
 
-# Prompt the user for the database passwd
-read -p "Please enter the mysql password: " passwd
-# Add the hostname to database
-sudo bash -c "echo 'export LAZYINS_PASSWD=\"$passwd\"' >> \"\$HOME/.bashrc\""
+# WARNING: Storing passwords in .bashrc is insecure!
+read -p "Please enter the MySQL password: " passwd
+update_bashrc "LAZYINS_PASSWD" "$passwd"
+
+# Notify user to reload
+echo -e "\nChanges written to $BASH_RC"
+echo "Run 'source ~/.bashrc' or restart your terminal to apply changes."
 
 # Check if the darabase commands was successful
 if [ $? -eq 0 ]; then

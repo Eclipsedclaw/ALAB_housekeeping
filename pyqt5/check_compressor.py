@@ -25,8 +25,8 @@ def get_compressor():
         name_compressor = ['T1', 'T2', 'T3', 'P_Return']
         types_compressor = ['int', 'int', 'int', 'int']
 
-        # Fixed compressor address, configured by Robin
-        compresspath = "/dev/ttyUSB1"
+        # TODO: make this input user determined
+        compresspath = "/dev/ttyUSB0"
         Compressor = serial.Serial(compresspath)
         
         # Standard baud rates include 110, 300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 38400, 57600, 115200, 128000 and 256000 bits per second.
@@ -80,6 +80,11 @@ def get_compressor():
         pass
         return None
     
+# search serial port
+ser = serial.Serial()
+devices = [info.device for info in list_ports.comports()]
+print('available port: ')
+print(devices)
 
 try:
     while True:
