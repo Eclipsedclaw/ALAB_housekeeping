@@ -83,7 +83,7 @@ devices = [info.device for info in list_ports.comports()]
 print('available port: ')
 print(devices)
 
-MKS_serial_command(MKS_command='@0254AD?;FF', serial_path='/dev/ttyUSB1')
+MKS_serial_command(MKS_command='@254AD?;FF', serial_path='/dev/ttyUSB0')
 
 #pump_data(MKS_command='@002PR3?;FF', serial_path='/dev/cu.usbserial-0001')
 

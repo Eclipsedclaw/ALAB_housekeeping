@@ -39,8 +39,7 @@ readline.set_completer(complete_path)
 
 def pump_data(serial_path,  db_name, table_name, MKS_address, serial_baudrate = 115200, serial_parity = 'N', serial_stopbits = 1, serial_bytesize = 8):
     while True:
-        MKSpath = serial_path
-        MKS = serial.Serial(MKSpath)
+        MKS = serial.Serial(serial_path)
         MKS.baudrate = serial_baudrate
         MKS.parity = serial_parity
         MKS.stopbits = serial_stopbits
@@ -64,8 +63,12 @@ def pump_data(serial_path,  db_name, table_name, MKS_address, serial_baudrate = 
                 try:
                     ChamberPressureOut = MKS.read(MKS.inWaiting()).decode('utf8')
                     print("ChamberPressureOut for PR"+str(i+1)+" string is: "+ str(ChamberPressureOut))
-                    match = re.search(fr'@{MKS_address}ACK(.*?)\;FF', ChamberPressureOut)
-                    chamber_pressure.append(abs(float(match.group(1))))
+                    try:
+                        match = re.search(fr'@{MKS_address}ACK(.*?)\;FF', ChamberPressureOut)
+                        chamber_pressure.append(abs(float(match.group(1))))
+                    except Exception as e:
+                        print("Error for readout PR"+str(i+1)+"!")
+                        chamber_pressure.append("None")
                 except Exception as e:
                     print("Error in chamber pressure query:", e)
                 finally:
@@ -78,8 +81,11 @@ def pump_data(serial_path,  db_name, table_name, MKS_address, serial_baudrate = 
             print(values_pressure)
 
             # insert
-            cursor.setup(name_pressure, types = types_pressure)
-            cursor.register(values_pressure)
+            if(all(element is None for element in values_pressure)):
+                print("ALL MKS readout shows NONE! Check communication connection!")
+            else:
+                cursor.setup(name_pressure, types = types_pressure)
+                cursor.register(values_pressure)
 
             print("Current pressure: ", values_pressure)
             return values_pressure
@@ -91,8 +97,7 @@ def pump_data(serial_path,  db_name, table_name, MKS_address, serial_baudrate = 
 
 def MKS_serial_command(MKS_command, serial_path, serial_baudrate = 115200, serial_parity = 'N', serial_stopbits = 1, serial_bytesize = 8):
     while True:
-        MKSpath = serial_path
-        MKS = serial.Serial(MKSpath)
+        MKS = serial.Serial(serial_path)
         MKS.baudrate = serial_baudrate
         MKS.parity = serial_parity
         MKS.stopbits = serial_stopbits
@@ -123,7 +128,8 @@ print(devices)
 
 port_path = input("Please enter the data port: ")
 print("MKS gauge port address serial reply:")
-MKS_serial_command(MKS_command='@254AD?FF', serial_path=port_path, serial_baudrate = 115200, serial_parity = 'N', serial_stopbits = 1, serial_bytesize = 8)
+MKS_serial_command(MKS_command='@254AD?;FF', serial_path=port_path, serial_baudrate = 115200, serial_parity = 'N', serial_stopbits = 1, serial_bytesize = 8)
+
 MKS_address = input("Please enter MKS gauge address: ")
 
 

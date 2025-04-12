@@ -13,7 +13,7 @@ cd ./pyqt5/
 cd ./Python_UI/
 ```
 
-### To use mySQL database and grafana, go to grafana
+### To import DP sensor csv files to mysql database, go to DPsensor
 ```bash
-cd ./grafana/
+cd ./DPsensor/
 ```
