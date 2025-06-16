@@ -45,76 +45,14 @@ def get_compressor():
 
         """
 
-        compresspath = "/dev/ttyUSB3"
+        compresspath = "/dev/ttyUSB1"
         Compressor = serial.Serial(compresspath, baudrate=9600, parity='N', stopbits=1, bytesize=8, timeout=2)
         
         # telegram command sent to the turbo:
         # 001: address, 00: read (01:control/read back), 309:actual rotation speed, 02:the digit of the readout, =?: query, 107: sum of ASCII values of previous units modulo 256
         
         # Send command with correct checksum and carriage return
-        
-        base_command = '0011001006000000'
-        
-        # Calculate checksum: sum of ASCII values modulo 256
-        checksum = sum(ord(c) for c in base_command) % 256
-        
-        command = f'{base_command}{checksum:03d}\r'
-        
-        Compressor.write(command.encode('ascii'))
-
-        print(f"command : {command}")
-        sleep(2)
-        # Read response (adjust size or use readline())
-        response = Compressor.read(100)  # Or: Compressor.readline()
-        print("Start Raw bytes:", response)
-        print("Decoded:", response.decode('ascii', errors='ignore'))
-        TurboOUT = response.decode('ascii', errors='ignore')
-        
-
-        for i in range(1000):
-            base_command = '0010030902=?'
-            
-            # Calculate checksum: sum of ASCII values modulo 256
-            checksum = sum(ord(c) for c in base_command) % 256
-            
-            command = f'{base_command}{checksum:03d}\r'
-            
-            Compressor.write(command.encode('ascii'))
-
-            print(f"command : {command}")
-            
-            # Wait for response
-            sleep(0.5)
-
-
-            # Read response (adjust size or use readline())
-            response = Compressor.read(100)  # Or: Compressor.readline()
-            print("RPM Raw bytes:", response)
-            print("Decoded:", response.decode('ascii', errors='ignore'))
-            TurboOUT = response.decode('ascii', errors='ignore')
-
-
-            # This is to check whether there is any values properly read
-            if(TurboOUT[10:16] == ''):
-                rpm_temp = None
-            else:
-                rpm_temp = TurboOUT[10:16]
-
-            # Compressor return pressure
-            #Compressor.write(b'$PRA95F7\r')
-            # Todo: figure out why it need to sleep for a certain amount of time
-            
-
-            values_turbo = [rpm_temp]
-
-            # insert data to mysql database
-            cursor.setup(name_turbo, types = types_turbo)
-            cursor.register(values_turbo)
-            
-            print("Current turbo status['rpm']: ", values_turbo)
-
-
-        base_command = '0011001006000000'
+        base_command = '0010030902=?'
         
         # Calculate checksum: sum of ASCII values modulo 256
         checksum = sum(ord(c) for c in base_command) % 256
@@ -124,12 +62,37 @@ def get_compressor():
         Compressor.write(command.encode('ascii'))
 
         print(f"command : {command}")
+        
+        # Wait for response
         sleep(0.5)
+
+
         # Read response (adjust size or use readline())
         response = Compressor.read(100)  # Or: Compressor.readline()
-        print("Raw bytes:", response)
+        print("RPM Raw bytes:", response)
         print("Decoded:", response.decode('ascii', errors='ignore'))
         TurboOUT = response.decode('ascii', errors='ignore')
+
+
+        # This is to check whether there is any values properly read
+        if(TurboOUT[10:16] == ''):
+            rpm_temp = None
+        else:
+            rpm_temp = TurboOUT[10:16]
+
+        # Compressor return pressure
+        #Compressor.write(b'$PRA95F7\r')
+        # Todo: figure out why it need to sleep for a certain amount of time
+        
+
+        values_turbo = [rpm_temp]
+
+        # insert data to mysql database
+        cursor.setup(name_turbo, types = types_turbo)
+        cursor.register(values_turbo)
+        
+        print("Current turbo status['rpm']: ", values_turbo)
+
         Compressor.close()
         return values_turbo
     # If can't connect to database, drop this query
@@ -145,9 +108,9 @@ print('available port: ')
 print(devices)
 
 try:
-    # while True:
-    temp_value = get_compressor()
-    #print("this query readout is: ",temp_value)
-    time.sleep(1)  # Delay for 0.1 second
+    while True:
+        temp_value = get_compressor()
+        #print("this query readout is: ",temp_value)
+        time.sleep(1)  # Delay for 0.1 second
 except KeyboardInterrupt:
     print("Process interrupted by the user.")
