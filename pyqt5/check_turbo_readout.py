@@ -11,6 +11,17 @@ import os
 #from gpiozero import LED
 import signal
 
+# Define reasonable limits for validation
+MAX_DRV_CURRENT = 10.0  # Adjust this value based on your device specifications
+MAX_DRV_VOLTAGE = 50.0  # Adjust this value based on your device specifications
+
+# search serial port
+ser = serial.Serial()
+devices = [info.device for info in list_ports.comports()]
+print('available port: ')
+print(devices)
+device = input("Input the USB port number(Not 0):")
+
 # This function query compressor status and send to mysql database
 def get_compressor():
     print("Getting turbo feedback now...")
@@ -35,7 +46,7 @@ def get_compressor():
                            346, 349, 354, 360, 361, 362, 363,
                            364, 365, 366, 367, 368, 369]
 
-        compresspath = "/dev/ttyUSB2"
+        compresspath = "/dev/ttyUSB" + device
         Compressor = serial.Serial(compresspath, baudrate=9600, parity='N', stopbits=1, bytesize=8, timeout=2)
         
         # Initialize list to store all values
@@ -58,10 +69,10 @@ def get_compressor():
                 print(f"Reading {name_turbo[i]} (param {param}): {command.strip()}")
                 
                 # Wait for response
-                sleep(0.05)
+                sleep(0.01)
                 
                 # Read response
-                response = Compressor.read(100)
+                response = Compressor.read(20)
                 print(f"Raw response: {response}")
                 decoded_response = response.decode('ascii', errors='ignore')
                 print(f"Decoded response: {decoded_response}")
@@ -71,16 +82,29 @@ def get_compressor():
                 
                 if param in {303, 349, 360, 361, 362, 363, 364, 365, 366, 367, 368, 369}:  # Error Codes and the Electronic Name
                     value = decoded_response[10:16].strip()
-                    # Convert to int if possible, otherwise store as None
                 elif param in {310, 313}:
                     value = decoded_response[10:16].strip()
                     try:
                         # Convert to int first, then to decimal format
                         int_value = int(value)
-                        value = round(int_value / 100, 2)  # Convert 123456 to 1234.56
+                        decimal_value = round(int_value / 100, 2)  # Convert 123456 to 1234.56
+                        # Validate DrvCurrent and DrvVoltage
+                        if param == 310:  # DrvCurrent
+                            if decimal_value > MAX_DRV_CURRENT:
+                                print(f"ERROR: DrvCurrent value {decimal_value} exceeds maximum limit {MAX_DRV_CURRENT}. Storing NULL.")
+                                value = None
+                            else:
+                                value = decimal_value
+                        elif param == 313:  # DrvVoltage
+                            if decimal_value > MAX_DRV_VOLTAGE:
+                                print(f"ERROR: DrvVoltage value {decimal_value} exceeds maximum limit {MAX_DRV_VOLTAGE}. Storing NULL.")
+                                value = None
+                            else:
+                                value = decimal_value
                     except ValueError:
                         value = None
                         print(f"Warning: Could not convert '{decoded_response[10:16]}' to int for {name_turbo[i]}")
+
                 elif len(decoded_response) > 16 and decoded_response[10:16].strip():
                     value = decoded_response[10:16].strip()
                     try:
@@ -95,7 +119,7 @@ def get_compressor():
                 values_turbo.append(value)
                 
                 # Small delay between commands to avoid overwhelming the device
-                #sleep(0.1)
+                sleep(0.01)
                 
             except Exception as param_error:
                 print(f"Error reading parameter {param} ({name_turbo[i]}): {param_error}")
@@ -118,12 +142,6 @@ def get_compressor():
         print(f"Database or other error: {e}")
         return None
 
-# search serial port
-ser = serial.Serial()
-devices = [info.device for info in list_ports.comports()]
-print('available port: ')
-print(devices)
-
 try:
     while True:
         temp_value = get_compressor()
@@ -131,6 +149,6 @@ try:
             print("Successfully read turbo data")
         else:
             print("Failed to read turbo data")
-        time.sleep(0.1)  # Increased delay since we're reading more parameters
+        time.sleep(0.01)  # Increased delay since we're reading more parameters
 except KeyboardInterrupt:
     print("Process interrupted by the user.")

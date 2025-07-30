@@ -14,6 +14,13 @@ import os
 #from gpiozero import LED
 import signal
 
+# search serial port
+ser = serial.Serial()
+devices = [info.device for info in list_ports.comports()]
+print('available port: ')
+print(devices)
+device = input("Input the USB port number(Not 0):")
+
 # This function query compressor status and send to mysql database
 def get_compressor():
     print("Getting turbo feedback now...")
@@ -22,7 +29,7 @@ def get_compressor():
         cursor = Cursor(host=os.environ.get('LAZYINS_HOST'), port=os.environ.get('LAZYINS_PORT'), user=os.environ.get('LAZYINS_USER'), passwd=os.environ.get('LAZYINS_PASSWD'), db_name = 'bench_test', table_name = 'turbo')
 
         # table for compressor in db, currently shows compressor temperature T1/T2/T3
-        name_turbo = ['rpm']
+        name_turbo = ['ActualSpd']
         types_turbo = ['int']
         """
         # TODO: make this input user determined
@@ -45,7 +52,7 @@ def get_compressor():
 
         """
 
-        compresspath = "/dev/ttyUSB1"
+        compresspath = "/dev/ttyUSB"+device
         Compressor = serial.Serial(compresspath, baudrate=9600, parity='N', stopbits=1, bytesize=8, timeout=2)
         
         # telegram command sent to the turbo:
@@ -101,11 +108,6 @@ def get_compressor():
         pass
         return None
     
-# search serial port
-ser = serial.Serial()
-devices = [info.device for info in list_ports.comports()]
-print('available port: ')
-print(devices)
 
 try:
     while True:
