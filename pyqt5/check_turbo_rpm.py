@@ -1,18 +1,12 @@
-# Author: Jiancheng Zeng(JC)
-# Date: Jan 2nd, 2025
+# Author: Jiancheng Zeng(JC), Junwen Zheng
+# Date: July 30, 2025
 
 import time
-import pymysql
-from datetime import datetime
 from time import sleep
 import serial
 from serial.tools import list_ports
-#import RPi.GPIO as GPIO
-import math
 from lazyins import Cursor
 import os
-#from gpiozero import LED
-import signal
 
 # search serial port
 ser = serial.Serial()
@@ -31,26 +25,6 @@ def get_compressor():
         # table for compressor in db, currently shows compressor temperature T1/T2/T3
         name_turbo = ['ActualSpd']
         types_turbo = ['int']
-        """
-        # TODO: make this input user determined
-        compresspath = "/dev/ttyACM1"
-        Compressor = serial.Serial(compresspath)
-        
-        # Standard baud rates include 110, 300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 38400, 57600, 115200, 128000 and 256000 bits per second.
-        Compressor.baudrate = 9600
-        Compressor.parity = 'N'
-        Compressor.stopbits = 1
-        Compressor.bytesize = 8
-
-        # Compressor temperature
-        Compressor.write(b'0010030902=?107\r')
-        # Todo: figure out why it need to sleep for a certain amount of time
-        sleep(1)
-        #CompressorOut_T = Compressor.readline().decode('utf8')
-        CompressorOut_T = Compressor.read(Compressor.inWaiting()).decode('utf8')
-        print("Readout is: ",CompressorOut_T)
-
-        """
 
         compresspath = "/dev/ttyUSB"+device
         Compressor = serial.Serial(compresspath, baudrate=9600, parity='N', stopbits=1, bytesize=8, timeout=2)

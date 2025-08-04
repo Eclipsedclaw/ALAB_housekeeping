@@ -1,15 +1,12 @@
+# Author: Jiancheng Zeng(JC), Junwen Zheng
+# Date: July 30, 2025
+
 import time
-import pymysql
-from datetime import datetime
 from time import sleep
 import serial
 from serial.tools import list_ports
-#import RPi.GPIO as GPIO
-import math
 from lazyins import Cursor
 import os
-#from gpiozero import LED
-import signal
 
 # Define reasonable limits for validation
 MAX_DRV_CURRENT = 10.0  # Adjust this value based on your device specifications
