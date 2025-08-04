@@ -14,3 +14,14 @@ python ./HK.py
 ![image](https://github.com/Eclipsedclaw/ALAB_housekeeping/assets/37788723/815f612c-d92f-4d13-b5b4-86addbbd6914)
 
 4. For control buttons such as heater and compressor control, it is suggested to use after asking people who understand their functionality. Do not click them without understanding what they do.
+
+
+# How to run the turbo codes
+1. To turn on the turbo, run
+```
+python turbo_ON.py
+```
+To turn off, run
+```
+python turbo_OFF.py
+```
