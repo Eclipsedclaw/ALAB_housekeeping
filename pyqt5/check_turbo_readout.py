@@ -18,13 +18,14 @@ devices = [info.device for info in list_ports.comports()]
 print('available port: ')
 print(devices)
 device = input("Input the USB port number(Not 0):")
+chamber_name = input("Please choose which chamber the turbo is used for (type Main or UPS): ")
 
 # This function query compressor status and send to mysql database
 def get_compressor():
     print("Getting turbo feedback now...")
     try:
         # Keita's module for eazy sql input
-        cursor = Cursor(host=os.environ.get('LAZYINS_HOST'), port=os.environ.get('LAZYINS_PORT'), user=os.environ.get('LAZYINS_USER'), passwd=os.environ.get('LAZYINS_PASSWD'), db_name = 'bench_test', table_name = 'turbo')
+        cursor = Cursor(host=os.environ.get('LAZYINS_HOST'), port=os.environ.get('LAZYINS_PORT'), user=os.environ.get('LAZYINS_USER'), passwd=os.environ.get('LAZYINS_PASSWD'), db_name = 'bench_test', table_name = 'Turbo_'+chamber_name)
 
         # Define all turbo parameters
         name_turbo = ['RemotePrio','SpdSwPtAtt','ErrorCode','OvTempElec','OvTempPump','SetSpdAtt','PumpAccel',
