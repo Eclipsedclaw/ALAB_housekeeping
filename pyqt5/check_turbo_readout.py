@@ -12,16 +12,18 @@ import os
 MAX_DRV_CURRENT = 10.0  # Adjust this value based on your device specifications
 MAX_DRV_VOLTAGE = 50.0  # Adjust this value based on your device specifications
 
-# search serial port
+# search serial port and let the users choose the port for the turbo
 ser = serial.Serial()
 devices = [info.device for info in list_ports.comports()]
 print('available port: ')
 print(devices)
-device = input("Input the USB port number(Not 0):")
+device = input("Input the USB port number:")
+
+# let the users choose which chamber the turbo is used for
 chamber_name = input("Please choose which chamber the turbo is used for (type Main or UPS): ")
 
-# This function query compressor status and send to mysql database
-def get_compressor():
+# This function query the turbo status and send to mysql database
+def get_turbo():
     print("Getting turbo feedback now...")
     try:
         # Keita's module for eazy sql input
@@ -44,9 +46,9 @@ def get_compressor():
                            346, 349, 354, 360, 361, 362, 363,
                            364, 365, 366, 367, 368, 369]
 
-        compresspath = "/dev/ttyUSB" + device
-        Compressor = serial.Serial(compresspath, baudrate=9600, parity='N', stopbits=1, bytesize=8, timeout=2)
-        
+        turbopath = "/dev/ttyUSB" + device
+        Turbo = serial.Serial(turbopath, baudrate=9600, parity='N', stopbits=1, bytesize=8, timeout=2)
+
         # Initialize list to store all values
         values_turbo = []
         
@@ -63,14 +65,14 @@ def get_compressor():
                 command = f'{base_command}{checksum:03d}\r'
                 
                 # Send command
-                Compressor.write(command.encode('ascii'))
+                Turbo.write(command.encode('ascii'))
                 print(f"Reading {name_turbo[i]} (param {param}): {command.strip()}")
                 
                 # Wait for response
                 sleep(0.01)
                 
                 # Read response
-                response = Compressor.read(20)
+                response = Turbo.read(20)
                 print(f"Raw response: {response}")
                 decoded_response = response.decode('ascii', errors='ignore')
                 print(f"Decoded response: {decoded_response}")
@@ -130,7 +132,7 @@ def get_compressor():
         cursor.setup(name_turbo, types=types_turbo)
         cursor.register(values_turbo)
 
-        Compressor.close()
+        Turbo.close()
         return values_turbo
         
     except serial.SerialException as e:
@@ -142,7 +144,7 @@ def get_compressor():
 
 try:
     while True:
-        temp_value = get_compressor()
+        temp_value = get_turbo()
         if temp_value:
             print("Successfully read turbo data")
         else:
