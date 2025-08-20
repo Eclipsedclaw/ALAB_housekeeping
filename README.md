@@ -21,9 +21,7 @@ cd ./DPsensor/
 <h2>How to pipe data from devices to grafana (MKS gauge, RTDs via MHADC board, turbo control)</h2>
 Quick note: The following scripts should ideally be run using screen/tmux so that data piping does not stop once the ssh session is terminated.
 You can create a screen by running 
-```
-screen -S screen_name
-```
+```screen -S screen_name```
 
 You can see which screens are active by running
 ```screen -ls```
