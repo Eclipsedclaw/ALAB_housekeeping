@@ -150,8 +150,11 @@ for db in databases:
     print(f" - {db[0]}")
 
 db_name = input("Please enter the database that you want to use: ")
+print(f"Selected database: {db_name}")
 
-cursor.execute(f"USE {db_name}")
+
+cursor.execute(f"USE {db_name}")  # this line froze
+
 
 # Get table name (chart name) from user input
 cursor.execute("SHOW TABLES")
