@@ -11,7 +11,7 @@ ser = serial.Serial()
 devices = [info.device for info in list_ports.comports()]
 print('available port: ')
 print(devices)
-device = input("Input the USB port number(Not 0):")
+device = input("Input the USB port number:")
 
 # This function query compressor status and send to mysql database
 def get_compressor():
