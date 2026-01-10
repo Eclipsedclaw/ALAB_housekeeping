@@ -45,8 +45,34 @@ def get_compressor():
         pass
         return None
 
+# original code
+''' 
 try:
     temp_value = get_compressor()
     time.sleep(1)  # Delay for 0.1 second
 except KeyboardInterrupt:
     print("Process interrupted by the user.")
+'''
+
+attempts = 0
+max_attempts = 10
+temp_value = None
+
+while attempts < max_attempts and temp_value is None:
+    try:
+        temp_value = get_compressor()
+        attempts += 1
+        
+        if temp_value is None:
+            print(f"Attempt {attempts} failed - function returned None")
+            if attempts < max_attempts:
+                time.sleep(0.3) # a wired delay time to catch the control script empty time slot
+        else:
+            print(f"Success on attempt {attempts}! Value: {temp_value}")
+            
+    except KeyboardInterrupt:
+        print("Process interrupted by the user.")
+        break
+
+if temp_value is None:
+    print(f"Failed after {attempts} attempts")
