@@ -167,12 +167,7 @@ def get_pressure():
         jacket_pressure.append(0.0)
     values_pressure = [*chamber_pressure, *jacket_pressure]
 
-# This function query rtd readout from arduino and send to mysql database
-#def get_rtd():
-    #try:
-        #cursor = Cursor(host=os.environ.get('LAZYINS_HOST'), port=os.environ.get('LAZYINS_PORT'), user=os.environ.get('LAZYINS_USER'), passwd=os.environ.get('LAZYINS_PASSWD'), db_name = 'pgrams', table_name = 'chamber')
-
-        # table for pressure in db
+    # Read RTD (Resistance Temperature Detector) data from Arduino
     name_rtd = ['rtd0', 'rtd1', 'rtd2', 'rtd3', 'rtd4', 'rtd5']
     types_rtd = ['FLOAT', 'FLOAT', 'FLOAT', 'FLOAT', 'FLOAT', 'FLOAT']
     ardpath = "/dev/ttyACM0"
