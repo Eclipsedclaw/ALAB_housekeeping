@@ -167,15 +167,6 @@ def get_pressure():
         jacket_pressure.append(0.0)
     values_pressure = [*chamber_pressure, *jacket_pressure]
 
-    # insert
-    #cursor.setup(name_pressure, types = types_pressure)
-    #cursor.register(values_pressure)
-
-    #return
-    #except:
-    #    pass
-    #    return
-
 # This function query rtd readout from arduino and send to mysql database
 #def get_rtd():
     #try:
