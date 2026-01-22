@@ -166,6 +166,8 @@ def get_pressure():
     for i in range(2):
         jacket_pressure.append(0.0)
     values_pressure = [*chamber_pressure, *jacket_pressure]
+    
+    return values_pressure
 
 # This function query rtd readout from arduino and send to mysql database
 #def get_rtd():
