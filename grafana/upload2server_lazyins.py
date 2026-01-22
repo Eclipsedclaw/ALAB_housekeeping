@@ -15,9 +15,8 @@ if __name__ == '__main__':
     # For time separation of HK datataking
     sleep_sec = 1
     while True:
-        ALABSQL.get_pressure()
+        ALABSQL.get_pressure()  # This function now also collects RTD data
         #ALABSQL.get_compressor()
-        #ALABSQL.get_rtd()
         sleep(sleep_sec)
 
 
