@@ -17,7 +17,6 @@ if __name__ == '__main__':
     while True:
         ALABSQL.get_pressure()
         #ALABSQL.get_compressor()
-        #ALABSQL.get_rtd()
         sleep(sleep_sec)
 
 
