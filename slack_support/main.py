@@ -63,9 +63,9 @@ def main():
     main_log.addHandler(handler_debug)
     main_log.addHandler(handler_terminal)
 
-    duration_img = 60 * 60  # 60 minutes
+    duration_img = 60 * 60 * 2  # 2 hours
     main_log.info("Starting Osaka MicroGRAMS Slack Info Bot")
-    duration_txt = 60 * 10   # 10 minutes
+    duration_txt = 60 * 60 * 2  # 2 hours
     main_log.info(f"Text push duration set to {duration_txt} seconds")
     main_log.info(f"Image push duration set to {duration_img} seconds")
     last_img_push_time = None
@@ -103,7 +103,6 @@ def main():
             ups_data = fetch_latest_ups_data(connector1)
             text += f"\n______Turbo({ups_data['time'] + delta_time} JST)______"
             text += "\nActual Turbo Rotation: ".ljust(ljust_value) + f"{str(ups_data.get('ActualSpd') or '0'):>5}" + " rpm"
-            #text += "\nActual Turbo Rotation: ".ljust(ljust_value) + f"{ups_data["ActualSpd"]:5}" + " rpm"
             text += "\nTemperature Pump Bottom Part: ".ljust(ljust_value) + f"{str(ups_data.get('TempPmpBot') or '0'):>5}" + " °C"
             text += "\nTemperature Motor: ".ljust(ljust_value) + f"{str(ups_data.get('TempMotor') or '0'):>5}" + " °C"
             text += "\nTemperature Electric: ".ljust(ljust_value) + f"{str(ups_data.get('TempElec') or '0'):>5}" + " °C"
