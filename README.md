@@ -54,5 +54,5 @@ This will also prompt you for a port; use trial and error to figure this out. Th
 <h3>Turbo control</h3>
 After you ssh into the pi, go to
 
-`ALAB_housekeeping/pyqt5`. Run the script for full turbo readout using the following command.
+`ALAB_housekeeping/turbo_Pfeiffer`. Run the script for full turbo readout using the following command.
 ```python3 check_turbo_readout.py```

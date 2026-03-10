@@ -1,0 +1,349 @@
+2026-03-09 15:14:19,098 - main [INFO]: Starting Osaka MicroGRAMS Slack Info Bot
+2026-03-09 15:14:19,098 - main [INFO]: Text push duration set to 600 seconds
+2026-03-09 15:14:19,099 - main [INFO]: Image push duration set to 21600 seconds
+2026-03-09 15:14:19,099 - main [INFO]: host: 127.0.0.1, user: root
+2026-03-09 15:22:57,329 - main [INFO]: Starting Osaka MicroGRAMS Slack Info Bot
+2026-03-09 15:22:57,329 - main [INFO]: Text push duration set to 600 seconds
+2026-03-09 15:22:57,329 - main [INFO]: Image push duration set to 21600 seconds
+2026-03-09 15:22:57,330 - main [INFO]: host: 127.0.0.1, user: root
+2026-03-09 15:25:31,574 - main [INFO]: Starting Osaka MicroGRAMS Slack Info Bot
+2026-03-09 15:25:31,574 - main [INFO]: Text push duration set to 600 seconds
+2026-03-09 15:25:31,574 - main [INFO]: Image push duration set to 21600 seconds
+2026-03-09 15:25:31,575 - main [INFO]: host: 127.0.0.1, user: root
+2026-03-09 15:25:31,575 - slack [INFO]: Initialized SlackHandler
+2026-03-09 15:25:31,873 - slack [INFO]: Slack auth test successful
+2026-03-09 15:25:33,100 - slack [INFO]: Authenticated as user: worldviewslowcontrol in team: ['GRAMS']
+
+2026-03-09 15:25:33,109 - main [ERROR]: Error occurred:
+Traceback (most recent call last):
+  File "/home/pi/osakainfo/main.py", line 105, in main
+    text += "\nActual Turbo Rotation: ".ljust(ljust_value) + f"{ups_data['ActualSpd']:5}" + " rpm"
+                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: unsupported format string passed to NoneType.__format__
+2026-03-09 15:26:33,111 - main [ERROR]: Error occurred:
+Traceback (most recent call last):
+  File "/home/pi/osakainfo/main.py", line 105, in main
+    text += "\nActual Turbo Rotation: ".ljust(ljust_value) + f"{ups_data['ActualSpd']:5}" + " rpm"
+                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: unsupported format string passed to NoneType.__format__
+2026-03-09 15:27:33,114 - main [ERROR]: Error occurred:
+Traceback (most recent call last):
+  File "/home/pi/osakainfo/main.py", line 105, in main
+    text += "\nActual Turbo Rotation: ".ljust(ljust_value) + f"{ups_data['ActualSpd']:5}" + " rpm"
+                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: unsupported format string passed to NoneType.__format__
+2026-03-09 15:28:33,117 - main [ERROR]: Error occurred:
+Traceback (most recent call last):
+  File "/home/pi/osakainfo/main.py", line 105, in main
+    text += "\nActual Turbo Rotation: ".ljust(ljust_value) + f"{ups_data['ActualSpd']:5}" + " rpm"
+                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: unsupported format string passed to NoneType.__format__
+2026-03-09 15:30:21,709 - main [INFO]: Starting Osaka MicroGRAMS Slack Info Bot
+2026-03-09 15:30:21,709 - main [INFO]: Text push duration set to 600 seconds
+2026-03-09 15:30:21,709 - main [INFO]: Image push duration set to 21600 seconds
+2026-03-09 15:30:21,709 - main [INFO]: host: 127.0.0.1, user: root
+2026-03-09 15:30:21,710 - slack [INFO]: Initialized SlackHandler
+2026-03-09 15:30:22,009 - slack [INFO]: Slack auth test successful
+2026-03-09 15:30:22,599 - slack [INFO]: Authenticated as user: worldviewslowcontrol in team: ['GRAMS']
+
+2026-03-09 15:30:22,602 - main [ERROR]: Error occurred:
+Traceback (most recent call last):
+  File "/home/pi/osakainfo/main.py", line 105, in main
+    text += "\nActual Turbo Rotation: ".ljust(ljust_value) + f"{ups_data['ActualSpd']:5}" + " rpm"
+                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: unsupported format string passed to NoneType.__format__
+2026-03-09 15:32:04,890 - main [INFO]: Starting Osaka MicroGRAMS Slack Info Bot
+2026-03-09 15:32:04,890 - main [INFO]: Text push duration set to 600 seconds
+2026-03-09 15:32:04,890 - main [INFO]: Image push duration set to 21600 seconds
+2026-03-09 15:32:04,891 - main [INFO]: host: 127.0.0.1, user: root
+2026-03-09 15:32:04,891 - slack [INFO]: Initialized SlackHandler
+2026-03-09 15:32:05,232 - slack [INFO]: Slack auth test successful
+2026-03-09 15:32:05,814 - slack [INFO]: Authenticated as user: worldviewslowcontrol in team: ['GRAMS']
+
+2026-03-09 15:32:05,817 - main [ERROR]: Error occurred:
+Traceback (most recent call last):
+  File "/home/pi/osakainfo/main.py", line 105, in main
+    text += "\nActual Turbo Rotation: ".ljust(ljust_value) + f"{ups_data['ActualSpd']:5}" + " rpm"
+                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: unsupported format string passed to NoneType.__format__
+2026-03-09 15:32:53,092 - main [INFO]: Starting Osaka MicroGRAMS Slack Info Bot
+2026-03-09 15:32:53,092 - main [INFO]: Text push duration set to 600 seconds
+2026-03-09 15:32:53,092 - main [INFO]: Image push duration set to 600 seconds
+2026-03-09 15:32:53,093 - main [INFO]: host: 127.0.0.1, user: root
+2026-03-09 15:32:53,093 - slack [INFO]: Initialized SlackHandler
+2026-03-09 15:32:53,385 - slack [INFO]: Slack auth test successful
+2026-03-09 15:32:54,030 - slack [INFO]: Authenticated as user: worldviewslowcontrol in team: ['GRAMS']
+
+2026-03-09 15:32:54,034 - main [ERROR]: Error occurred:
+Traceback (most recent call last):
+  File "/home/pi/osakainfo/main.py", line 105, in main
+    text += "\nActual Turbo Rotation: ".ljust(ljust_value) + f"{ups_data['ActualSpd']:5}" + " rpm"
+                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: unsupported format string passed to NoneType.__format__
+2026-03-09 15:33:54,036 - main [ERROR]: Error occurred:
+Traceback (most recent call last):
+  File "/home/pi/osakainfo/main.py", line 105, in main
+    text += "\nActual Turbo Rotation: ".ljust(ljust_value) + f"{ups_data['ActualSpd']:5}" + " rpm"
+                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: unsupported format string passed to NoneType.__format__
+2026-03-09 15:35:29,601 - main [INFO]: Starting Osaka MicroGRAMS Slack Info Bot
+2026-03-09 15:35:29,601 - main [INFO]: Text push duration set to 600 seconds
+2026-03-09 15:35:29,601 - main [INFO]: Image push duration set to 600 seconds
+2026-03-09 15:35:29,601 - main [INFO]: host: 127.0.0.1, user: root
+2026-03-09 15:35:29,601 - slack [INFO]: Initialized SlackHandler
+2026-03-09 15:35:29,903 - slack [INFO]: Slack auth test successful
+2026-03-09 15:35:30,507 - slack [INFO]: Authenticated as user: worldviewslowcontrol in team: ['GRAMS']
+
+2026-03-09 15:35:30,511 - main [ERROR]: Error occurred:
+Traceback (most recent call last):
+  File "/home/pi/osakainfo/main.py", line 105, in main
+    text += "\nActual Turbo Rotation: ".ljust(ljust_value) + f"{ups_data['ActualSpd']:5}" + " rpm"
+                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: unsupported format string passed to NoneType.__format__
+2026-03-09 15:35:35,513 - main [ERROR]: Error occurred:
+Traceback (most recent call last):
+  File "/home/pi/osakainfo/main.py", line 105, in main
+    text += "\nActual Turbo Rotation: ".ljust(ljust_value) + f"{ups_data['ActualSpd']:5}" + " rpm"
+                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: unsupported format string passed to NoneType.__format__
+2026-03-09 15:40:12,872 - main [INFO]: Starting Osaka MicroGRAMS Slack Info Bot
+2026-03-09 15:40:12,873 - main [INFO]: Text push duration set to 600 seconds
+2026-03-09 15:40:12,873 - main [INFO]: Image push duration set to 600 seconds
+2026-03-09 15:40:12,873 - main [INFO]: host: 127.0.0.1, user: root
+2026-03-09 15:40:12,873 - slack [INFO]: Initialized SlackHandler
+2026-03-09 15:40:13,169 - slack [INFO]: Slack auth test successful
+2026-03-09 15:40:13,778 - slack [INFO]: Authenticated as user: worldviewslowcontrol in team: ['GRAMS']
+
+2026-03-09 15:40:13,781 - main [ERROR]: Error occurred:
+Traceback (most recent call last):
+  File "/home/pi/osakainfo/main.py", line 107, in main
+    text += "\nTemperature Pump Bottom Part: ".ljust(ljust_value) + f"{ups_data['TempPmpBot']:5}" + " °C"
+                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: unsupported format string passed to NoneType.__format__
+2026-03-09 15:40:18,784 - main [ERROR]: Error occurred:
+Traceback (most recent call last):
+  File "/home/pi/osakainfo/main.py", line 107, in main
+    text += "\nTemperature Pump Bottom Part: ".ljust(ljust_value) + f"{ups_data['TempPmpBot']:5}" + " °C"
+                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: unsupported format string passed to NoneType.__format__
+2026-03-09 15:42:47,514 - main [INFO]: Starting Osaka MicroGRAMS Slack Info Bot
+2026-03-09 15:42:47,514 - main [INFO]: Text push duration set to 600 seconds
+2026-03-09 15:42:47,514 - main [INFO]: Image push duration set to 600 seconds
+2026-03-09 15:42:47,514 - main [INFO]: host: 127.0.0.1, user: root
+2026-03-09 15:42:47,514 - slack [INFO]: Initialized SlackHandler
+2026-03-09 15:42:47,803 - slack [INFO]: Slack auth test successful
+2026-03-09 15:42:48,401 - slack [INFO]: Authenticated as user: worldviewslowcontrol in team: ['GRAMS']
+
+2026-03-09 15:42:48,404 - slack [INFO]: Sending block message to channel #worldview_slow_control
+2026-03-09 15:42:49,303 - main [ERROR]: Error occurred:
+Traceback (most recent call last):
+  File "/home/pi/osakainfo/main.py", line 119, in main
+    result = make_screenshot_and_push_to_slack(slack_handler, channel, thread_ts=last_ts)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pi/osakainfo/main.py", line 32, in make_screenshot_and_push_to_slack
+    make_screenshot(screenshot_path)
+  File "/home/pi/osakainfo/screenshot.py", line 13, in make_screenshot
+    browser = p.chromium.launch(headless=True)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pi/.local/lib/python3.11/site-packages/playwright/sync_api/_generated.py", line 14566, in launch
+    self._sync(
+  File "/home/pi/.local/lib/python3.11/site-packages/playwright/_impl/_sync_base.py", line 115, in _sync
+    return task.result()
+           ^^^^^^^^^^^^^
+  File "/home/pi/.local/lib/python3.11/site-packages/playwright/_impl/_browser_type.py", line 97, in launch
+    await self._channel.send(
+  File "/home/pi/.local/lib/python3.11/site-packages/playwright/_impl/_connection.py", line 69, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pi/.local/lib/python3.11/site-packages/playwright/_impl/_connection.py", line 559, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.Error: BrowserType.launch: Executable doesn't exist at /home/pi/.cache/ms-playwright/chromium_headless_shell-1208/chrome-linux/headless_shell
+╔════════════════════════════════════════════════════════════╗
+║ Looks like Playwright was just installed or updated.       ║
+║ Please run the following command to download new browsers: ║
+║                                                            ║
+║     playwright install                                     ║
+║                                                            ║
+║ <3 Playwright Team                                         ║
+╚════════════════════════════════════════════════════════════╝
+2026-03-09 15:42:54,306 - slack [INFO]: Editing block message in channel C0AKLJCJYUU with ts 1773085368.703229
+2026-03-09 15:44:32,132 - main [INFO]: Starting Osaka MicroGRAMS Slack Info Bot
+2026-03-09 15:44:32,133 - main [INFO]: Text push duration set to 600 seconds
+2026-03-09 15:44:32,133 - main [INFO]: Image push duration set to 600 seconds
+2026-03-09 15:44:32,133 - main [INFO]: host: 127.0.0.1, user: root
+2026-03-09 15:44:32,133 - slack [INFO]: Initialized SlackHandler
+2026-03-09 15:44:32,443 - slack [INFO]: Slack auth test successful
+2026-03-09 15:44:33,043 - slack [INFO]: Authenticated as user: worldviewslowcontrol in team: ['GRAMS']
+
+2026-03-09 15:44:33,046 - slack [INFO]: Sending block message to channel #worldview_slow_control
+2026-03-09 15:49:02,937 - main [INFO]: Starting Osaka MicroGRAMS Slack Info Bot
+2026-03-09 15:49:02,937 - main [INFO]: Text push duration set to 600 seconds
+2026-03-09 15:49:02,937 - main [INFO]: Image push duration set to 600 seconds
+2026-03-09 15:49:02,938 - main [INFO]: host: 127.0.0.1, user: root
+2026-03-09 15:49:02,938 - slack [INFO]: Initialized SlackHandler
+2026-03-09 15:49:03,253 - slack [INFO]: Slack auth test successful
+2026-03-09 15:49:03,837 - slack [INFO]: Authenticated as user: worldviewslowcontrol in team: ['GRAMS']
+
+2026-03-09 15:49:03,841 - slack [INFO]: Sending block message to channel #worldview_slow_control
+2026-03-09 15:49:05,870 - main [ERROR]: Error occurred:
+Traceback (most recent call last):
+  File "/home/pi/osakainfo/main.py", line 119, in main
+    result = make_screenshot_and_push_to_slack(slack_handler, channel, thread_ts=last_ts)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pi/osakainfo/main.py", line 32, in make_screenshot_and_push_to_slack
+    make_screenshot(screenshot_path)
+  File "/home/pi/osakainfo/screenshot.py", line 16, in make_screenshot
+    page.goto(GRAFANA_URL)
+  File "/home/pi/.local/lib/python3.11/site-packages/playwright/sync_api/_generated.py", line 9054, in goto
+    self._sync(
+  File "/home/pi/.local/lib/python3.11/site-packages/playwright/_impl/_sync_base.py", line 115, in _sync
+    return task.result()
+           ^^^^^^^^^^^^^
+  File "/home/pi/.local/lib/python3.11/site-packages/playwright/_impl/_page.py", line 552, in goto
+    return await self._main_frame.goto(**locals_to_params(locals()))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: Frame.goto() missing 1 required positional argument: 'url'
+2026-03-09 15:49:10,873 - slack [INFO]: Editing block message in channel C0AKLJCJYUU with ts 1773085744.123209
+2026-03-09 15:50:41,250 - main [INFO]: Starting Osaka MicroGRAMS Slack Info Bot
+2026-03-09 15:50:41,250 - main [INFO]: Text push duration set to 600 seconds
+2026-03-09 15:50:41,250 - main [INFO]: Image push duration set to 600 seconds
+2026-03-09 15:50:41,250 - main [INFO]: host: 127.0.0.1, user: root
+2026-03-09 15:50:41,250 - slack [INFO]: Initialized SlackHandler
+2026-03-09 15:50:41,535 - slack [INFO]: Slack auth test successful
+2026-03-09 15:50:42,169 - slack [INFO]: Authenticated as user: worldviewslowcontrol in team: ['GRAMS']
+
+2026-03-09 15:50:42,172 - slack [INFO]: Sending block message to channel #worldview_slow_control
+2026-03-09 15:50:43,292 - main [ERROR]: Error occurred:
+Traceback (most recent call last):
+  File "/home/pi/osakainfo/main.py", line 119, in main
+    result = make_screenshot_and_push_to_slack(slack_handler, channel, thread_ts=last_ts)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pi/osakainfo/main.py", line 32, in make_screenshot_and_push_to_slack
+    make_screenshot(screenshot_path)
+  File "/home/pi/osakainfo/screenshot.py", line 16, in make_screenshot
+    page.goto(GRAFANA_URL)
+  File "/home/pi/.local/lib/python3.11/site-packages/playwright/sync_api/_generated.py", line 9054, in goto
+    self._sync(
+  File "/home/pi/.local/lib/python3.11/site-packages/playwright/_impl/_sync_base.py", line 115, in _sync
+    return task.result()
+           ^^^^^^^^^^^^^
+  File "/home/pi/.local/lib/python3.11/site-packages/playwright/_impl/_page.py", line 552, in goto
+    return await self._main_frame.goto(**locals_to_params(locals()))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: Frame.goto() missing 1 required positional argument: 'url'
+2026-03-09 15:50:48,295 - slack [INFO]: Editing block message in channel C0AKLJCJYUU with ts 1773085842.468619
+2026-03-09 16:08:05,102 - main [INFO]: Starting Osaka MicroGRAMS Slack Info Bot
+2026-03-09 16:08:05,102 - main [INFO]: Text push duration set to 3600 seconds
+2026-03-09 16:08:05,102 - main [INFO]: Image push duration set to 3600 seconds
+2026-03-09 16:08:05,102 - main [INFO]: host: 127.0.0.1, user: root
+2026-03-09 16:08:05,102 - slack [INFO]: Initialized SlackHandler
+2026-03-09 16:08:05,409 - slack [INFO]: Slack auth test successful
+2026-03-09 16:08:06,039 - slack [INFO]: Authenticated as user: worldviewslowcontrol in team: ['GRAMS']
+
+2026-03-09 16:08:06,046 - slack [INFO]: Sending block message to channel #worldview_slow_control
+2026-03-09 16:08:22,474 - slack [INFO]: Uploading file Worldview_micrograms_dashboard.png to Slack
+2026-03-09 16:08:22,764 - main [ERROR]: Error occurred:
+Traceback (most recent call last):
+  File "/home/pi/osakainfo/main.py", line 119, in main
+    result = make_screenshot_and_push_to_slack(slack_handler, channel, thread_ts=last_ts)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pi/osakainfo/main.py", line 33, in make_screenshot_and_push_to_slack
+    result = push_screenshot_to_slack(slack_handler, channel, screenshot_path, thread_ts=thread_ts)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pi/osakainfo/main.py", line 27, in push_screenshot_to_slack
+    return slack_handler.upload_and_send_image(channel, [image_path], titles=["Worldview Micrograms Dashboard Screenshot"], thread_ts=thread_ts)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pi/osakainfo/SlackHandler.py", line 130, in upload_and_send_image
+    upload_response = self.return_wrapper(self.upload_file(file_path))
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pi/osakainfo/SlackHandler.py", line 104, in upload_file
+    ret = self.client.files_getUploadURLExternal(filename=file_path, length=file_size)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pi/.local/lib/python3.11/site-packages/slack_sdk/web/client.py", line 4103, in files_getUploadURLExternal
+    return self.api_call("files.getUploadURLExternal", params=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pi/.local/lib/python3.11/site-packages/slack_sdk/web/base_client.py", line 169, in api_call
+    return self._sync_send(api_url=api_url, req_args=req_args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pi/.local/lib/python3.11/site-packages/slack_sdk/web/base_client.py", line 200, in _sync_send
+    return self._urllib_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pi/.local/lib/python3.11/site-packages/slack_sdk/web/base_client.py", line 331, in _urllib_api_call
+    ).validate()
+      ^^^^^^^^^^
+  File "/home/pi/.local/lib/python3.11/site-packages/slack_sdk/web/slack_response.py", line 197, in validate
+    raise e.SlackApiError(message=msg, response=self)
+slack_sdk.errors.SlackApiError: The request to the Slack API failed. (url: https://slack.com/api/files.getUploadURLExternal)
+The server responded with: {'ok': False, 'error': 'missing_scope', 'needed': 'files:write', 'provided': 'groups:read,channels:read,chat:write'}
+2026-03-09 16:08:27,768 - slack [INFO]: Editing block message in channel C0AKLJCJYUU with ts 1773086886.346639
+2026-03-09 16:09:25,797 - main [INFO]: Starting Osaka MicroGRAMS Slack Info Bot
+2026-03-09 16:09:25,797 - main [INFO]: Text push duration set to 3600 seconds
+2026-03-09 16:09:25,798 - main [INFO]: Image push duration set to 3600 seconds
+2026-03-09 16:09:25,798 - main [INFO]: host: 127.0.0.1, user: root
+2026-03-09 16:09:25,798 - slack [INFO]: Initialized SlackHandler
+2026-03-09 16:09:26,107 - slack [INFO]: Slack auth test successful
+2026-03-09 16:09:26,712 - slack [INFO]: Authenticated as user: worldviewslowcontrol in team: ['GRAMS']
+
+2026-03-09 16:09:26,716 - slack [INFO]: Sending block message to channel #worldview_slow_control
+2026-03-09 16:09:43,209 - slack [INFO]: Uploading file Worldview_micrograms_dashboard.png to Slack
+2026-03-09 16:09:43,521 - main [ERROR]: Error occurred:
+Traceback (most recent call last):
+  File "/home/pi/osakainfo/main.py", line 119, in main
+    result = make_screenshot_and_push_to_slack(slack_handler, channel, thread_ts=last_ts)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pi/osakainfo/main.py", line 33, in make_screenshot_and_push_to_slack
+    result = push_screenshot_to_slack(slack_handler, channel, screenshot_path, thread_ts=thread_ts)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pi/osakainfo/main.py", line 27, in push_screenshot_to_slack
+    return slack_handler.upload_and_send_image(channel, [image_path], titles=["Worldview Micrograms Dashboard Screenshot"], thread_ts=thread_ts)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pi/osakainfo/SlackHandler.py", line 130, in upload_and_send_image
+    upload_response = self.return_wrapper(self.upload_file(file_path))
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pi/osakainfo/SlackHandler.py", line 104, in upload_file
+    ret = self.client.files_getUploadURLExternal(filename=file_path, length=file_size)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pi/.local/lib/python3.11/site-packages/slack_sdk/web/client.py", line 4103, in files_getUploadURLExternal
+    return self.api_call("files.getUploadURLExternal", params=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pi/.local/lib/python3.11/site-packages/slack_sdk/web/base_client.py", line 169, in api_call
+    return self._sync_send(api_url=api_url, req_args=req_args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pi/.local/lib/python3.11/site-packages/slack_sdk/web/base_client.py", line 200, in _sync_send
+    return self._urllib_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pi/.local/lib/python3.11/site-packages/slack_sdk/web/base_client.py", line 331, in _urllib_api_call
+    ).validate()
+      ^^^^^^^^^^
+  File "/home/pi/.local/lib/python3.11/site-packages/slack_sdk/web/slack_response.py", line 197, in validate
+    raise e.SlackApiError(message=msg, response=self)
+slack_sdk.errors.SlackApiError: The request to the Slack API failed. (url: https://slack.com/api/files.getUploadURLExternal)
+The server responded with: {'ok': False, 'error': 'missing_scope', 'needed': 'files:write', 'provided': 'groups:read,channels:read,chat:write'}
+2026-03-09 16:09:48,528 - slack [INFO]: Editing block message in channel C0AKLJCJYUU with ts 1773086967.018609
+2026-03-09 16:11:54,192 - main [INFO]: Starting Osaka MicroGRAMS Slack Info Bot
+2026-03-09 16:11:54,192 - main [INFO]: Text push duration set to 3600 seconds
+2026-03-09 16:11:54,192 - main [INFO]: Image push duration set to 3600 seconds
+2026-03-09 16:11:54,193 - main [INFO]: host: 127.0.0.1, user: root
+2026-03-09 16:11:54,193 - slack [INFO]: Initialized SlackHandler
+2026-03-09 16:11:54,478 - slack [INFO]: Slack auth test successful
+2026-03-09 16:11:55,087 - slack [INFO]: Authenticated as user: worldviewslowcontrol in team: ['GRAMS']
+
+2026-03-09 16:11:55,090 - slack [INFO]: Sending block message to channel #worldview_slow_control
+2026-03-09 16:12:11,673 - slack [INFO]: Uploading file Worldview_micrograms_dashboard.png to Slack
+2026-03-09 16:12:12,416 - slack [INFO]: Sending images to channel C0AKLJCJYUU in thread 1773087115.345289
+2026-03-09 17:11:55,170 - slack [INFO]: Editing block message in channel C0AKLJCJYUU with ts 1773087115.345289
+2026-03-09 17:12:11,808 - slack [INFO]: Uploading file Worldview_micrograms_dashboard.png to Slack
+2026-03-09 17:12:12,626 - slack [INFO]: Sending images to channel C0AKLJCJYUU in thread 1773087115.345289
+2026-03-09 17:37:19,905 - main [INFO]: Starting Osaka MicroGRAMS Slack Info Bot
+2026-03-09 17:37:19,905 - main [INFO]: Text push duration set to 600 seconds
+2026-03-09 17:37:19,905 - main [INFO]: Image push duration set to 3600 seconds
+2026-03-09 17:37:19,905 - main [INFO]: host: 127.0.0.1, user: root
+2026-03-09 17:37:19,905 - slack [INFO]: Initialized SlackHandler
+2026-03-09 17:37:20,200 - slack [INFO]: Slack auth test successful
+2026-03-09 17:37:21,821 - slack [INFO]: Authenticated as user: worldviewslowcontrol in team: ['GRAMS']
+
+2026-03-09 17:37:21,825 - slack [INFO]: Sending block message to channel #worldview_slow_control
+2026-03-09 17:37:38,416 - slack [INFO]: Uploading file Worldview_micrograms_dashboard.png to Slack
+2026-03-09 17:37:39,325 - slack [INFO]: Sending images to channel C0AKLJCJYUU in thread 1773092242.098779
+2026-03-09 17:47:22,716 - slack [INFO]: Editing block message in channel C0AKLJCJYUU with ts 1773092242.098779
+2026-03-09 17:57:23,135 - slack [INFO]: Editing block message in channel C0AKLJCJYUU with ts 1773092242.098779
