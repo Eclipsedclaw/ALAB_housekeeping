@@ -78,7 +78,7 @@ def main():
     main_log.info(f"host: {host}, user: {user}")
     last_ts = None
     slack_handler = SlackHandler.SlackHandler(os.getenv("SLACK_TOKEN"), logger=slack_log)
-    img_queue = CallbackDeque.CallbackDeque(maxlen=4, callback=lambda file_ids: [slack_handler.delete_img(file_id) for file_id in file_ids])
+    img_queue = CallbackDeque.CallbackDeque(maxlen=999, callback=lambda file_ids: [slack_handler.delete_img(file_id) for file_id in file_ids])
     connector1 = mysqlIO.mysqlIO(host, user, password, "", logger=mysql_log)
     while True:
         current_time = datetime.datetime.now()
