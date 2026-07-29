@@ -137,7 +137,8 @@ config = {
     'user': os.environ.get('LAZYINS_USER'),
     'password': os.environ.get('LAZYINS_PASSWD'),
     'host': os.environ.get('LAZYINS_HOST'),
-    'port': os.environ.get('LAZYINS_PORT')
+    'port': os.environ.get('LAZYINS_PORT'),
+    'ssl_disabled': True  # <-- Add this line to force a plain connection
 }
 
 # Get database name from user input
