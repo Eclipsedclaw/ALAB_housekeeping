@@ -21,9 +21,9 @@ sudo /etc/init.d/udev restart
 # Trigger the rules to apply to already connected devices
 sudo udevadm trigger
 
-# Get the original user's home directory (even when run with sudo)
-REAL_USER=$(who am i | awk '{print $1}')
-USER_HOME=$(getent passwd "$REAL_USER" | cut -d: -f6)
+# Get the original user's home directory
+REAL_USER="${SUDO_USER:-$USER}"
+USER_HOME=$(eval echo "~$REAL_USER")
 BASH_RC="$USER_HOME/.bashrc"
 
 # Function to add/update a variable in .bashrc
